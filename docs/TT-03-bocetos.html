@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TíoTec — Bocetos TT-03</title>
+    <style>
+        *{box-sizing:border-box}
+        body{margin:0;padding:32px;background:#e9edf3;color:#172b45;font-family:Arial,sans-serif}
+        h1{margin:0 0 8px}
+        .intro{max-width:850px;line-height:1.6}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:28px;margin-top:28px}
+        .phone{background:#f8fafc;border:2px solid #64748b;border-radius:24px;overflow:hidden;display:flex;flex-direction:column;min-height:590px}
+        header{background:#154b85;color:white;padding:20px}
+        header small{display:block;margin-bottom:8px}
+        header h2{font-size:21px;margin:0}
+        main{padding:20px;flex:1}
+        .card{background:white;border:1px solid #cbd5e1;border-radius:12px;padding:16px;margin-bottom:14px}
+        h3{font-size:17px;margin:0 0 10px}
+        p{font-size:15px;line-height:1.5}
+        .btn{display:block;background:#154b85;color:white;padding:13px;border-radius:9px;text-align:center;margin-top:12px;font-weight:bold}
+        .secondary{background:white;color:#154b85;border:1px solid #154b85}
+        label{display:block;font-size:14px;font-weight:bold;margin:16px 0 7px}
+        .field{background:white;border:1px solid #64748b;padding:13px;border-radius:8px}
+        .option{padding:12px;border:1px solid #cbd5e1;border-radius:8px;margin:9px 0;background:white}
+        .selected{border:2px solid #154b85;background:#edf5ff}
+        nav{display:flex;justify-content:space-around;padding:17px 8px;background:white;border-top:1px solid #cbd5e1;font-size:12px;gap:7px}
+        .active{font-weight:bold;color:#154b85;text-decoration:underline}
+        .badge{display:inline-block;border-radius:6px;padding:5px 8px;font-size:12px;font-weight:bold}
+        .high{background:#fee2e2;color:#991b1b}
+        .medium{background:#fef3c7;color:#854d0e}
+        .good{background:#dcfce7;color:#166534}
+        .note{background:#eaf2ff;color:#173d69;padding:12px;border-radius:8px;font-size:13px;line-height:1.5}
+        .muted{color:#475569;font-size:13px}
+        .progress{height:8px;background:#dbe3ed;border-radius:8px;margin:14px 0}
+        .progress span{display:block;width:50%;height:100%;background:#154b85;border-radius:8px}
+        .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+        footer{margin-top:30px;line-height:1.6}
+        @media(max-width:420px){body{padding:16px}.grid{grid-template-columns:1fr}}
+        @media print{body{background:white;padding:0}.grid{grid-template-columns:repeat(2,1fr);gap:16px}.phone{break-inside:avoid;min-height:550px}header,.btn,.badge{print-color-adjust:exact}}
+    </style>
+</head>
+<body>
+<h1>TíoTec Preventivo</h1>
+<p class="intro">
+    <strong>TT-03 · Propuesta de diseño — Gerard Zambrano</strong><br>
+    Bocetos estáticos para revisión de Enzo Morales.
+    Los botones representan acciones previstas: no ejecutan funciones.
+    Todos los nombres, equipos, resultados y solicitudes son ficticios.
+</p>
+
+<div class="grid">
+
+    <section class="phone">
+        <header><small>01 · Inicio</small><h2>Tu prevención digital</h2></header>
+        <main>
+            <p>Hola, Usuario Demo.</p>
+            <div class="card">
+                <h3>Última evaluación</h3>
+                <p>Teléfono de prueba · 15 oct.</p>
+                <span class="badge medium">Riesgo medio</span>
+                <p class="muted">Tienes medidas que puedes mejorar.</p>
+            </div>
+            <div class="card">
+                <h3>3 acciones pendientes</h3>
+                <p>Empieza por las de prioridad alta.</p>
+                <div class="btn secondary">Ver mis acciones</div>
+            </div>
+            <div class="btn">Evaluar dispositivo</div>
+            <div class="btn secondary">Mis dispositivos</div>
+            <div class="btn secondary">Historial de evaluaciones</div>
+        </main>
+        <nav><span class="active">Inicio</span><span>Mis acciones</span><span>Aprende</span><span>Perfil</span></nav>
+    </section>
+
+    <section class="phone">
+        <header><small>02 · Perfil</small><h2>Mi perfil ficticio</h2></header>
+        <main>
+            <div class="note">Usa un alias de prueba. No ingreses datos personales reales.</div>
+            <label>Alias</label><div class="field">Usuario Demo</div>
+            <label>Experiencia digital</label><div class="field">Principiante ▾</div>
+            <div class="btn">Guardar perfil</div>
+            <div class="btn secondary">Mis recordatorios</div>
+            <div class="btn secondary">Asistencia simulada</div>
+            <label>Rol de demostración</label>
+            <div class="field">Usuario final ▾</div>
+            <p class="muted">Opciones de prueba: usuario, administrador y referente técnico. No representa autenticación real.</p>
+        </main>
+        <nav><span>Inicio</span><span>Mis acciones</span><span>Aprende</span><span class="active">Perfil</span></nav>
+    </section>
+
+    <section class="phone">
+        <header><small>03 · ← Inicio</small><h2>Mis dispositivos</h2></header>
+        <main>
+            <div class="card">
+                <h3>Teléfono de prueba</h3>
+                <p>Android · Dispositivo ficticio</p>
+                <div class="btn">Evaluar este dispositivo</div>
+                <div class="btn secondary">Editar</div>
+            </div>
+            <div class="card">
+                <h3>Agregar dispositivo</h3>
+                <label>Nombre ficticio</label><div class="field">Tablet de prueba</div>
+                <label>Sistema operativo</label><div class="field">Android ▾</div>
+                <div class="btn">Guardar dispositivo</div>
+            </div>
+        </main>
+        <nav><span class="active">Inicio</span><span>Mis acciones</span><span>Aprende</span><span>Perfil</span></nav>
+    </section>
+
+    <section class="phone">
+        <header><small>04 · ← Dispositivos</small><h2>Evaluación preventiva</h2></header>
+        <main>
+            <p class="muted">Teléfono de prueba · Pregunta 4 de 8</p>
+            <div class="progress"><span></span></div>
+            <span class="badge medium">Autenticación</span>
+            <h3 style="margin-top:20px">¿Tienes activada la verificación en dos pasos?</h3>
+            <p>Es una comprobación adicional que protege el acceso a una cuenta.</p>
+            <div class="option">○ Sí</div>
+            <div class="option selected">● No</div>
+            <div class="option">○ No lo sé</div>
+            <div class="btn">Siguiente</div>
+            <div class="btn secondary">Anterior</div>
+            <p class="muted">Antes de finalizar podrás revisar tus respuestas. Si sales, se pedirá confirmación.</p>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>05 · ← Inicio</small><h2>Resultados preventivos</h2></header>
+        <main>
+            <div class="note">Orientación según tus respuestas. No es un escaneo ni un diagnóstico del equipo.</div>
+            <div class="card" style="margin-top:14px">
+                <h3>Autenticación</h3>
+                <span class="badge high">Riesgo alto</span>
+                <p>No indicaste tener verificación en dos pasos.</p>
+                <strong>Acción recomendada:</strong>
+                <p>Revisar cómo activar una comprobación adicional.</p>
+                <div class="btn secondary">Aprender cómo hacerlo</div>
+            </div>
+            <div class="card">
+                <h3>Respaldos</h3>
+                <span class="badge medium">Riesgo medio</span>
+                <p>Revisa la frecuencia de tus copias de seguridad.</p>
+            </div>
+            <p class="muted">La pantalla continúa con actualizaciones y recuperación de cuentas.</p>
+            <div class="btn">Ver mis acciones</div>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>06 · Mis acciones</small><h2>Tu plan preventivo</h2></header>
+        <main>
+            <div class="row"><span class="badge medium">Pendientes</span><span class="badge good">Completadas</span></div>
+            <div class="card">
+                <span class="badge high">Prioridad alta</span>
+                <h3 style="margin-top:12px">Activar verificación en dos pasos</h3>
+                <p>Teléfono de prueba</p>
+                <p class="muted">Próxima revisión: 22 oct.</p>
+                <div class="btn">Marcar como completada</div>
+                <div class="btn secondary">Crear recordatorio</div>
+            </div>
+            <div class="card">
+                <span class="badge medium">Prioridad media</span>
+                <h3 style="margin-top:12px">Revisar respaldo</h3>
+                <p>Comprobar cuándo se guardó la última copia.</p>
+            </div>
+            <p class="muted">Una acción completada podrá volver a marcarse como pendiente.</p>
+        </main>
+        <nav><span>Inicio</span><span class="active">Mis acciones</span><span>Aprende</span><span>Perfil</span></nav>
+    </section>
+
+    <section class="phone">
+        <header><small>07 · ← Inicio</small><h2>Historial</h2></header>
+        <main>
+            <p>Consulta tus evaluaciones anteriores.</p>
+            <div class="card">
+                <h3>15 de octubre · Teléfono de prueba</h3>
+                <span class="badge medium">Riesgo medio</span>
+                <p>Evaluación guardada.</p>
+                <div class="btn secondary">Ver detalle</div>
+            </div>
+            <div class="card">
+                <h3>8 de octubre · Teléfono de prueba</h3>
+                <span class="badge high">Riesgo alto</span>
+                <p>Consulta las respuestas y recomendaciones de esa fecha.</p>
+                <div class="btn secondary">Ver detalle</div>
+            </div>
+            <div class="note">Consultar el detalle no crea una nueva evaluación.</div>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>08 · Aprende</small><h2>Consejos para protegerte</h2></header>
+        <main>
+            <div class="field">Todas las categorías ▾</div>
+            <div class="card" style="margin-top:16px">
+                <h3>Protege el acceso a tus cuentas</h3>
+                <p>Conoce qué es la verificación en dos pasos.</p>
+                <p class="muted">Autenticación · Lectura breve</p>
+                <div class="btn secondary">Leer contenido</div>
+            </div>
+            <div class="card">
+                <h3>Cuida tus archivos</h3>
+                <p>Aprende por qué conviene mantener respaldos.</p>
+                <p class="muted">Respaldos · Lectura breve</p>
+                <div class="btn secondary">Leer contenido</div>
+            </div>
+            <div class="note">El detalle mostrará título, categoría y texto breve, con opción de volver al origen.</div>
+        </main>
+        <nav><span>Inicio</span><span>Mis acciones</span><span class="active">Aprende</span><span>Perfil</span></nav>
+    </section>
+
+    <section class="phone">
+        <header><small>09 · ← Perfil</small><h2>Recordatorios</h2></header>
+        <main>
+            <div class="card">
+                <h3>Revisar verificación en dos pasos</h3>
+                <p>22 oct. · 18:00</p>
+                <div class="btn secondary">Modificar</div>
+                <div class="btn secondary">Cancelar recordatorio</div>
+            </div>
+            <label>Acción o revisión</label><div class="field">Revisar respaldo ▾</div>
+            <label>Fecha</label><div class="field">22 / 10 / 2026</div>
+            <label>Hora</label><div class="field">18:00</div>
+            <div class="btn">Guardar recordatorio</div>
+            <p class="muted">Se explicará el permiso de notificaciones antes de solicitarlo.</p>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>10 · ← Perfil</small><h2>Asistencia simulada</h2></header>
+        <main>
+            <div class="note">Demostración académica. No envía solicitudes a especialistas reales.</div>
+            <label>Categoría</label><div class="field">Respaldos ▾</div>
+            <p class="muted">Se registrará una solicitud ficticia sin información personal.</p>
+            <div class="btn">Crear solicitud simulada</div>
+            <div class="card" style="margin-top:20px">
+                <h3>Solicitud DEMO-001</h3>
+                <p>Categoría: respaldos</p>
+                <span class="badge medium">Pendiente</span>
+                <p class="muted">Creada: 15 oct.</p>
+                <div class="btn secondary">Ver detalle e historial</div>
+            </div>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>11 · ← Perfil · Rol de prueba</small><h2>Administración</h2></header>
+        <main>
+            <div class="field">Contenidos educativos ▾</div>
+            <p class="muted">También permite seleccionar categorías, preguntas y recomendaciones.</p>
+            <div class="card">
+                <h3>Protege tus cuentas</h3>
+                <span class="badge medium">Pendiente de revisión</span>
+                <div class="btn secondary">Editar contenido</div>
+            </div>
+            <label>Título</label><div class="field">Protege tus cuentas</div>
+            <label>Categoría</label><div class="field">Autenticación ▾</div>
+            <label>Contenido breve</label><div class="field">Texto educativo de prueba…</div>
+            <div class="btn">Guardar para revisión</div>
+            <p class="muted">Propuesta de flujo sujeta al acuerdo de TT-01.</p>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>12 · ← Perfil · Rol de prueba</small><h2>Revisión técnica</h2></header>
+        <main>
+            <div class="card">
+                <h3>Protege tus cuentas</h3>
+                <span class="badge medium">Pendiente de revisión</span>
+                <p>Contenido educativo de autenticación.</p>
+                <div class="btn secondary">Ver contenido completo</div>
+            </div>
+            <label>Observaciones</label><div class="field">Usar instrucciones breves y claras…</div>
+            <div class="btn">Marcar como revisado</div>
+            <div class="btn secondary">Solicitar corrección</div>
+            <div class="btn secondary">Revisar criterios de riesgo</div>
+            <p class="muted">La publicación seguirá las reglas que acuerde el equipo.</p>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>13 · Estado vacío</small><h2>Mis dispositivos</h2></header>
+        <main>
+            <div class="card">
+                <h3>Aún no tienes dispositivos</h3>
+                <p>Agrega un equipo ficticio para comenzar tu primera evaluación.</p>
+                <div class="btn">Agregar dispositivo</div>
+            </div>
+            <div class="note">El mismo patrón se adapta a historial, acciones, recordatorios y solicitudes: explicar qué falta y ofrecer una acción.</div>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>14 · Estados de conexión</small><h2>Carga y errores</h2></header>
+        <main>
+            <div class="card">
+                <h3>Cargando evaluación…</h3>
+                <div class="progress"><span></span></div>
+                <p>Espera un momento.</p>
+            </div>
+            <div class="card">
+                <h3>No pudimos conectar</h3>
+                <p>Tus respuestas siguen en esta pantalla. Intenta guardar nuevamente.</p>
+                <div class="btn">Reintentar</div>
+            </div>
+            <div class="note">Sin conexión: mostrar información guardada cuando esté disponible e indicar su origen local.</div>
+        </main>
+    </section>
+
+    <section class="phone">
+        <header><small>15 · Validación y permisos</small><h2>Mensajes claros</h2></header>
+        <main>
+            <label>Alias ficticio</label><div class="field" style="border:2px solid #991b1b"> </div>
+            <p style="color:#991b1b">Escribe un alias para continuar.</p>
+            <div class="card">
+                <h3>Notificaciones desactivadas</h3>
+                <p>Puedes consultar tus recordatorios, pero no recibirás avisos.</p>
+                <div class="btn secondary">Ver cómo habilitarlas</div>
+                <div class="btn secondary">Continuar</div>
+            </div>
+            <div class="card">
+                <h3>¿Salir de la evaluación?</h3>
+                <p>Si sales sin finalizar, perderás las respuestas de esta evaluación.</p>
+                <div class="btn">Seguir respondiendo</div>
+                <div class="btn secondary">Salir sin guardar</div>
+            </div>
+        </main>
+    </section>
+
+</div>
+
+<footer>
+    <strong>Recorrido principal:</strong>
+    Inicio → seleccionar o agregar dispositivo → evaluación → resultados → acciones.<br>
+    <strong>Primer uso:</strong>
+    bienvenida y aviso de datos ficticios → crear perfil → Inicio.<br>
+    <strong>Accesibilidad prevista:</strong>
+    texto adaptable, controles fáciles de pulsar, mensajes junto a los campos,
+    contraste verificable y riesgos identificados con palabras además de colores.<br>
+    <strong>Estado:</strong>
+    bocetos pendientes de revisión. No representan funcionalidades implementadas.
+</footer>
+</body>
+</html>
