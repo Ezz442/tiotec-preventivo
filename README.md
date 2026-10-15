@@ -11,7 +11,7 @@ Proyecto en dupla para la asignatura **DSY1105**, basado en el caso *TíoTec Pre
 | Integrante | GitHub |
 |---|---|
 | Enzo Morales | [@Ezz442](https://github.com/Ezz442) |
-| Gerard Zambrano | _pendiente_ |
+| Gerard Zambrano | _[@gjjzc](https://github.com/gjjzc)_ |
 
 ## Tecnologías
 
