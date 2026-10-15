@@ -47,6 +47,7 @@ erDiagram
     RECOMENDACION ||--o{ ACCION : origina
     RECOMENDACION }o--o| CONTENIDO : "enlaza a"
     ACCION ||--o{ RECORDATORIO : tiene
+    DISPOSITIVO ||--o{ RECORDATORIO : "próxima evaluación"
     PERFIL ||--o{ SOLICITUD_ASISTENCIA : crea
     SOLICITUD_ASISTENCIA ||--|{ HISTORIAL_SOLICITUD : registra
 ```
@@ -140,7 +141,9 @@ Se guarda **solo al finalizar** (bocetos 04 y 15: si sale sin finalizar, no se g
 | Campo | Tipo | Notas |
 |---|---|---|
 | `id` | UUID | |
-| `accionId` | UUID | |
+| `tipo` | enum | `ACCION` o `PROXIMA_EVALUACION` (TT-03 permite ambos) |
+| `accionId` | UUID o null | Obligatorio si `tipo = ACCION` |
+| `dispositivoId` | UUID o null | Obligatorio si `tipo = PROXIMA_EVALUACION` |
 | `titulo` | texto | |
 | `fechaHora` | fecha-hora | |
 | `estado` | enum | `PROGRAMADO`, `CANCELADO`, `ENVIADO` |
