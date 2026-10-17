@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>TíoTec — Bocetos TT-03</title>
-    <style>
+	<title>TíoTec — Bocetos TT-03 adaptados en TT-27</title>    <style>
         *{box-sizing:border-box}
         body{margin:0;padding:32px;background:#e9edf3;color:#172b45;font-family:Arial,sans-serif}
         h1{margin:0 0 8px}
@@ -43,7 +42,8 @@
 <body>
 <h1>TíoTec Preventivo</h1>
 <p class="intro">
-    <strong>TT-03 · Propuesta de diseño — Gerard Zambrano</strong><br>
+    <strong>TT-27 · Adaptación de bocetos TT-03 — Gerard Zambrano</strong><br>
+    Alcance EP2: interfaz Android con datos locales, sin API.<br>
     Bocetos estáticos para revisión de Enzo Morales.
     Los botones representan acciones previstas: no ejecutan funciones.
     Todos los nombres, equipos, resultados y solicitudes son ficticios.
@@ -82,9 +82,8 @@
             <div class="btn">Guardar perfil</div>
             <div class="btn secondary">Mis recordatorios</div>
             <div class="btn secondary">Asistencia simulada</div>
-            <label>Rol de demostración</label>
-            <div class="field">Usuario final ▾</div>
-            <p class="muted">Opciones de prueba: usuario, administrador y referente técnico. No representa autenticación real.</p>
+                        <div class="btn secondary">Preferencias</div>
+            <p class="muted">Tu perfil y tus preferencias se guardarán en este dispositivo.</p>
         </main>
         <nav><span>Inicio</span><span>Mis acciones</span><span>Aprende</span><span class="active">Perfil</span></nav>
     </section>
@@ -97,11 +96,18 @@
                 <p>Android · Dispositivo ficticio</p>
                 <div class="btn">Evaluar este dispositivo</div>
                 <div class="btn secondary">Editar</div>
+                <div class="btn secondary">Eliminar dispositivo</div>
+                <p class="muted">Antes de eliminar, se mostrará una confirmación.</p>
             </div>
             <div class="card">
                 <h3>Agregar dispositivo</h3>
                 <label>Nombre ficticio</label><div class="field">Tablet de prueba</div>
                 <label>Sistema operativo</label><div class="field">Android ▾</div>
+                <label>Imagen del dispositivo (opcional)</label>
+                <div class="field">Sin imagen seleccionada</div>
+                <div class="btn secondary">Tomar foto</div>
+                <div class="btn secondary">Elegir de galería</div>
+                <p class="muted">Puedes guardar sin imagen. Si agregas una, podrás reemplazarla o quitarla.</p>
                 <div class="btn">Guardar dispositivo</div>
             </div>
         </main>
@@ -113,6 +119,7 @@
         <main>
             <p class="muted">Teléfono de prueba · Pregunta 4 de 8</p>
             <div class="progress"><span></span></div>
+            <p class="muted">El progreso se animará al avanzar entre preguntas.</p>
             <span class="badge medium">Autenticación</span>
             <h3 style="margin-top:20px">¿Tienes activada la verificación en dos pasos?</h3>
             <p>Es una comprobación adicional que protege el acceso a una cuenta.</p>
@@ -165,6 +172,7 @@
                 <p>Comprobar cuándo se guardó la última copia.</p>
             </div>
             <p class="muted">Una acción completada podrá volver a marcarse como pendiente.</p>
+            <p class="muted">Al completar una acción, se animará su cambio de color y el indicador de avance.</p>
         </main>
         <nav><span>Inicio</span><span class="active">Mis acciones</span><span>Aprende</span><span>Perfil</span></nav>
     </section>
@@ -244,38 +252,66 @@
         </main>
     </section>
 
-    <section class="phone">
-        <header><small>11 · ← Perfil · Rol de prueba</small><h2>Administración</h2></header>
+        <section class="phone">
+        <header>
+            <small>11 · ← Perfil</small>
+            <h2>Preferencias</h2>
+        </header>
         <main>
-            <div class="field">Contenidos educativos ▾</div>
-            <p class="muted">También permite seleccionar categorías, preguntas y recomendaciones.</p>
             <div class="card">
-                <h3>Protege tus cuentas</h3>
-                <span class="badge medium">Pendiente de revisión</span>
-                <div class="btn secondary">Editar contenido</div>
+                <h3>Apariencia</h3>
+                <label>Tema de la aplicación</label>
+                <div class="field">Según el sistema ▾</div>
+                <p class="muted">Opciones: claro, oscuro o según el sistema.</p>
             </div>
-            <label>Título</label><div class="field">Protege tus cuentas</div>
-            <label>Categoría</label><div class="field">Autenticación ▾</div>
-            <label>Contenido breve</label><div class="field">Texto educativo de prueba…</div>
-            <div class="btn">Guardar para revisión</div>
-            <p class="muted">Propuesta de flujo sujeta al acuerdo de TT-01.</p>
+
+            <div class="card">
+                <h3>Avisos de recordatorios</h3>
+                <div class="option selected">● Activados</div>
+                <div class="option">○ Desactivados</div>
+                <p class="muted">Activar esta preferencia no concede el permiso de notificaciones de Android.</p>
+            </div>
+
+            <div class="note">
+                Si falta el permiso, se explicará cómo habilitarlo.
+                Puedes continuar usando la app sin recibir avisos.
+            </div>
+
+            <div class="btn">Guardar preferencias</div>
+            <p class="muted">Las opciones se conservarán al cerrar y abrir la app.</p>
         </main>
     </section>
 
-    <section class="phone">
-        <header><small>12 · ← Perfil · Rol de prueba</small><h2>Revisión técnica</h2></header>
+        <section class="phone">
+        <header>
+            <small>12 · ← Dispositivos</small>
+            <h2>Imagen del dispositivo</h2>
+        </header>
         <main>
-            <div class="card">
-                <h3>Protege tus cuentas</h3>
-                <span class="badge medium">Pendiente de revisión</span>
-                <p>Contenido educativo de autenticación.</p>
-                <div class="btn secondary">Ver contenido completo</div>
+            <div class="note">
+                Imagen opcional. Usa una foto de un objeto de prueba,
+                sin información personal.
             </div>
-            <label>Observaciones</label><div class="field">Usar instrucciones breves y claras…</div>
-            <div class="btn">Marcar como revisado</div>
-            <div class="btn secondary">Solicitar corrección</div>
-            <div class="btn secondary">Revisar criterios de riesgo</div>
-            <p class="muted">La publicación seguirá las reglas que acuerde el equipo.</p>
+
+            <div class="card" style="margin-top:14px">
+                <h3>Vista previa de imagen</h3>
+                <div class="field">Sin imagen seleccionada</div>
+                <div class="btn">Tomar foto</div>
+                <div class="btn secondary">Elegir de galería</div>
+                <p class="muted">Si ya existe una imagen, podrás reemplazarla o quitarla.</p>
+            </div>
+
+            <div class="card">
+                <h3>Si cancelas</h3>
+                <p>Se conservan los datos del formulario y la imagen anterior, si existe.</p>
+            </div>
+
+            <div class="card">
+                <h3>Si la cámara no está disponible</h3>
+                <p>Si no puedes usarla o se deniega un permiso necesario, puedes elegir de galería o continuar sin imagen.</p>
+            </div>
+
+            <div class="btn secondary">Volver al formulario</div>
         </main>
     </section>
 
@@ -291,20 +327,35 @@
         </main>
     </section>
 
-    <section class="phone">
-        <header><small>14 · Estados de conexión</small><h2>Carga y errores</h2></header>
+        <section class="phone">
+        <header>
+            <small>14 · Estados locales</small>
+            <h2>Carga y guardado</h2>
+        </header>
         <main>
             <div class="card">
-                <h3>Cargando evaluación…</h3>
+                <h3>Guardando evaluación…</h3>
                 <div class="progress"><span></span></div>
-                <p>Espera un momento.</p>
+                <p>Espera un momento. Evitaremos guardar dos veces.</p>
+                <p class="muted">El indicador aparecerá únicamente durante una operación real.</p>
             </div>
+
             <div class="card">
-                <h3>No pudimos conectar</h3>
-                <p>Tus respuestas siguen en esta pantalla. Intenta guardar nuevamente.</p>
+                <h3>No pudimos guardar</h3>
+                <p>Tus respuestas se conservan en el formulario. Intenta guardar nuevamente.</p>
                 <div class="btn">Reintentar</div>
             </div>
-            <div class="note">Sin conexión: mostrar información guardada cuando esté disponible e indicar su origen local.</div>
+
+            <div class="card">
+                <h3>✓ Evaluación guardada</h3>
+                <p>Puedes consultar sus resultados desde el historial.</p>
+                <div class="btn secondary">Ver resultados</div>
+            </div>
+
+            <div class="note">
+                Estos son estados alternativos.
+                La evaluación y consulta de datos funcionan sin internet.
+            </div>
         </main>
     </section>
 
@@ -312,8 +363,12 @@
         <header><small>15 · Validación y permisos</small><h2>Mensajes claros</h2></header>
         <main>
             <label>Alias ficticio</label><div class="field" style="border:2px solid #991b1b"> </div>
-            <p style="color:#991b1b">Escribe un alias para continuar.</p>
-            <div class="card">
+            <p style="color:#991b1b">
+                <span aria-hidden="true">⚠</span>
+                Error: escribe un alias para continuar.
+            </p>
+            <p class="muted">El mensaje aparecerá junto al campo mediante AnimatedVisibility.</p>
+		<div class="card">
                 <h3>Notificaciones desactivadas</h3>
                 <p>Puedes consultar tus recordatorios, pero no recibirás avisos.</p>
                 <div class="btn secondary">Ver cómo habilitarlas</div>
