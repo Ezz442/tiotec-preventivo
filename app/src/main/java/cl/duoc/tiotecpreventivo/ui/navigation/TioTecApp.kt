@@ -31,6 +31,12 @@ import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
 import androidx.compose.ui.tooling.preview.Preview
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
+import cl.duoc.tiotecpreventivo.data.local.InicioRepositoryMemoria
+import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModelFactory
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
@@ -148,8 +154,20 @@ fun TioTecApp(
                     .fillMaxSize()
             ) {
                 composable(DestinoPrincipal.INICIO.ruta) {
+                    val factory = remember {
+                        InicioViewModelFactory(
+                            InicioRepositoryMemoria()
+                        )
+                    }
+
+                    val inicioViewModel: InicioViewModel = viewModel(
+                        factory = factory
+                    )
+
+                    val uiState by inicioViewModel.uiState.collectAsState()
+
                     InicioScreen(
-                        onVerDispositivos = {
+                        uiState = uiState, onVerDispositivos = {
                             navController.navigate(GRAFO_DISPOSITIVOS) {
                                 launchSingleTop = true
                             }
