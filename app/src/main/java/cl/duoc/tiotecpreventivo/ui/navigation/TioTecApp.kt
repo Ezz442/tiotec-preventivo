@@ -29,18 +29,18 @@ import cl.duoc.tiotecpreventivo.ui.screens.AprendeScreen
 import cl.duoc.tiotecpreventivo.ui.screens.DispositivosScreen
 import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
+import androidx.compose.ui.tooling.preview.Preview
+import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
 
 private enum class DestinoPrincipal(
-    val ruta: String,
-    val titulo: String,
-    val simbolo: String
+    val ruta: String, val titulo: String, val simbolo: String
 ) {
-    INICIO("inicio", "Inicio", "⌂"),
-    ACCIONES("acciones", "Mis acciones", "✓"),
-    APRENDE("aprende", "Aprende", "?"),
+    INICIO("inicio", "Inicio", "⌂"), ACCIONES("acciones", "Mis acciones", "✓"), APRENDE(
+        "aprende", "Aprende", "?"
+    ),
     PERFIL("perfil", "Perfil", "○")
 }
 
@@ -72,8 +72,7 @@ fun TioTecApp(
     }
 
     PermanentNavigationDrawer(
-        modifier = Modifier.fillMaxSize(),
-        drawerContent = {
+        modifier = Modifier.fillMaxSize(), drawerContent = {
             if (!esCompacto) {
                 PermanentDrawerSheet {
                     Text(
@@ -85,48 +84,39 @@ fun TioTecApp(
                     DestinoPrincipal.entries.forEach { destino ->
                         NavigationDrawerItem(
                             label = {
-                                Text(destino.titulo)
-                            },
-                            icon = {
-                                Text(destino.simbolo)
-                            },
-                            selected = destinoSeleccionado == destino.ruta,
-                            onClick = {
-                                navegarPrincipal(destino)
-                            },
-                            modifier = Modifier.padding(horizontal = 12.dp)
+                            Text(destino.titulo)
+                        }, icon = {
+                            Text(destino.simbolo)
+                        }, selected = destinoSeleccionado == destino.ruta, onClick = {
+                            navegarPrincipal(destino)
+                        }, modifier = Modifier.padding(horizontal = 12.dp)
                         )
                     }
                 }
             }
-        }
-    ) {
+        }) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            if (enDispositivos) {
-                                "Mis dispositivos"
-                            } else {
-                                "TíoTec Preventivo"
-                            }
-                        )
-                    },
-                    navigationIcon = {
+                TopAppBar(title = {
+                    Text(
                         if (enDispositivos) {
-                            TextButton(
-                                onClick = {
-                                    navController.popBackStack()
-                                }
-                            ) {
-                                Text("← Volver")
-                            }
+                            "Mis dispositivos"
+                        } else {
+                            "TíoTec Preventivo"
+                        }
+                    )
+                }, navigationIcon = {
+                    if (enDispositivos) {
+                        TextButton(
+                            onClick = {
+                                navController.popBackStack()
+                            }) {
+                            Text("← Volver")
                         }
                     }
-                )
+                })
             },
             bottomBar = {
                 if (esCompacto) {
@@ -145,13 +135,11 @@ fun TioTecApp(
                                 },
                                 label = {
                                     Text(destino.titulo)
-                                }
-                            )
+                                })
                         }
                     }
                 }
-            }
-        ) { innerPadding ->
+            }) { innerPadding ->
             NavHost(
                 navController = navController,
                 startDestination = DestinoPrincipal.INICIO.ruta,
@@ -165,8 +153,7 @@ fun TioTecApp(
                             navController.navigate(GRAFO_DISPOSITIVOS) {
                                 launchSingleTop = true
                             }
-                        }
-                    )
+                        })
                 }
 
                 composable(DestinoPrincipal.ACCIONES.ruta) {
@@ -182,8 +169,7 @@ fun TioTecApp(
                 }
 
                 navigation(
-                    startDestination = RUTA_DISPOSITIVOS,
-                    route = GRAFO_DISPOSITIVOS
+                    startDestination = RUTA_DISPOSITIVOS, route = GRAFO_DISPOSITIVOS
                 ) {
                     composable(RUTA_DISPOSITIVOS) {
                         DispositivosScreen()
@@ -191,5 +177,29 @@ fun TioTecApp(
                 }
             }
         }
+    }
+}
+
+@Preview(
+    showBackground = true, widthDp = 360, heightDp = 800, name = "Navegación Compact"
+)
+@Composable
+fun TioTecCompactPreview() {
+    TioTecPreventivoTheme {
+        TioTecApp(
+            windowWidthSizeClass = WindowWidthSizeClass.Compact
+        )
+    }
+}
+
+@Preview(
+    showBackground = true, widthDp = 1200, heightDp = 800, name = "Navegación Expanded"
+)
+@Composable
+fun TioTecExpandedPreview() {
+    TioTecPreventivoTheme {
+        TioTecApp(
+            windowWidthSizeClass = WindowWidthSizeClass.Expanded
+        )
     }
 }
