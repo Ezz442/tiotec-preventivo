@@ -8,6 +8,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,20 +20,20 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cl.duoc.tiotecpreventivo.ui.screens.AccionesScreen
 import cl.duoc.tiotecpreventivo.ui.screens.AprendeScreen
+import cl.duoc.tiotecpreventivo.ui.screens.DispositivosScreen
 import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
-import androidx.compose.material3.TextButton
-import cl.duoc.tiotecpreventivo.ui.screens.DispositivosScreen
+import androidx.navigation.navigation
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
+private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
+
 private enum class DestinoPrincipal(
-    val ruta: String,
-    val titulo: String,
-    val simbolo: String
+    val ruta: String, val titulo: String, val simbolo: String
 ) {
-    INICIO("inicio", "Inicio", "⌂"),
-    ACCIONES("acciones", "Mis acciones", "✓"),
-    APRENDE("aprende", "Aprende", "?"),
+    INICIO("inicio", "Inicio", "⌂"), ACCIONES("acciones", "Mis acciones", "✓"), APRENDE(
+        "aprende", "Aprende", "?"
+    ),
     PERFIL("perfil", "Perfil", "○")
 }
 
@@ -48,60 +49,48 @@ fun TioTecApp() {
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        if (enDispositivos) {
-                            "Mis dispositivos"
-                        } else {
-                            "TíoTec Preventivo"
-                        }
-                    )
-                },
-                navigationIcon = {
+            TopAppBar(title = {
+                Text(
                     if (enDispositivos) {
-                        TextButton(
-                            onClick = {
-                                navController.popBackStack()
-                            }
-                        ) {
-                            Text("← Volver")
-                        }
+                        "Mis dispositivos"
+                    } else {
+                        "TíoTec Preventivo"
+                    }
+                )
+            }, navigationIcon = {
+                if (enDispositivos) {
+                    TextButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }) {
+                        Text("← Volver")
                     }
                 }
-            )
+            })
         },
         bottomBar = {
             NavigationBar {
                 DestinoPrincipal.entries.forEach { destino ->
-                    NavigationBarItem(
-                        selected = rutaActual == destino.ruta,
-                        onClick = {
-                            navController.navigate(destino.ruta) {
-                                popUpTo(
-                                    navController.graph
-                                        .findStartDestination().id
-                                ) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
+                    NavigationBarItem(selected = rutaActual == destino.ruta, onClick = {
+                        navController.navigate(destino.ruta) {
+                            popUpTo(
+                                navController.graph.findStartDestination().id
+                            ) {
+                                saveState = true
                             }
-                        },
-                        icon = {
-                            Text(
-                                text = destino.simbolo,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        },
-                        label = {
-                            Text(destino.titulo)
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                    )
+                    }, icon = {
+                        Text(
+                            text = destino.simbolo, style = MaterialTheme.typography.titleLarge
+                        )
+                    }, label = {
+                        Text(destino.titulo)
+                    })
                 }
             }
-        }
-    ) { innerPadding ->
+        }) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = DestinoPrincipal.INICIO.ruta,
@@ -112,11 +101,10 @@ fun TioTecApp() {
             composable(DestinoPrincipal.INICIO.ruta) {
                 InicioScreen(
                     onVerDispositivos = {
-                        navController.navigate(RUTA_DISPOSITIVOS) {
+                        navController.navigate(GRAFO_DISPOSITIVOS) {
                             launchSingleTop = true
                         }
-                    }
-                )
+                    })
             }
 
             composable(DestinoPrincipal.ACCIONES.ruta) {
@@ -131,8 +119,13 @@ fun TioTecApp() {
                 PerfilScreen()
             }
 
-            composable(RUTA_DISPOSITIVOS) {
-                DispositivosScreen()
+            navigation(
+                startDestination = RUTA_DISPOSITIVOS,
+                route = GRAFO_DISPOSITIVOS
+            ) {
+                composable(RUTA_DISPOSITIVOS) {
+                    DispositivosScreen()
+                }
             }
         }
     }
