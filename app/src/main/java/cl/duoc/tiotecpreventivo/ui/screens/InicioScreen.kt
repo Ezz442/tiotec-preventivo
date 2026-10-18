@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import androidx.compose.material3.Button
+import cl.duoc.tiotecpreventivo.ui.components.TarjetaInformativa
 @Composable
 fun InicioScreen(
     modifier: Modifier = Modifier,
@@ -37,22 +38,10 @@ fun InicioScreen(
             style = MaterialTheme.typography.bodyLarge
         )
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Comienza con un dispositivo",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Text(
-                    text = "Registra un equipo ficticio para realizar tu primera evaluación preventiva.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
+        TarjetaInformativa(
+            titulo = "Comienza con un dispositivo",
+            descripcion = "Registra un equipo ficticio para realizar tu primera evaluación preventiva."
+        )
 
         Button(
             onClick = onVerDispositivos,
