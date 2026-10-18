@@ -21,7 +21,10 @@ import cl.duoc.tiotecpreventivo.ui.screens.AccionesScreen
 import cl.duoc.tiotecpreventivo.ui.screens.AprendeScreen
 import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
+import androidx.compose.material3.TextButton
+import cl.duoc.tiotecpreventivo.ui.screens.DispositivosScreen
 
+private const val RUTA_DISPOSITIVOS = "dispositivos"
 private enum class DestinoPrincipal(
     val ruta: String,
     val titulo: String,
@@ -39,6 +42,7 @@ fun TioTecApp() {
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
     val rutaActual = entradaActual?.destination?.route
+    val enDispositivos = rutaActual == RUTA_DISPOSITIVOS
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -46,7 +50,24 @@ fun TioTecApp() {
         topBar = {
             TopAppBar(
                 title = {
-                    Text("TíoTec Preventivo")
+                    Text(
+                        if (enDispositivos) {
+                            "Mis dispositivos"
+                        } else {
+                            "TíoTec Preventivo"
+                        }
+                    )
+                },
+                navigationIcon = {
+                    if (enDispositivos) {
+                        TextButton(
+                            onClick = {
+                                navController.popBackStack()
+                            }
+                        ) {
+                            Text("← Volver")
+                        }
+                    }
                 }
             )
         },
@@ -89,7 +110,13 @@ fun TioTecApp() {
                 .fillMaxSize()
         ) {
             composable(DestinoPrincipal.INICIO.ruta) {
-                InicioScreen()
+                InicioScreen(
+                    onVerDispositivos = {
+                        navController.navigate(RUTA_DISPOSITIVOS) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
 
             composable(DestinoPrincipal.ACCIONES.ruta) {
@@ -102,6 +129,10 @@ fun TioTecApp() {
 
             composable(DestinoPrincipal.PERFIL.ruta) {
                 PerfilScreen()
+            }
+
+            composable(RUTA_DISPOSITIVOS) {
+                DispositivosScreen()
             }
         }
     }

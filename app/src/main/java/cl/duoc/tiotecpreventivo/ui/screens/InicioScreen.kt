@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
-
+import androidx.compose.material3.Button
 @Composable
-fun InicioScreen(modifier: Modifier = Modifier) {
-    Column(
+fun InicioScreen(
+    modifier: Modifier = Modifier,
+    onVerDispositivos: () -> Unit = {}
+) {    Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
@@ -50,6 +52,13 @@ fun InicioScreen(modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+        }
+
+        Button(
+            onClick = onVerDispositivos,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Mis dispositivos")
         }
     }
 }
