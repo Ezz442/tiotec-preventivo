@@ -20,10 +20,6 @@ fun DispositivosScreen(modifier: Modifier = Modifier) {
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Mis dispositivos",
-            style = MaterialTheme.typography.headlineMedium
-        )
 
         Text(
             text = "Administra los equipos ficticios que utilizarás en tus evaluaciones.",

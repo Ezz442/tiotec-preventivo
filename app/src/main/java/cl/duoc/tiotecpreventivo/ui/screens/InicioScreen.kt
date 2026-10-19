@@ -33,8 +33,7 @@ fun InicioScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Tu prevención digital",
-            style = MaterialTheme.typography.headlineMedium
+            text = "Tu prevención digital", style = MaterialTheme.typography.headlineMedium
         )
 
         when {
@@ -42,8 +41,7 @@ fun InicioScreen(
                 CircularProgressIndicator()
 
                 Text(
-                    text = "Cargando información…",
-                    style = MaterialTheme.typography.bodyLarge
+                    text = "Cargando información…", style = MaterialTheme.typography.bodyLarge
                 )
             }
 
@@ -56,11 +54,8 @@ fun InicioScreen(
             }
 
             else -> {
-                Text(
-                    text = uiState.alias?.let { "Hola, $it." }
-                        ?: "Bienvenido a TíoTec.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Text(text = uiState.alias?.let { "Hola, $it." } ?: "Bienvenido a TíoTec.",
+                    style = MaterialTheme.typography.bodyLarge)
 
                 Text(
                     text = "Revisa tus hábitos y organiza acciones para proteger tus dispositivos.",
@@ -81,6 +76,7 @@ fun InicioScreen(
 
         Button(
             onClick = onVerDispositivos,
+            enabled = !uiState.cargando,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Mis dispositivos")
@@ -101,5 +97,15 @@ fun InicioClaroPreview() {
 fun InicioOscuroPreview() {
     TioTecPreventivoTheme(darkTheme = true) {
         InicioScreen()
+    }
+}
+
+@Preview(showBackground = true, name = "Inicio cargando")
+@Composable
+fun InicioCargandoPreview() {
+    TioTecPreventivoTheme {
+        InicioScreen(
+            uiState = InicioUiState(cargando = true)
+        )
     }
 }
