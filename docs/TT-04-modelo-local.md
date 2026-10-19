@@ -159,10 +159,13 @@ enum class NivelRiesgo(val etiqueta: String) {
 data class EvaluacionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val dispositivoId: Long,
+    val nombreDispositivo: String,                 // copia del nombre al momento de evaluar
+    val sistemaOperativoDispositivo: SistemaOperativo, // copia del sistema operativo al momento de evaluar
     val fecha: Long,
     val nivelGlobal: NivelRiesgo       // el peor nivel entre las categorías
 )
 ```
+- `nombreDispositivo` y `sistemaOperativoDispositivo` se copian desde `DispositivoEntity` al guardar. El historial y el detalle muestran **siempre estas copias**, no los datos actuales del dispositivo. Así, si después se edita o se archiva el dispositivo, la evaluación sigue mostrando cómo se llamaba y qué sistema tenía cuando se hizo.
 - Se guarda **solo al finalizar**. Si el usuario sale antes, se pide confirmación y no se guarda nada.
 - Mientras responde, las respuestas viven en el `UiState` del ViewModel. Por eso se conservan al retroceder entre preguntas.
 - Evaluación, respuestas, resultados y acciones se guardan en **una sola transacción** (`@Transaction`). Si falla, no queda nada a medias y la pantalla ofrece *Reintentar* sin perder las respuestas.
@@ -203,7 +206,7 @@ data class ResultadoCategoriaEntity(
 
 ### 4.6 Acción (checklist)
 ```kotlin
-enum class Prioridad { ALTA, MEDIA, BAJA }
+enum class Prioridad { ALTA, MEDIA, BAJA }   // orden de importancia: ALTA → MEDIA → BAJA
 enum class EstadoAccion { PENDIENTE, COMPLETADA }
 
 @Entity(
@@ -318,9 +321,26 @@ Los DAO solo hablan con Room. Los repositorios juntan DAO, catálogo y archivos,
 
 Consultas clave de los DAO:
 - `DispositivoDao`: `SELECT * FROM dispositivo WHERE archivado = 0 ORDER BY nombre`.
-- `EvaluacionDao`: historial `ORDER BY fecha DESC`, unido al nombre del dispositivo para mostrar *"15 de octubre · Teléfono de prueba"*.
+- `EvaluacionDao`: historial `ORDER BY fecha DESC`. Muestra *"15 de octubre · Teléfono de prueba"* usando la copia `nombreDispositivo` de la propia evaluación, sin unir con la tabla `dispositivo`.
 - `EvaluacionDao.contarPorDispositivo(id)`: decide entre borrar o archivar.
-- `AccionDao`: `WHERE estado = :estado ORDER BY prioridad, fechaRevision`.
+- `AccionDao`: ordena por prioridad **ALTA → MEDIA → BAJA** y luego por fecha de revisión. Room guarda el enum como texto, así que `ORDER BY prioridad` ordenaría alfabéticamente (ALTA → BAJA → MEDIA). Por eso se usa `CASE`:
+
+```kotlin
+@Query("""
+    SELECT * FROM accion
+    WHERE estado = :estado
+    ORDER BY
+        CASE prioridad
+            WHEN 'ALTA' THEN 0
+            WHEN 'MEDIA' THEN 1
+            WHEN 'BAJA' THEN 2
+        END,
+        fechaRevision ASC
+""")
+fun observarPorEstado(estado: EstadoAccion): Flow<List<AccionEntity>>
+```
+
+El mismo orden se aplica en memoria a las recomendaciones de *Resultados* con `sortedBy { it.prioridad.ordinal }`, que respeta el orden en que está declarado el enum.
 
 ---
 
