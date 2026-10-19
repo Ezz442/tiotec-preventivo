@@ -3,11 +3,13 @@ package cl.duoc.tiotecpreventivo.data
 import android.content.Context
 import cl.duoc.tiotecpreventivo.data.catalogo.CatalogoRepositoryLocal
 import cl.duoc.tiotecpreventivo.data.local.TioTecDatabase
+import cl.duoc.tiotecpreventivo.data.preferences.preferenciasDataStore
 import cl.duoc.tiotecpreventivo.repository.AccionRepository
 import cl.duoc.tiotecpreventivo.repository.CatalogoRepository
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.EvaluacionRepository
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
+import cl.duoc.tiotecpreventivo.repository.PreferenciasRepository
 import cl.duoc.tiotecpreventivo.repository.RecordatorioRepository
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepository
 
@@ -49,5 +51,10 @@ class AppContainer(context: Context) {
 
     val solicitudRepository: SolicitudRepository by lazy {
         SolicitudRepository(baseDeDatos.solicitudDao())
+    }
+
+    /** Preferencias simples en DataStore (TT-08): tema, primera ejecución y avisos. */
+    val preferenciasRepository: PreferenciasRepository by lazy {
+        PreferenciasRepository(context.preferenciasDataStore)
     }
 }
