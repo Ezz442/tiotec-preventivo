@@ -37,9 +37,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.duoc.tiotecpreventivo.data.local.InicioRepositoryMemoria
 import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasUiState
+import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
+import cl.duoc.tiotecpreventivo.ui.screens.AjustesRuta
+import cl.duoc.tiotecpreventivo.ui.screens.AjustesScreen
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
+private const val RUTA_AJUSTES = "ajustes"
 
 private enum class DestinoPrincipal(
     val ruta: String, val titulo: String, val simbolo: String
@@ -53,18 +58,22 @@ private enum class DestinoPrincipal(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TioTecApp(
-    windowWidthSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact
+    windowWidthSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
+    /** Lo crea MainActivity para que Ajustes y el tema usen la misma instancia. Null en previews. */
+    preferenciasViewModel: PreferenciasViewModel? = null
 ) {
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
     val rutaActual = entradaActual?.destination?.route
     val enDispositivos = rutaActual == RUTA_DISPOSITIVOS
+    val enAjustes = rutaActual == RUTA_AJUSTES
+    val enPantallaSecundaria = enDispositivos || enAjustes
     val esCompacto = windowWidthSizeClass == WindowWidthSizeClass.Compact
 
-    val destinoSeleccionado = if (enDispositivos) {
-        DestinoPrincipal.INICIO.ruta
-    } else {
-        rutaActual
+    val destinoSeleccionado = when {
+        enDispositivos -> DestinoPrincipal.INICIO.ruta
+        enAjustes -> DestinoPrincipal.PERFIL.ruta
+        else -> rutaActual
     }
 
     val navegarPrincipal: (DestinoPrincipal) -> Unit = { destino ->
@@ -107,14 +116,14 @@ fun TioTecApp(
             topBar = {
                 TopAppBar(title = {
                     Text(
-                        if (enDispositivos) {
-                            "Mis dispositivos"
-                        } else {
-                            "TíoTec Preventivo"
+                        when {
+                            enDispositivos -> "Mis dispositivos"
+                            enAjustes -> "Ajustes"
+                            else -> "TíoTec Preventivo"
                         }
                     )
                 }, navigationIcon = {
-                    if (enDispositivos) {
+                    if (enPantallaSecundaria) {
                         TextButton(
                             onClick = {
                                 navController.popBackStack()
@@ -183,7 +192,26 @@ fun TioTecApp(
                 }
 
                 composable(DestinoPrincipal.PERFIL.ruta) {
-                    PerfilScreen()
+                    PerfilScreen(
+                        onAbrirAjustes = {
+                            navController.navigate(RUTA_AJUSTES) {
+                                launchSingleTop = true
+                            }
+                        }
+                    )
+                }
+
+                composable(RUTA_AJUSTES) {
+                    if (preferenciasViewModel != null) {
+                        AjustesRuta(viewModel = preferenciasViewModel)
+                    } else {
+                        // Solo en previews, donde no hay DataStore.
+                        AjustesScreen(
+                            uiState = PreferenciasUiState(cargando = false),
+                            onTemaChange = {},
+                            onAvisosChange = {}
+                        )
+                    }
                 }
 
                 navigation(
