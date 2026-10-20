@@ -22,55 +22,44 @@ Archivo en el teléfono: `files/datastore/preferencias_tiotec.preferences_pb` (i
 | `data/preferences/Preferencias.kt` | `Preferencias` y `Tema` (con `usarModoOscuro`) |
 | `data/preferences/PreferenciasDataStore.kt` | Un único `DataStore` por app (`Context.preferenciasDataStore`) |
 | `repository/PreferenciasRepository.kt` | `preferencias: Flow<Preferencias>`, `setTema`, `setAvisosActivos`, `marcarPrimeraEjecucionCompleta` |
-| `viewmodel/PreferenciasViewModel.kt` | `uiState: StateFlow<PreferenciasUiState>` con `stateIn` y eventos `onTemaChange`, `onAvisosChange`, `onBienvenidaVista` |
-| `ui/screens/AjustesScreen.kt` | `AjustesRuta` observa con `collectAsState()`; `AjustesScreen` sin estado, con previews claro y oscuro |
+| `viewmodel/PreferenciasViewModel.kt` | `uiState: StateFlow<PreferenciasUiState>` con `stateIn`; eventos `onTemaChange`, `onAvisosChange`, `onBienvenidaVista`, `onMensajeMostrado`; atrapa errores al guardar |
+| `ui/screens/AjustesScreen.kt` | `AjustesRuta` observa con `collectAsState()` y muestra el Snackbar; `AjustesScreen` sin estado, con previews claro y oscuro |
 | `data/AppContainer.kt` | Agrega `preferenciasRepository` |
+| `MainActivity.kt` | Crea el ViewModel y aplica el tema guardado |
+| `ui/navigation/TioTecApp.kt` · `ui/screens/PerfilScreen.kt` | Ruta `ajustes` y botón **Ajustes** en Perfil |
 
 Flujo: `AjustesScreen` → evento → `PreferenciasViewModel` → `PreferenciasRepository` → DataStore → `Flow` → `StateFlow` → `collectAsState()` → la pantalla se redibuja.
 
-## 3. Sin bloquear la interfaz
+## 3. Sin bloquear la interfaz y errores al guardar
 
 - Las lecturas son `Flow` y las escrituras son funciones `suspend` lanzadas en `viewModelScope`; DataStore hace la E/S fuera del hilo principal.
-- Mientras llega el primer valor, `PreferenciasUiState.cargando = true` y la pantalla muestra un indicador.
-- Si el archivo no se puede leer (`IOException`), se usan los valores por defecto en vez de cerrar la app.
+- Mientras llega el primer valor, `PreferenciasUiState.cargando = true`. `MainActivity` espera ese primer valor antes de dibujar, para no mostrar un instante el tema equivocado.
+- Si el archivo no se puede **leer** (`IOException`), se usan los valores por defecto en vez de cerrar la app.
+- Si **guardar** falla (tema, avisos o primera ejecución), el ViewModel atrapa el error y pone un `mensaje` en el UiState; `AjustesRuta` lo muestra en un **Snackbar** y llama a `onMensajeMostrado()`. DataStore no modifica el archivo cuando una escritura falla, así que el `Flow` sigue emitiendo el valor anterior y la pantalla **mantiene la configuración previa**. La app sigue funcionando y el siguiente intento puede guardar normalmente.
 - Un valor de tema desconocido vuelve a `SISTEMA`.
 
-## 4. Pruebas
+| Falla al guardar | Mensaje |
+|---|---|
+| Tema | "No pudimos guardar el tema. Se mantiene el anterior." |
+| Recordatorios | "No pudimos guardar los recordatorios. Se mantiene la configuración anterior." |
+| Primera ejecución | "No pudimos guardar tu avance. Volverás a ver la bienvenida." |
 
-`app/src/test/java/cl/duoc/tiotecpreventivo/repository/PreferenciasRepositoryTest.kt` corre en la JVM, **sin emulador**:
+## 4. Conexión con la app
 
-- valores por defecto sin datos guardados;
-- guardar y leer cada preferencia, y que cambiar una no altere las demás;
-- **las preferencias sobreviven al cerrar y reabrir** (se detiene el DataStore y se abre otro sobre el mismo archivo);
-- tema desconocido → Sistema;
-- `Tema.usarModoOscuro` para las tres opciones.
+- **Tema:** `MainActivity` crea un único `PreferenciasViewModel` (`by viewModels`) y pasa `darkTheme = tema.usarModoOscuro(isSystemInDarkTheme())` a `TioTecPreventivoTheme`. La barra de estado también sigue el tema elegido.
+- **Ajustes:** *Perfil* tiene el botón **Ajustes**, que abre la ruta `ajustes` del `NavHost`. Es una pantalla secundaria: la barra superior dice "Ajustes", muestra "← Volver" y la pestaña *Perfil* sigue marcada. Ajustes usa la misma instancia del ViewModel que el tema, así que el cambio se ve al instante.
+
+## 5. Pruebas
+
+| Prueba | Dónde | Comprueba |
+|---|---|---|
+| `PreferenciasRepositoryTest` (6) | JVM, sin emulador | Valores por defecto; guardar y leer; cambiar una sin alterar las demás; **cerrar y reabrir el DataStore conserva los valores**; tema desconocido → Sistema; `usarModoOscuro` |
+| `PreferenciasViewModelTest` (5) | JVM, sin emulador | Guardado correcto sin mensaje; **si falla guardar tema, avisos o primera ejecución, se mantiene el valor anterior y aparece el mensaje**; el mensaje se limpia y el siguiente guardado funciona |
+| `AjustesPersistenciaTest` (1) | Emulador | Perfil → Ajustes → elegir Oscuro → **cerrar la app y volver a abrirla** → Oscuro sigue seleccionado |
 
 ```bash
-./gradlew :app:testDebugUnitTest --tests "cl.duoc.tiotecpreventivo.repository.PreferenciasRepositoryTest"
+./gradlew :app:testDebugUnitTest            # JVM
+./gradlew :app:connectedDebugAndroidTest    # con el emulador encendido
 ```
 
-## 5. Conexión con la interfaz de TT-05 (después de mergear el PR #6)
-
-TT-08 no modifica `MainActivity`, `Theme.kt` ni `TioTecApp.kt` para no chocar con el PR #6. Al integrarlo:
-
-**Aplicar el tema guardado** en `MainActivity`:
-
-```kotlin
-private val preferenciasViewModel: PreferenciasViewModel by viewModels {
-    PreferenciasViewModel.Factory(
-        (application as TioTecApplication).contenedor.preferenciasRepository
-    )
-}
-
-// dentro de setContent { ... }
-val preferencias by preferenciasViewModel.uiState.collectAsState()
-TioTecPreventivoTheme(
-    darkTheme = preferencias.tema.usarModoOscuro(isSystemInDarkTheme())
-) {
-    TioTecApp(windowWidthSizeClass = windowSizeClass.widthSizeClass)
-}
-```
-
-**Abrir Ajustes** desde Perfil: agregar una ruta `ajustes` en el `NavHost` que muestre `AjustesRuta(viewModel = …)`.
-
-Comprobación manual: cambiar a tema Oscuro, cerrar la app desde recientes, abrirla y verificar que sigue oscura.
+`AjustesPersistenciaTest` cierra y reabre la pantalla dentro del mismo proceso. El reinicio completo (archivo leído desde cero) lo cubre `PreferenciasRepositoryTest`. Comprobación manual adicional: elegir Oscuro, cerrar la app desde recientes, abrirla y verificar que sigue oscura.
