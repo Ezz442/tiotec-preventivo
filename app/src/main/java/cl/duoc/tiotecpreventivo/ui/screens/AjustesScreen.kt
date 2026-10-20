@@ -1,6 +1,7 @@
 package cl.duoc.tiotecpreventivo.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,11 +16,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -31,8 +36,8 @@ import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasUiState
 import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
 
 /**
- * Punto de entrada con ViewModel: observa el StateFlow de preferencias y
- * reenvía los eventos. Se agrega al NavHost cuando se integre TT-05.
+ * Punto de entrada con ViewModel: observa el StateFlow de preferencias, reenvía
+ * los eventos y muestra un Snackbar si algo no se pudo guardar.
  */
 @Composable
 fun AjustesRuta(
@@ -40,13 +45,26 @@ fun AjustesRuta(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    AjustesScreen(
-        uiState = uiState,
-        onTemaChange = viewModel::onTemaChange,
-        onAvisosChange = viewModel::onAvisosChange,
-        modifier = modifier
-    )
+    LaunchedEffect(uiState.mensaje) {
+        uiState.mensaje?.let { mensaje ->
+            snackbarHostState.showSnackbar(mensaje)
+            viewModel.onMensajeMostrado()
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        AjustesScreen(
+            uiState = uiState,
+            onTemaChange = viewModel::onTemaChange,
+            onAvisosChange = viewModel::onAvisosChange
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }
 
 /** Pantalla sin estado propio: recibe el UiState y avisa los cambios hacia arriba. */
@@ -64,11 +82,6 @@ fun AjustesScreen(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Ajustes",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
         if (uiState.cargando) {
             CircularProgressIndicator()
             return@Column
