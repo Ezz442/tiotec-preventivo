@@ -52,19 +52,36 @@ abstract class DispositivoDao {
     @Query("UPDATE dispositivo SET archivado = 1, actualizadoEn = :fecha WHERE id = :id")
     abstract suspend fun marcarArchivado(id: Long, fecha: Long)
 
+    /**
+     * Cancela los recordatorios programados del dispositivo, de ambos tipos:
+     * - PROXIMA_EVALUACION: apuntan directo al dispositivo (`dispositivoId`);
+     * - ACCION: apuntan a acciones de evaluaciones de este dispositivo
+     *   (recordatorio → accion → evaluacion → dispositivo).
+     * Los enviados o ya cancelados no se tocan. Devuelve cuántos se cancelaron.
+     */
     @Query(
         """
         UPDATE recordatorio SET estado = 'CANCELADO'
-        WHERE dispositivoId = :id AND estado = 'PROGRAMADO'
+        WHERE estado = 'PROGRAMADO'
+          AND (
+                dispositivoId = :id
+                OR accionId IN (
+                    SELECT accion.id FROM accion
+                    INNER JOIN evaluacion ON evaluacion.id = accion.evaluacionId
+                    WHERE evaluacion.dispositivoId = :id
+                )
+          )
         """
     )
-    abstract suspend fun cancelarRecordatoriosDe(id: Long)
+    abstract suspend fun cancelarRecordatoriosDe(id: Long): Int
 
     /**
      * Regla de eliminación de TT-04 (4.2), en una sola transacción:
      * - sin evaluaciones → se borra el registro;
-     * - con evaluaciones → se archiva y se cancelan sus recordatorios programados,
-     *   pero sus evaluaciones siguen en el historial.
+     * - con evaluaciones → se archiva y se cancelan sus recordatorios programados
+     *   (de próxima evaluación y de sus acciones), pero sus evaluaciones, acciones
+     *   y respuestas siguen en el historial.
+     * Si cualquier paso falla, Room revierte todo: no queda archivado a medias.
      * @return true si se archivó, false si se borró.
      */
     @Transaction

@@ -49,7 +49,8 @@ DispositivosViewModel(contenedor.dispositivoRepository)
 `eliminar` aplica en **una sola transacción** la regla de TT-04 (4.2):
 
 - **Sin evaluaciones:** se borra el registro. Devuelve la ruta de la imagen para que TT-18/19 borre el archivo.
-- **Con evaluaciones:** se marca `archivado`, desaparece de *Mis dispositivos*, se cancelan sus recordatorios programados y el **historial se conserva** con la copia del nombre y sistema operativo de cada evaluación.
+- **Con evaluaciones:** se marca `archivado`, desaparece de *Mis dispositivos* y el **historial se conserva** (evaluaciones, respuestas, resultados y acciones) con la copia del nombre y sistema operativo de cada evaluación.
+- Al archivar se cancelan los recordatorios **programados de ambos tipos**: los de *próxima evaluación* del dispositivo y los de las *acciones* de sus evaluaciones (recordatorio → acción → evaluación → dispositivo). Los ya enviados y los de otros dispositivos no se tocan.
 
 La confirmación con `AlertDialog` la muestra la pantalla antes de llamar a `eliminar` (TT-09).
 
@@ -74,7 +75,7 @@ La confirmación con `AlertDialog` la muestra la pantalla antes de llamar a `eli
 
 | Archivo | Comprueba |
 |---|---|
-| `RepositoriosRoomTest` | Perfil único; CRUD de dispositivos; nombre repetido; borrar vs. archivar con historial intacto y recordatorios cancelados; evaluación completa (respuestas, resultados, acciones, nivel global); rechazo de respuestas incompletas; **reversión de la transacción** si falla; historial más reciente primero; orden de acciones y `completadaEn`; recordatorios (crear, modificar, cancelar, fecha pasada); solicitudes `DEMO-00X` con historial |
+| `RepositoriosRoomTest` | Perfil único; CRUD de dispositivos; nombre repetido; borrar vs. archivar con historial intacto; **al archivar se cancelan los recordatorios de ambos tipos** (acción y próxima evaluación) sin tocar los enviados ni los de otro dispositivo; evaluación completa (respuestas, resultados, acciones, nivel global); rechazo de respuestas incompletas; **reversión de la transacción** si falla; historial más reciente primero; orden de acciones y `completadaEn`; recordatorios (crear, modificar, cancelar, fecha pasada); solicitudes `DEMO-00X` con historial |
 | `PersistenciaReaperturaTest` | Datos guardados en un archivo SQLite siguen ahí al **cerrar y reabrir** la base |
 
 Ejecutar con el emulador encendido:
