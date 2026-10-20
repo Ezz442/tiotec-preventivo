@@ -1,6 +1,6 @@
 package cl.duoc.tiotecpreventivo.ui
 
-import androidx.compose.ui.test.and
+
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
