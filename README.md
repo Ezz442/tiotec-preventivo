@@ -43,7 +43,7 @@ Proyecto en dupla para la asignatura **DSY1105**, basado en el caso *TíoTec Pre
 2. Abrir la carpeta en Android Studio y esperar la sincronización de Gradle.
 3. Ejecutar la configuración `app` en un emulador o dispositivo (mínimo Android 7.0, API 24).
 
-_La API de prueba y sus instrucciones de arranque se documentarán en TT-06._
+_La app funciona sin conexión: los datos de prueba están dentro del proyecto. Ver [docs/TT-06-datos-ficticios.md](docs/TT-06-datos-ficticios.md)._
 
 ## Flujo de trabajo
 
