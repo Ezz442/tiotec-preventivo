@@ -10,6 +10,7 @@ import cl.duoc.tiotecpreventivo.data.catalogo.Prioridad
 import cl.duoc.tiotecpreventivo.data.catalogo.ValorRespuesta
 import cl.duoc.tiotecpreventivo.data.local.entity.AccionEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoAccion
+import cl.duoc.tiotecpreventivo.data.local.entity.EstadoRecordatorio
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoSolicitud
 import cl.duoc.tiotecpreventivo.data.local.entity.EvaluacionEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.ExperienciaDigital
@@ -160,6 +161,56 @@ class RepositoriosRoomTest {
                 evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.SI), resultados(NivelRiesgo.RIESGO_BAJO))
             }
         }
+    }
+
+    @Test
+    fun archivar_cancelaRecordatoriosDeAmbosTiposYConservaElHistorial(): Unit = runBlocking {
+        val (perfilId, id) = crearPerfilYDispositivo("Teléfono de la abuela")
+        val otroId = dispositivos.crear(perfilId, "Computador de prueba", SistemaOperativo.WINDOWS)
+
+        val evaluacionId = evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO)
+        )
+        val otraEvaluacionId = evaluaciones.guardarEvaluacion(
+            otroId, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO)
+        )
+        val accionesDelDispositivo = evaluaciones.obtenerDetalle(evaluacionId)!!.acciones
+        val accionDelOtro = evaluaciones.obtenerDetalle(otraEvaluacionId)!!.acciones.first()
+
+        val futuro = ahora + 3_600_000
+        // Del dispositivo que se archivará: ambos tipos.
+        val deAccion = recordatorios.crearParaAccion(accionesDelDispositivo[0].id, "Revisar acción", futuro)
+        val deProximaEvaluacion = recordatorios.crearProximaEvaluacion(id, "Volver a evaluar", futuro)
+        // Ya enviado: debe quedar como ENVIADO, no como CANCELADO.
+        val yaEnviado = recordatorios.crearParaAccion(accionesDelDispositivo[1].id, "Ya avisado", futuro)
+        recordatorios.marcarEnviado(yaEnviado)
+        // Del otro dispositivo: no se deben tocar.
+        val otroDeAccion = recordatorios.crearParaAccion(accionDelOtro.id, "Acción del otro", futuro)
+        val otroDeProxima = recordatorios.crearProximaEvaluacion(otroId, "Evaluar el otro", futuro)
+
+        assertEquals(ResultadoEliminacion.Archivado, dispositivos.eliminar(id))
+
+        // Ambos tipos de recordatorio del dispositivo archivado quedan cancelados.
+        assertEquals(EstadoRecordatorio.CANCELADO, recordatorios.obtener(deAccion)!!.estado)
+        assertEquals(EstadoRecordatorio.CANCELADO, recordatorios.obtener(deProximaEvaluacion)!!.estado)
+        assertEquals(EstadoRecordatorio.ENVIADO, recordatorios.obtener(yaEnviado)!!.estado)
+
+        // Los del otro dispositivo siguen programados.
+        assertEquals(EstadoRecordatorio.PROGRAMADO, recordatorios.obtener(otroDeAccion)!!.estado)
+        assertEquals(EstadoRecordatorio.PROGRAMADO, recordatorios.obtener(otroDeProxima)!!.estado)
+        assertEquals(
+            setOf(otroDeAccion, otroDeProxima),
+            recordatorios.observarActivos().first().map { it.id }.toSet()
+        )
+
+        // La evaluación y su historial se conservan completos.
+        val detalle = evaluaciones.obtenerDetalle(evaluacionId)
+        assertNotNull("La evaluación debe seguir existiendo", detalle)
+        assertEquals("Teléfono de la abuela", detalle!!.evaluacion.nombreDispositivo)
+        assertEquals(CatalogoLocal.preguntas.size, detalle.respuestas.size)
+        assertEquals(Categoria.entries.size, detalle.resultados.size)
+        assertEquals(accionesDelDispositivo.map { it.id }, detalle.acciones.map { it.id })
+        assertEquals(2, evaluaciones.observarHistorial().first().size)
     }
 
     // ---------- Evaluaciones ----------
