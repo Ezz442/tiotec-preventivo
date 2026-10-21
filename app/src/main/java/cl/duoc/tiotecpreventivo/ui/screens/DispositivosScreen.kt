@@ -30,6 +30,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
 import cl.duoc.tiotecpreventivo.ui.components.DispositivoFormulario
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosUiState
+import androidx.compose.foundation.layout.WindowInsets
 
 @Composable
 fun DispositivosScreen(
@@ -60,7 +61,9 @@ fun DispositivosScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .imePadding(), snackbarHost = {
+            .imePadding(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }) { innerPadding ->
         LazyColumn(
@@ -80,29 +83,41 @@ fun DispositivosScreen(
             when {
                 uiState.cargando -> {
                     item {
-                        CircularProgressIndicator()
-                        Text("Cargando dispositivos…")
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            CircularProgressIndicator()
+                            Text("Cargando dispositivos…")
+                        }
                     }
                 }
 
                 uiState.errorCarga != null -> {
                     item {
-                        Text(
-                            text = uiState.errorCarga, color = MaterialTheme.colorScheme.error
-                        )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = uiState.errorCarga, color = MaterialTheme.colorScheme.error
+                            )
 
-                        Button(onClick = onReintentar) {
-                            Text("Reintentar")
+                            Button(onClick = onReintentar) {
+                                Text("Reintentar")
+                            }
                         }
                     }
                 }
 
                 uiState.perfilId == null -> {
                     item {
-                        Text("Primero crea tu perfil ficticio.")
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text("Primero crea tu perfil ficticio.")
 
-                        Button(onClick = onIrAPerfil) {
-                            Text("Ir a Perfil")
+                            Button(onClick = onIrAPerfil) {
+                                Text("Ir a Perfil")
+                            }
                         }
                     }
                 }
