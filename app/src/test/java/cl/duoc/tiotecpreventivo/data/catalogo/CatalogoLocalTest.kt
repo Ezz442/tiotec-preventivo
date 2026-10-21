@@ -64,6 +64,32 @@ class CatalogoLocalTest {
     }
 
     @Test
+    fun puntajesSubenDeSiANoLoSeANo() {
+        CatalogoLocal.preguntas.forEach { pregunta ->
+            val p = pregunta.puntajes
+            assertTrue(pregunta.id, p.getValue(ValorRespuesta.SI) < p.getValue(ValorRespuesta.NO_SE))
+            assertTrue(pregunta.id, p.getValue(ValorRespuesta.NO_SE) < p.getValue(ValorRespuesta.NO))
+        }
+    }
+
+    @Test
+    fun practicasClavePesanMasYTienenRecomendacionDePrioridadAlta() {
+        Categoria.entries.forEach { categoria ->
+            assertTrue("$categoria sin práctica clave", repositorio.preguntasDe(categoria).any { it.clave })
+        }
+        CatalogoLocal.preguntas.forEach { pregunta ->
+            val esperado = if (pregunta.clave) CatalogoLocal.PUNTAJES_CLAVE else CatalogoLocal.PUNTAJES_NORMAL
+            assertEquals(pregunta.id, esperado, pregunta.puntajes)
+
+            val prioridad = CatalogoLocal.recomendaciones.single { it.preguntaId == pregunta.id }.prioridad
+            assertEquals(
+                "${pregunta.id}: clave ⇔ recomendación de prioridad alta",
+                pregunta.clave, prioridad == Prioridad.ALTA
+            )
+        }
+    }
+
+    @Test
     fun ordenDePreguntasEsUnicoDentroDeCadaCategoria() {
         Categoria.entries.forEach { categoria ->
             val ordenes = repositorio.preguntasDe(categoria).map { it.orden }
