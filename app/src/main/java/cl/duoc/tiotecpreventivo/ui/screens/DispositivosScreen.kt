@@ -2,34 +2,225 @@ package cl.duoc.tiotecpreventivo.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
+import cl.duoc.tiotecpreventivo.ui.components.DispositivoFormulario
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
+import cl.duoc.tiotecpreventivo.viewmodel.DispositivosUiState
 
 @Composable
-fun DispositivosScreen(modifier: Modifier = Modifier) {
-    Column(
+fun DispositivosScreen(
+    modifier: Modifier = Modifier,
+    uiState: DispositivosUiState = DispositivosUiState(),
+    onAgregar: () -> Unit = {},
+    onEditar: (Long) -> Unit = {},
+    onSolicitarEliminar: (Long) -> Unit = {},
+    onConfirmarEliminar: () -> Unit = {},
+    onCancelarEliminar: () -> Unit = {},
+    onNombreChange: (String) -> Unit = {},
+    onSistemaChange: (SistemaOperativo) -> Unit = {},
+    onGuardar: () -> Unit = {},
+    onCancelarFormulario: () -> Unit = {},
+    onReintentar: () -> Unit = {},
+    onIrAPerfil: () -> Unit = {},
+    onConsumirMensaje: () -> Unit = {}
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.mensaje) {
+        uiState.mensaje?.let { mensaje ->
+            snackbarHostState.showSnackbar(mensaje)
+            onConsumirMensaje()
+        }
+    }
+
+    Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+            .imePadding(), snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentPadding = PaddingValues(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Text(
+                    text = "Administra los equipos ficticios de tus evaluaciones.",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
 
-        Text(
-            text = "Administra los equipos ficticios que utilizarás en tus evaluaciones.",
-            style = MaterialTheme.typography.bodyLarge
-        )
+            when {
+                uiState.cargando -> {
+                    item {
+                        CircularProgressIndicator()
+                        Text("Cargando dispositivos…")
+                    }
+                }
 
-        Text(
-            text = "Aquí se mostrará tu lista de dispositivos.",
-            style = MaterialTheme.typography.bodyMedium
-        )
+                uiState.errorCarga != null -> {
+                    item {
+                        Text(
+                            text = uiState.errorCarga, color = MaterialTheme.colorScheme.error
+                        )
+
+                        Button(onClick = onReintentar) {
+                            Text("Reintentar")
+                        }
+                    }
+                }
+
+                uiState.perfilId == null -> {
+                    item {
+                        Text("Primero crea tu perfil ficticio.")
+
+                        Button(onClick = onIrAPerfil) {
+                            Text("Ir a Perfil")
+                        }
+                    }
+                }
+
+                uiState.formularioVisible -> {
+                    item {
+                        DispositivoFormulario(
+                            uiState = uiState,
+                            onNombreChange = onNombreChange,
+                            onSistemaChange = onSistemaChange,
+                            onGuardar = onGuardar,
+                            onCancelar = onCancelarFormulario
+                        )
+                    }
+                }
+
+                else -> {
+                    item {
+                        Button(
+                            onClick = onAgregar,
+                            enabled = !uiState.eliminando,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Agregar dispositivo")
+                        }
+                    }
+
+                    if (uiState.dispositivos.isEmpty()) {
+                        item {
+                            Text(
+                                "Todavía no tienes dispositivos. Agrega uno para comenzar."
+                            )
+                        }
+                    }
+
+                    items(
+                        items = uiState.dispositivos, key = { it.id }) { dispositivo ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = dispositivo.nombre,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                Text(dispositivo.sistemaOperativo.etiqueta)
+
+                                OutlinedButton(
+                                    onClick = { onEditar(dispositivo.id) },
+                                    enabled = !uiState.eliminando
+                                ) {
+                                    Text("Editar")
+                                }
+
+                                TextButton(
+                                    onClick = {
+                                        onSolicitarEliminar(dispositivo.id)
+                                    }, enabled = !uiState.eliminando
+                                ) {
+                                    Text("Eliminar")
+                                }
+                            }
+                        }
+                    }
+
+                    if (uiState.dispositivoAEliminar == null) {
+                        uiState.errorOperacion?.let { error ->
+                            item {
+                                Text(
+                                    text = error, color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    uiState.dispositivoAEliminar?.let { dispositivo ->
+        AlertDialog(onDismissRequest = onCancelarEliminar, title = {
+            Text("Eliminar dispositivo")
+        }, text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("¿Quieres quitar «${dispositivo.nombre}»?")
+
+                Text(
+                    "Si tiene evaluaciones, se archivará y conservará su historial. " + "Si no tiene evaluaciones, se eliminará."
+                )
+
+                uiState.errorOperacion?.let { error ->
+                    Text(
+                        text = error, color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        }, confirmButton = {
+            TextButton(
+                onClick = onConfirmarEliminar, enabled = !uiState.eliminando
+            ) {
+                Text(
+                    if (uiState.eliminando) "Procesando…"
+                    else "Confirmar"
+                )
+            }
+        }, dismissButton = {
+            TextButton(
+                onClick = onCancelarEliminar, enabled = !uiState.eliminando
+            ) {
+                Text("Cancelar")
+            }
+        })
     }
 }
 
@@ -37,6 +228,10 @@ fun DispositivosScreen(modifier: Modifier = Modifier) {
 @Composable
 fun DispositivosPreview() {
     TioTecPreventivoTheme {
-        DispositivosScreen()
+        DispositivosScreen(
+            uiState = DispositivosUiState(
+                cargando = false, perfilId = 1L
+            )
+        )
     }
 }

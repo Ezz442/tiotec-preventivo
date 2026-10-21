@@ -45,6 +45,8 @@ import androidx.compose.ui.platform.LocalContext
 import cl.duoc.tiotecpreventivo.TioTecApplication
 import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModelFactory
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
@@ -239,7 +241,41 @@ fun TioTecApp(
                     startDestination = RUTA_DISPOSITIVOS, route = GRAFO_DISPOSITIVOS
                 ) {
                     composable(RUTA_DISPOSITIVOS) {
-                        DispositivosScreen()
+                        val context = LocalContext.current
+
+                        val contenedor =
+                            (context.applicationContext as TioTecApplication).contenedor
+
+                        val factory = remember(contenedor) {
+                            DispositivosViewModelFactory(
+                                dispositivoRepository = contenedor.dispositivoRepository,
+                                perfilRepository = contenedor.perfilRepository
+                            )
+                        }
+
+                        val dispositivosViewModel: DispositivosViewModel = viewModel(
+                            factory = factory
+                        )
+
+                        val uiState by dispositivosViewModel.uiState.collectAsState()
+
+                        DispositivosScreen(
+                            uiState = uiState,
+                            onAgregar = dispositivosViewModel::abrirNuevo,
+                            onEditar = dispositivosViewModel::editarDispositivo,
+                            onSolicitarEliminar = dispositivosViewModel::solicitarEliminacion,
+                            onConfirmarEliminar = dispositivosViewModel::confirmarEliminacion,
+                            onCancelarEliminar = dispositivosViewModel::cancelarEliminacion,
+                            onNombreChange = dispositivosViewModel::onNombreChange,
+                            onSistemaChange = dispositivosViewModel::onSistemaOperativoChange,
+                            onGuardar = dispositivosViewModel::guardarDispositivo,
+                            onCancelarFormulario = dispositivosViewModel::cancelarFormulario,
+                            onReintentar = dispositivosViewModel::reintentarCarga,
+                            onIrAPerfil = {
+                                navegarPrincipal(DestinoPrincipal.PERFIL)
+                            },
+                            onConsumirMensaje = dispositivosViewModel::consumirMensaje
+                        )
                     }
                 }
             }
