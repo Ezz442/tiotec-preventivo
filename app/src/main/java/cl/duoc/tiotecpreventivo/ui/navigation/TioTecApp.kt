@@ -47,10 +47,13 @@ import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModelFactory
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
 private const val RUTA_AJUSTES = "ajustes"
+private const val RUTA_EVALUACION = "evaluacion/{dispositivoId}"
 
 private enum class DestinoPrincipal(
     val ruta: String, val titulo: String, val simbolo: String
@@ -71,6 +74,7 @@ fun TioTecApp(
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
     val rutaActual = entradaActual?.destination?.route
+    val enEvaluacion = rutaActual == RUTA_EVALUACION
     val enDispositivos = rutaActual == RUTA_DISPOSITIVOS
     val enAjustes = rutaActual == RUTA_AJUSTES
     val enPantallaSecundaria = enDispositivos || enAjustes
@@ -94,7 +98,7 @@ fun TioTecApp(
 
     PermanentNavigationDrawer(
         modifier = Modifier.fillMaxSize(), drawerContent = {
-            if (!esCompacto) {
+            if (!esCompacto && !enEvaluacion) {
                 PermanentDrawerSheet {
                     Text(
                         text = "TíoTec Preventivo",
@@ -105,12 +109,12 @@ fun TioTecApp(
                     DestinoPrincipal.entries.forEach { destino ->
                         NavigationDrawerItem(
                             label = {
-                            Text(destino.titulo)
-                        }, icon = {
-                            Text(destino.simbolo)
-                        }, selected = destinoSeleccionado == destino.ruta, onClick = {
-                            navegarPrincipal(destino)
-                        }, modifier = Modifier.padding(horizontal = 12.dp)
+                                Text(destino.titulo)
+                            }, icon = {
+                                Text(destino.simbolo)
+                            }, selected = destinoSeleccionado == destino.ruta, onClick = {
+                                navegarPrincipal(destino)
+                            }, modifier = Modifier.padding(horizontal = 12.dp)
                         )
                     }
                 }
@@ -125,6 +129,7 @@ fun TioTecApp(
                         when {
                             enDispositivos -> "Mis dispositivos"
                             enAjustes -> "Ajustes"
+                            enEvaluacion -> "Evaluación preventiva"
                             else -> "TíoTec Preventivo"
                         }
                     )
@@ -140,7 +145,7 @@ fun TioTecApp(
                 })
             },
             bottomBar = {
-                if (esCompacto) {
+                if (esCompacto && !enEvaluacion) {
                     NavigationBar {
                         DestinoPrincipal.entries.forEach { destino ->
                             NavigationBarItem(
@@ -271,11 +276,33 @@ fun TioTecApp(
                             onGuardar = dispositivosViewModel::guardarDispositivo,
                             onCancelarFormulario = dispositivosViewModel::cancelarFormulario,
                             onReintentar = dispositivosViewModel::reintentarCarga,
+                            onEvaluar = { dispositivoId ->
+                                navController.navigate("evaluacion/$dispositivoId") {
+                                    launchSingleTop = true
+                                }
+                            },
                             onIrAPerfil = {
                                 navegarPrincipal(DestinoPrincipal.PERFIL)
                             },
                             onConsumirMensaje = dispositivosViewModel::consumirMensaje
+
+
                         )
+                    }
+
+                    composable(
+                        route = RUTA_EVALUACION, arguments = listOf(
+                        navArgument("dispositivoId") {
+                            type = NavType.LongType
+                        })) { entrada ->
+                        val dispositivoId = requireNotNull(
+                            entrada.arguments
+                        ).getLong("dispositivoId")
+
+                        EvaluacionFlujo(
+                            dispositivoId = dispositivoId, onSalir = {
+                                navController.popBackStack()
+                            })
                     }
                 }
             }

@@ -38,6 +38,7 @@ fun DispositivosScreen(
     uiState: DispositivosUiState = DispositivosUiState(),
     onAgregar: () -> Unit = {},
     onEditar: (Long) -> Unit = {},
+    onEvaluar: (Long) -> Unit = {},
     onSolicitarEliminar: (Long) -> Unit = {},
     onConfirmarEliminar: () -> Unit = {},
     onCancelarEliminar: () -> Unit = {},
@@ -168,6 +169,13 @@ fun DispositivosScreen(
                                 )
 
                                 Text(dispositivo.sistemaOperativo.etiqueta)
+
+                                Button(
+                                    onClick = { onEvaluar(dispositivo.id) },
+                                    enabled = !uiState.eliminando
+                                ) {
+                                    Text("Evaluar dispositivo")
+                                }
 
                                 OutlinedButton(
                                     onClick = { onEditar(dispositivo.id) },
