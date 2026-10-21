@@ -41,6 +41,10 @@ import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasUiState
 import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
 import cl.duoc.tiotecpreventivo.ui.screens.AjustesRuta
 import cl.duoc.tiotecpreventivo.ui.screens.AjustesScreen
+import androidx.compose.ui.platform.LocalContext
+import cl.duoc.tiotecpreventivo.TioTecApplication
+import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModelFactory
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
@@ -192,13 +196,31 @@ fun TioTecApp(
                 }
 
                 composable(DestinoPrincipal.PERFIL.ruta) {
+                    val context = LocalContext.current
+
+                    val contenedor = (context.applicationContext as TioTecApplication).contenedor
+
+                    val factory = remember(contenedor) {
+                        PerfilViewModelFactory(contenedor.perfilRepository)
+                    }
+
+                    val perfilViewModel: PerfilViewModel = viewModel(
+                        factory = factory
+                    )
+
+                    val uiState by perfilViewModel.uiState.collectAsState()
+
                     PerfilScreen(
+                        uiState = uiState,
+                        onAliasChange = perfilViewModel::onAliasChange,
+                        onExperienciaChange = perfilViewModel::onExperienciaChange,
+                        onGuardar = perfilViewModel::guardarPerfil,
+                        onReintentar = perfilViewModel::reintentarCarga,
                         onAbrirAjustes = {
                             navController.navigate(RUTA_AJUSTES) {
                                 launchSingleTop = true
                             }
-                        }
-                    )
+                        })
                 }
 
                 composable(RUTA_AJUSTES) {
@@ -209,8 +231,7 @@ fun TioTecApp(
                         AjustesScreen(
                             uiState = PreferenciasUiState(cargando = false),
                             onTemaChange = {},
-                            onAvisosChange = {}
-                        )
+                            onAvisosChange = {})
                     }
                 }
 
