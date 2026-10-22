@@ -6,6 +6,7 @@ import cl.duoc.tiotecpreventivo.data.catalogo.ValorRespuesta
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoAccion
 import cl.duoc.tiotecpreventivo.data.local.entity.EvaluacionConDetalle
 import cl.duoc.tiotecpreventivo.data.local.entity.NivelRiesgo
+import cl.duoc.tiotecpreventivo.data.local.entity.RespuestaEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
 import cl.duoc.tiotecpreventivo.repository.CatalogoRepository
 
@@ -18,7 +19,16 @@ data class ResultadoEvaluacion(
     val nivelGlobal: NivelRiesgo,
     val categorias: List<ResultadoCategoriaVista>,
     val recomendaciones: List<RecomendacionVista>,
+    /** Respuestas tal como se guardaron (TT-14): no cambian si después se edita el catálogo o el dispositivo. */
+    val respuestas: List<RespuestaVista> = emptyList(),
     val aviso: String = ReglasRiesgo.AVISO_ORIENTACION
+)
+
+data class RespuestaVista(
+    val preguntaId: String,
+    val categoria: Categoria,
+    val textoPregunta: String,
+    val respuesta: ValorRespuesta
 )
 
 data class ResultadoCategoriaVista(
@@ -102,6 +112,16 @@ class ResultadoEvaluacionMapper(
                 )
             }
 
+        // Orden del cuestionario; una pregunta que ya no está en el catálogo va al final de su categoría.
+        val ordenCuestionario = catalogo.preguntas().mapIndexed { i, p -> p.id to i }.toMap()
+        val respuestas = detalle.respuestas
+            .sortedWith(
+                compareBy<RespuestaEntity> { it.categoria.ordinal }
+                    .thenBy { ordenCuestionario[it.preguntaId] ?: Int.MAX_VALUE }
+                    .thenBy { it.preguntaId }
+            )
+            .map { RespuestaVista(it.preguntaId, it.categoria, it.textoPregunta, it.valor) }
+
         return ResultadoEvaluacion(
             evaluacionId = detalle.evaluacion.id,
             nombreDispositivo = detalle.evaluacion.nombreDispositivo,
@@ -109,7 +129,8 @@ class ResultadoEvaluacionMapper(
             fecha = detalle.evaluacion.fecha,
             nivelGlobal = detalle.evaluacion.nivelGlobal,
             categorias = categorias,
-            recomendaciones = recomendaciones
+            recomendaciones = recomendaciones,
+            respuestas = respuestas
         )
     }
 }
