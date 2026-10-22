@@ -15,42 +15,44 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import cl.duoc.tiotecpreventivo.TioTecApplication
+import cl.duoc.tiotecpreventivo.data.local.InicioRepositoryLocal
 import cl.duoc.tiotecpreventivo.ui.screens.AccionesScreen
+import cl.duoc.tiotecpreventivo.ui.screens.AjustesRuta
+import cl.duoc.tiotecpreventivo.ui.screens.AjustesScreen
 import cl.duoc.tiotecpreventivo.ui.screens.AprendeScreen
+import cl.duoc.tiotecpreventivo.ui.screens.ContenidoScreen
 import cl.duoc.tiotecpreventivo.ui.screens.DispositivosScreen
 import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
-import androidx.compose.ui.tooling.preview.Preview
+import cl.duoc.tiotecpreventivo.ui.screens.ResultadoScreen
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
-import cl.duoc.tiotecpreventivo.data.local.InicioRepositoryMemoria
-import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModel
-import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModelFactory
-import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasUiState
-import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
-import cl.duoc.tiotecpreventivo.ui.screens.AjustesRuta
-import cl.duoc.tiotecpreventivo.ui.screens.AjustesScreen
-import androidx.compose.ui.platform.LocalContext
-import cl.duoc.tiotecpreventivo.TioTecApplication
-import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModel
-import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.AccionesViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.AccionesViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModelFactory
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
-import cl.duoc.tiotecpreventivo.ui.screens.ContenidoScreen
-import cl.duoc.tiotecpreventivo.ui.screens.ResultadoScreen
+import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasUiState
+import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModelFactory
 
@@ -185,9 +187,15 @@ fun TioTecApp(
                     .fillMaxSize()
             ) {
                 composable(DestinoPrincipal.INICIO.ruta) {
-                    val factory = remember {
+                    val context = LocalContext.current
+                    val contenedor = (context.applicationContext as TioTecApplication).contenedor
+
+                    val factory = remember(contenedor) {
                         InicioViewModelFactory(
-                            InicioRepositoryMemoria()
+                            InicioRepositoryLocal(
+                                perfilRepository = contenedor.perfilRepository,
+                                accionRepository = contenedor.accionRepository
+                            )
                         )
                     }
 
@@ -206,7 +214,22 @@ fun TioTecApp(
                 }
 
                 composable(DestinoPrincipal.ACCIONES.ruta) {
-                    AccionesScreen()
+                    val context = LocalContext.current
+                    val contenedor = (context.applicationContext as TioTecApplication).contenedor
+
+                    val factory = remember(contenedor) {
+                        AccionesViewModelFactory(contenedor.accionRepository)
+                    }
+
+                    val accionesViewModel: AccionesViewModel = viewModel(factory = factory)
+                    val uiState by accionesViewModel.uiState.collectAsState()
+
+                    AccionesScreen(
+                        uiState = uiState,
+                        onFiltroChange = accionesViewModel::cambiarFiltro,
+                        onCambiarEstado = accionesViewModel::cambiarEstado,
+                        onReintentar = accionesViewModel::reintentarCarga
+                    )
                 }
 
                 composable(DestinoPrincipal.APRENDE.ruta) {
@@ -301,25 +324,23 @@ fun TioTecApp(
 
                     composable(
                         route = RUTA_EVALUACION, arguments = listOf(
-                        navArgument("dispositivoId") {
-                            type = NavType.LongType
-                        })) { entrada ->
+                            navArgument("dispositivoId") {
+                                type = NavType.LongType
+                            })
+                    ) { entrada ->
                         val dispositivoId = requireNotNull(
                             entrada.arguments
                         ).getLong("dispositivoId")
 
-                        EvaluacionFlujo(
-                            dispositivoId = dispositivoId,
-                            onSalir = {
-                                navController.popBackStack()
-                            },
-                            onVerResultado = { evaluacionId ->
-                                // Se quita la evaluación de la pila: "Volver" lleva a Mis dispositivos.
-                                navController.navigate("resultado/$evaluacionId") {
-                                    popUpTo(RUTA_EVALUACION) { inclusive = true }
-                                    launchSingleTop = true
-                                }
-                            })
+                        EvaluacionFlujo(dispositivoId = dispositivoId, onSalir = {
+                            navController.popBackStack()
+                        }, onVerResultado = { evaluacionId ->
+                            // Se quita la evaluación de la pila: "Volver" lleva a Mis dispositivos.
+                            navController.navigate("resultado/$evaluacionId") {
+                                popUpTo(RUTA_EVALUACION) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        })
                     }
 
                     composable(
@@ -350,8 +371,7 @@ fun TioTecApp(
                                     launchSingleTop = true
                                 }
                             },
-                            onVolver = { navController.popBackStack() }
-                        )
+                            onVolver = { navController.popBackStack() })
                     }
                 }
 
@@ -367,9 +387,7 @@ fun TioTecApp(
                     }
 
                     ContenidoScreen(
-                        contenido = contenido,
-                        onVolver = { navController.popBackStack() }
-                    )
+                        contenido = contenido, onVolver = { navController.popBackStack() })
                 }
             }
         }
