@@ -176,6 +176,23 @@ class ResultadoEvaluacionMapperTest {
     }
 
     @Test
+    fun muestraLasRespuestasGuardadasEnOrdenDelCuestionario() {
+        val detalle = detalleGuardado(mixtas)
+        // Room no garantiza el orden y el texto guardado puede ser distinto al del catálogo actual.
+        val guardado = detalle.copy(
+            respuestas = detalle.respuestas.reversed().map {
+                if (it.preguntaId == "AUT-01") it.copy(textoPregunta = "Texto antiguo de AUT-01") else it
+            }
+        )
+        val resultado = mapper.construir(guardado)
+
+        assertEquals(catalogo.preguntas().map { it.id }, resultado.respuestas.map { it.preguntaId })
+        assertEquals("Texto antiguo de AUT-01",
+            resultado.respuestas.single { it.preguntaId == "AUT-01" }.textoPregunta)
+        assertEquals(NO_SE, resultado.respuestas.single { it.preguntaId == "ACT-03" }.respuesta)
+    }
+
+    @Test
     fun consultarVariasVecesDaElMismoResultado() {
         val detalle = detalleGuardado(mixtas)
         val primera = mapper.construir(detalle)

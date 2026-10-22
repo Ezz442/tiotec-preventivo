@@ -18,6 +18,10 @@ abstract class DispositivoDao {
     @Query("SELECT * FROM dispositivo WHERE id = :id")
     abstract fun observar(id: Long): Flow<DispositivoEntity?>
 
+    /** Todos, incluidos los archivados: el historial (TT-14) necesita su nombre actual. */
+    @Query("SELECT * FROM dispositivo")
+    abstract fun observarTodos(): Flow<List<DispositivoEntity>>
+
     @Query("SELECT * FROM dispositivo WHERE id = :id")
     abstract suspend fun obtener(id: Long): DispositivoEntity?
 

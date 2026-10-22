@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,7 +24,8 @@ import cl.duoc.tiotecpreventivo.viewmodel.InicioUiState
 fun InicioScreen(
     uiState: InicioUiState = InicioUiState(cargando = false),
     modifier: Modifier = Modifier,
-    onVerDispositivos: () -> Unit = {}
+    onVerDispositivos: () -> Unit = {},
+    onVerHistorial: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -80,6 +82,14 @@ fun InicioScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Mis dispositivos")
+        }
+
+        OutlinedButton(
+            onClick = onVerHistorial,
+            enabled = !uiState.cargando,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Historial de evaluaciones")
         }
     }
 }
