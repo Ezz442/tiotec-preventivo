@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,7 +31,10 @@ import cl.duoc.tiotecpreventivo.viewmodel.EvaluacionViewModelFactory
 
 @Composable
 fun EvaluacionFlujo(
-    dispositivoId: Long, onSalir: () -> Unit
+    dispositivoId: Long,
+    onSalir: () -> Unit,
+    /** TT-12: abre los resultados de la evaluación recién guardada. */
+    onVerResultado: (evaluacionId: Long) -> Unit = {}
 ) {
     val context = LocalContext.current
     val contenedor = (context.applicationContext as TioTecApplication).contenedor
@@ -59,7 +63,9 @@ fun EvaluacionFlujo(
         }
     }
 
-    if (uiState.evaluacionGuardadaId != null) {
+    val evaluacionGuardadaId = uiState.evaluacionGuardadaId
+
+    if (evaluacionGuardadaId != null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -72,7 +78,11 @@ fun EvaluacionFlujo(
 
             Text("Tus respuestas y resultados quedaron guardados.")
 
-            Button(onClick = onSalir) {
+            Button(onClick = { onVerResultado(evaluacionGuardadaId) }) {
+                Text("Ver resultados")
+            }
+
+            OutlinedButton(onClick = onSalir) {
                 Text("Volver a mis dispositivos")
             }
         }
