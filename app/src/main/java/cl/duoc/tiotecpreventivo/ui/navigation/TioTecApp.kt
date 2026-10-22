@@ -39,6 +39,7 @@ import cl.duoc.tiotecpreventivo.ui.screens.AjustesScreen
 import cl.duoc.tiotecpreventivo.ui.screens.AprendeScreen
 import cl.duoc.tiotecpreventivo.ui.screens.ContenidoScreen
 import cl.duoc.tiotecpreventivo.ui.screens.DispositivosScreen
+import cl.duoc.tiotecpreventivo.ui.screens.HistorialScreen
 import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
 import cl.duoc.tiotecpreventivo.ui.screens.ResultadoScreen
@@ -47,6 +48,8 @@ import cl.duoc.tiotecpreventivo.viewmodel.AccionesViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.AccionesViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.HistorialViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.HistorialViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.InicioViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModel
@@ -62,6 +65,7 @@ private const val RUTA_AJUSTES = "ajustes"
 private const val RUTA_EVALUACION = "evaluacion/{dispositivoId}"
 private const val RUTA_RESULTADO = "resultado/{evaluacionId}"
 private const val RUTA_CONTENIDO = "contenido/{contenidoId}"
+private const val RUTA_HISTORIAL = "historial"
 
 private enum class DestinoPrincipal(
     val ruta: String, val titulo: String, val simbolo: String
@@ -87,11 +91,12 @@ fun TioTecApp(
     val enAjustes = rutaActual == RUTA_AJUSTES
     val enResultado = rutaActual == RUTA_RESULTADO
     val enContenido = rutaActual == RUTA_CONTENIDO
-    val enPantallaSecundaria = enDispositivos || enAjustes || enResultado || enContenido
+    val enHistorial = rutaActual == RUTA_HISTORIAL
+    val enPantallaSecundaria = enDispositivos || enAjustes || enResultado || enContenido || enHistorial
     val esCompacto = windowWidthSizeClass == WindowWidthSizeClass.Compact
 
     val destinoSeleccionado = when {
-        enDispositivos || enResultado -> DestinoPrincipal.INICIO.ruta
+        enDispositivos || enResultado || enHistorial -> DestinoPrincipal.INICIO.ruta
         enAjustes -> DestinoPrincipal.PERFIL.ruta
         enContenido -> DestinoPrincipal.APRENDE.ruta
         else -> rutaActual
@@ -143,6 +148,7 @@ fun TioTecApp(
                             enEvaluacion -> "Evaluación preventiva"
                             enResultado -> "Resultados"
                             enContenido -> "Aprende"
+                            enHistorial -> "Historial"
                             else -> "TíoTec Preventivo"
                         }
                     )
@@ -210,7 +216,40 @@ fun TioTecApp(
                             navController.navigate(GRAFO_DISPOSITIVOS) {
                                 launchSingleTop = true
                             }
+                        }, onVerHistorial = {
+                            navController.navigate(RUTA_HISTORIAL) {
+                                launchSingleTop = true
+                            }
                         })
+                }
+
+                composable(RUTA_HISTORIAL) {
+                    val contenedor =
+                        (LocalContext.current.applicationContext as TioTecApplication).contenedor
+
+                    val factory = remember(contenedor) {
+                        HistorialViewModelFactory(contenedor.evaluacionRepository)
+                    }
+
+                    val historialViewModel: HistorialViewModel = viewModel(factory = factory)
+                    val uiState by historialViewModel.uiState.collectAsState()
+
+                    HistorialScreen(
+                        uiState = uiState,
+                        onSeleccionarDispositivo = historialViewModel::seleccionarDispositivo,
+                        // El detalle es la misma pantalla de resultados (TT-12); "Volver" regresa aquí.
+                        onAbrirEvaluacion = { evaluacionId ->
+                            navController.navigate("resultado/$evaluacionId") {
+                                launchSingleTop = true
+                            }
+                        },
+                        onIrADispositivos = {
+                            navController.navigate(GRAFO_DISPOSITIVOS) {
+                                launchSingleTop = true
+                            }
+                        },
+                        onReintentar = historialViewModel::reintentar
+                    )
                 }
 
                 composable(DestinoPrincipal.ACCIONES.ruta) {
