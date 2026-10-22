@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import cl.duoc.tiotecpreventivo.data.local.entity.EvaluacionEntity
 import cl.duoc.tiotecpreventivo.domain.FiltroDispositivo
 import cl.duoc.tiotecpreventivo.domain.HistorialLogica
+import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.EvaluacionRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -13,6 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -34,6 +38,8 @@ data class HistorialUiState(
  * en la lista. Solo lee, nunca escribe.
  */
 class HistorialViewModel(
+    /** dispositivoId → nombre actual, para que el filtro cambie al renombrar un dispositivo. */
+    private val observarNombresActuales: () -> Flow<Map<Long, String>> = { flowOf(emptyMap()) },
     private val observarHistorial: () -> Flow<List<EvaluacionEntity>>
 ) : ViewModel() {
 
@@ -52,9 +58,11 @@ class HistorialViewModel(
 
         observacion = viewModelScope.launch {
             try {
-                observarHistorial().collect { evaluaciones ->
+                combine(observarHistorial(), observarNombresActuales()) { evaluaciones, nombres ->
+                    evaluaciones to nombres
+                }.collect { (evaluaciones, nombres) ->
                     _uiState.update { actual ->
-                        val filtros = HistorialLogica.filtros(evaluaciones)
+                        val filtros = HistorialLogica.filtros(evaluaciones, nombres)
                         // Si el dispositivo filtrado ya no tiene evaluaciones, se vuelve a "Todos".
                         val seleccionado = actual.dispositivoSeleccionado
                             ?.takeIf { id -> filtros.any { it.dispositivoId == id } }
@@ -90,13 +98,21 @@ class HistorialViewModel(
 }
 
 class HistorialViewModelFactory(
-    private val evaluacionRepository: EvaluacionRepository
+    private val evaluacionRepository: EvaluacionRepository,
+    private val dispositivoRepository: DispositivoRepository
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HistorialViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return HistorialViewModel(evaluacionRepository::observarHistorial) as T
+            return HistorialViewModel(
+                observarHistorial = evaluacionRepository::observarHistorial,
+                observarNombresActuales = {
+                    dispositivoRepository.observarTodos().map { dispositivos ->
+                        dispositivos.associate { it.id to it.nombre }
+                    }
+                }
+            ) as T
         }
 
         throw IllegalArgumentException("ViewModel no compatible")

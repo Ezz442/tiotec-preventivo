@@ -90,6 +90,19 @@ class HistorialViewModelTest {
     }
 
     @Test
+    fun renombrarElDispositivoActualizaElFiltroPeroNoLasEvaluaciones() {
+        val room = MutableStateFlow(listOf(evaluacion(1, 10, "iaintegradajorge", 100)))
+        val nombres = MutableStateFlow(mapOf(10L to "iaintegradajorge"))
+        val viewModel = HistorialViewModel(observarNombresActuales = { nombres }, observarHistorial = { room })
+        assertEquals("iaintegradajorge", viewModel.uiState.value.filtros.single().nombre)
+
+        nombres.value = mapOf(10L to "superiajorge")
+
+        assertEquals("superiajorge", viewModel.uiState.value.filtros.single().nombre)
+        assertEquals("iaintegradajorge", viewModel.uiState.value.visibles.single().nombreDispositivo)
+    }
+
+    @Test
     fun errorAlLeerPermiteReintentar() {
         var falla = true
         val viewModel = HistorialViewModel {

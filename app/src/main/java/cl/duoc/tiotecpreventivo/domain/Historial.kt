@@ -4,7 +4,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.EvaluacionEntity
 
 /**
  * Opción del filtro por dispositivo del historial (TT-14).
- * @param nombre nombre guardado en la evaluación más reciente de ese dispositivo.
+ * @param nombre nombre actual del dispositivo; si ya no existe, el de su evaluación más reciente.
  */
 data class FiltroDispositivo(
     val dispositivoId: Long,
@@ -26,14 +26,22 @@ object HistorialLogica {
             compareByDescending<EvaluacionEntity> { it.fecha }.thenByDescending { it.id }
         )
 
-    /** Un filtro por cada dispositivo que tiene evaluaciones, ordenados por nombre. */
-    fun filtros(evaluaciones: List<EvaluacionEntity>): List<FiltroDispositivo> =
+    /**
+     * Un filtro por cada dispositivo que tiene evaluaciones, ordenados por nombre.
+     * @param nombresActuales dispositivoId → nombre actual (incluye archivados). El filtro
+     *   usa el nombre actual, aunque las tarjetas sigan mostrando el que tenía al evaluarse.
+     */
+    fun filtros(
+        evaluaciones: List<EvaluacionEntity>,
+        nombresActuales: Map<Long, String> = emptyMap()
+    ): List<FiltroDispositivo> =
         evaluaciones
             .groupBy { it.dispositivoId }
             .map { (dispositivoId, delDispositivo) ->
                 FiltroDispositivo(
                     dispositivoId = dispositivoId,
-                    nombre = ordenar(delDispositivo).first().nombreDispositivo,
+                    nombre = nombresActuales[dispositivoId]
+                        ?: ordenar(delDispositivo).first().nombreDispositivo,
                     cantidad = delDispositivo.size
                 )
             }

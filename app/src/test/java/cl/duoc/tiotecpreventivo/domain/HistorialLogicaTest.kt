@@ -53,6 +53,28 @@ class HistorialLogicaTest {
     }
 
     @Test
+    fun filtroUsaElNombreActualDelDispositivoAunqueNoSeHayaVueltoAEvaluar() {
+        // Caso de la revisión de Gerard: se renombra sin evaluar de nuevo.
+        val soloAntiguas = listOf(
+            evaluacion(1, dispositivoId = 10, nombre = "iaintegradajorge", fecha = 100),
+            evaluacion(2, dispositivoId = 10, nombre = "iaintegradajorge", fecha = 200)
+        )
+        val filtros = HistorialLogica.filtros(soloAntiguas, mapOf(10L to "superiajorge"))
+
+        assertEquals(listOf(FiltroDispositivo(10, "superiajorge", 2)), filtros)
+        // Las evaluaciones no cambian: siguen con el nombre que tenían al evaluarse.
+        assertTrue(HistorialLogica.filtrar(soloAntiguas, 10).all { it.nombreDispositivo == "iaintegradajorge" })
+    }
+
+    @Test
+    fun sinNombreActualSeUsaElDeLaEvaluacionMasReciente() {
+        val filtros = HistorialLogica.filtros(evaluaciones, mapOf(20L to "Notebook de prueba"))
+
+        assertEquals("Notebook de prueba", filtros.single { it.dispositivoId == 20L }.nombre)
+        assertEquals("Teléfono de prueba", filtros.single { it.dispositivoId == 10L }.nombre)
+    }
+
+    @Test
     fun historialVacio() {
         assertTrue(HistorialLogica.filtros(emptyList()).isEmpty())
         assertTrue(HistorialLogica.filtrar(emptyList(), null).isEmpty())

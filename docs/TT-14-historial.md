@@ -25,7 +25,7 @@ Cada evaluación guarda **copias** en Room (TT-04/TT-07), y el historial muestra
 | Nivel y explicación | `evaluacion.nivelGlobal`, `resultado_categoria` | La pantalla usa los niveles guardados; no los recalcula con reglas nuevas. |
 | Dispositivo eliminado con evaluaciones | Se **archiva** (TT-07) | Sale de Mis dispositivos, pero sus evaluaciones siguen en el historial. |
 
-El filtro muestra el nombre **más reciente** del dispositivo; cada tarjeta, el nombre que tenía al evaluarse.
+El filtro muestra el **nombre actual** del dispositivo (también si está archivado), aunque no se haya vuelto a evaluar; cada tarjeta mantiene el nombre que tenía al evaluarse. Para eso `HistorialViewModel` combina `observarHistorial()` con `DispositivoRepository.observarTodos()` (consulta nueva que incluye archivados; no cambia el esquema de Room).
 
 ## 3. Código
 
@@ -42,10 +42,10 @@ El filtro muestra el nombre **más reciente** del dispositivo; cada tarjeta, el 
 
 | Prueba | Dónde | Qué comprueba |
 |---|---|---|
-| `HistorialLogicaTest` (5) | JVM | Orden por fecha, filtros con nombre reciente y cantidad, filtrar, nombre antiguo conservado, vacío. |
-| `HistorialViewModelTest` (6) | JVM | Vacío, evaluación nueva aparece sola, filtro y "Todos", dispositivo inexistente, filtro que desaparece, error con reintento. |
+| `HistorialLogicaTest` (7) | JVM | Orden por fecha, filtros con cantidad, filtrar, nombre antiguo conservado, **filtro con nombre actual sin reevaluar**, respaldo al nombre de la evaluación, vacío. |
+| `HistorialViewModelTest` (7) | JVM | Vacío, evaluación nueva aparece sola, filtro y "Todos", dispositivo inexistente, filtro que desaparece, **renombrar actualiza el filtro y no las evaluaciones**, error con reintento. |
 | `ResultadoEvaluacionMapperTest` (+1) | JVM | Respuestas en orden del cuestionario con el texto guardado. |
-| `HistorialRoomTest` (5) | Emulador | Vacío; varias evaluaciones por fecha y dispositivo; editar dispositivo no sobrescribe; eliminar archiva y conserva; historial igual al cerrar y reabrir la base. |
+| `HistorialRoomTest` (6) | Emulador | Vacío; varias evaluaciones por fecha y dispositivo; editar dispositivo no sobrescribe; **renombrar sin reevaluar cambia el filtro**; eliminar archiva y conserva; historial igual al cerrar y reabrir la base. |
 
 ```powershell
 .\gradlew.bat :app:testDebugUnitTest
@@ -56,7 +56,7 @@ El filtro muestra el nombre **más reciente** del dispositivo; cada tarjeta, el 
 
 1. Sin evaluaciones: Inicio → Historial → mensaje vacío y botón a Mis dispositivos.
 2. Evaluar dos dispositivos (uno dos veces) → Historial muestra 3, la más reciente arriba, y filtros por dispositivo.
-3. Editar el nombre de un dispositivo y volver al Historial: las evaluaciones antiguas mantienen el nombre anterior.
+3. Editar el nombre de un dispositivo **sin volver a evaluarlo** y volver al Historial: las evaluaciones antiguas mantienen el nombre anterior y el filtro muestra el nombre nuevo.
 4. **Ver detalle** → resultados y *Ver las 12 respuestas*. **Volver** regresa al historial.
 5. Eliminar un dispositivo con evaluaciones (se archiva) → su historial sigue visible.
 6. Cerrar la app desde Recientes y abrirla: el historial sigue igual.

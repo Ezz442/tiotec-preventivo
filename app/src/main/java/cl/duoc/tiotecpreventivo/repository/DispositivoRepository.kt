@@ -29,6 +29,9 @@ class DispositivoRepository(
 
     fun observar(id: Long): Flow<DispositivoEntity?> = dao.observar(id)
 
+    /** Incluye archivados. Lo usa el filtro del historial para mostrar el nombre actual (TT-14). */
+    fun observarTodos(): Flow<List<DispositivoEntity>> = dao.observarTodos()
+
     suspend fun obtener(id: Long): DispositivoEntity? = dao.obtener(id)
 
     /** Para la validación "nombre no repetido entre activos". `excluirId` = id en edición, 0 al crear. */

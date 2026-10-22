@@ -128,6 +128,21 @@ class HistorialRoomTest {
     }
 
     @Test
+    fun renombrarSinVolverAEvaluarCambiaElFiltroYNoLasEvaluaciones(): Unit = runBlocking {
+        // Caso de la revisión de Gerard en TT-14.
+        val id = crearDispositivo("iaintegradajorge", SistemaOperativo.ANDROID)
+        evaluar(id, respuestas(ValorRespuesta.NO))
+        evaluar(id, respuestas(ValorRespuesta.SI))
+
+        dispositivos.actualizar(id, "superiajorge", SistemaOperativo.ANDROID)
+
+        val historial = evaluaciones.observarHistorial().first()
+        val nombres = dispositivos.observarTodos().first().associate { it.id to it.nombre }
+        assertEquals("superiajorge", HistorialLogica.filtros(historial, nombres).single().nombre)
+        assertTrue(historial.all { it.nombreDispositivo == "iaintegradajorge" })
+    }
+
+    @Test
     fun eliminarDispositivoConEvaluacionesConservaElHistorial(): Unit = runBlocking {
         val id = crearDispositivo("Computador antiguo", SistemaOperativo.WINDOWS)
         val evaluacionId = evaluar(id, respuestas(ValorRespuesta.NO))
@@ -135,6 +150,8 @@ class HistorialRoomTest {
         assertEquals(ResultadoEliminacion.Archivado, dispositivos.eliminar(id))
 
         assertTrue(dispositivos.observarActivos().first().none { it.id == id })
+        // Archivado sigue existiendo, así que el filtro conserva su nombre.
+        assertEquals("Computador antiguo", dispositivos.observarTodos().first().single { it.id == id }.nombre)
         val historial = evaluaciones.observarHistorial().first()
         assertEquals(listOf(evaluacionId), historial.map { it.id })
         val detalle = mapper.construir(evaluaciones.obtenerDetalle(evaluacionId)!!)

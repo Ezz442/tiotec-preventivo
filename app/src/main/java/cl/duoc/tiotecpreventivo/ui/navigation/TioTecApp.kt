@@ -228,7 +228,10 @@ fun TioTecApp(
                         (LocalContext.current.applicationContext as TioTecApplication).contenedor
 
                     val factory = remember(contenedor) {
-                        HistorialViewModelFactory(contenedor.evaluacionRepository)
+                        HistorialViewModelFactory(
+                            evaluacionRepository = contenedor.evaluacionRepository,
+                            dispositivoRepository = contenedor.dispositivoRepository
+                        )
                     }
 
                     val historialViewModel: HistorialViewModel = viewModel(factory = factory)
