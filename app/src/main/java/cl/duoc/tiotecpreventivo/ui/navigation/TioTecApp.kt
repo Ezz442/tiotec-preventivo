@@ -49,11 +49,17 @@ import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModelFactory
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import cl.duoc.tiotecpreventivo.ui.screens.ContenidoScreen
+import cl.duoc.tiotecpreventivo.ui.screens.ResultadoScreen
+import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModelFactory
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
 private const val RUTA_AJUSTES = "ajustes"
 private const val RUTA_EVALUACION = "evaluacion/{dispositivoId}"
+private const val RUTA_RESULTADO = "resultado/{evaluacionId}"
+private const val RUTA_CONTENIDO = "contenido/{contenidoId}"
 
 private enum class DestinoPrincipal(
     val ruta: String, val titulo: String, val simbolo: String
@@ -77,12 +83,15 @@ fun TioTecApp(
     val enEvaluacion = rutaActual == RUTA_EVALUACION
     val enDispositivos = rutaActual == RUTA_DISPOSITIVOS
     val enAjustes = rutaActual == RUTA_AJUSTES
-    val enPantallaSecundaria = enDispositivos || enAjustes
+    val enResultado = rutaActual == RUTA_RESULTADO
+    val enContenido = rutaActual == RUTA_CONTENIDO
+    val enPantallaSecundaria = enDispositivos || enAjustes || enResultado || enContenido
     val esCompacto = windowWidthSizeClass == WindowWidthSizeClass.Compact
 
     val destinoSeleccionado = when {
-        enDispositivos -> DestinoPrincipal.INICIO.ruta
+        enDispositivos || enResultado -> DestinoPrincipal.INICIO.ruta
         enAjustes -> DestinoPrincipal.PERFIL.ruta
+        enContenido -> DestinoPrincipal.APRENDE.ruta
         else -> rutaActual
     }
 
@@ -130,6 +139,8 @@ fun TioTecApp(
                             enDispositivos -> "Mis dispositivos"
                             enAjustes -> "Ajustes"
                             enEvaluacion -> "Evaluación preventiva"
+                            enResultado -> "Resultados"
+                            enContenido -> "Aprende"
                             else -> "TíoTec Preventivo"
                         }
                     )
@@ -285,8 +296,6 @@ fun TioTecApp(
                                 navegarPrincipal(DestinoPrincipal.PERFIL)
                             },
                             onConsumirMensaje = dispositivosViewModel::consumirMensaje
-
-
                         )
                     }
 
@@ -300,10 +309,67 @@ fun TioTecApp(
                         ).getLong("dispositivoId")
 
                         EvaluacionFlujo(
-                            dispositivoId = dispositivoId, onSalir = {
+                            dispositivoId = dispositivoId,
+                            onSalir = {
                                 navController.popBackStack()
+                            },
+                            onVerResultado = { evaluacionId ->
+                                // Se quita la evaluación de la pila: "Volver" lleva a Mis dispositivos.
+                                navController.navigate("resultado/$evaluacionId") {
+                                    popUpTo(RUTA_EVALUACION) { inclusive = true }
+                                    launchSingleTop = true
+                                }
                             })
                     }
+
+                    composable(
+                        route = RUTA_RESULTADO,
+                        arguments = listOf(navArgument("evaluacionId") { type = NavType.LongType })
+                    ) { entrada ->
+                        val evaluacionId = requireNotNull(entrada.arguments).getLong("evaluacionId")
+                        val contenedor =
+                            (LocalContext.current.applicationContext as TioTecApplication).contenedor
+
+                        val factory = remember(contenedor, evaluacionId) {
+                            ResultadoViewModelFactory(
+                                evaluacionId = evaluacionId,
+                                evaluacionRepository = contenedor.evaluacionRepository,
+                                catalogoRepository = contenedor.catalogoRepository
+                            )
+                        }
+
+                        val resultadoViewModel: ResultadoViewModel = viewModel(factory = factory)
+                        val uiState by resultadoViewModel.uiState.collectAsState()
+
+                        ResultadoScreen(
+                            uiState = uiState,
+                            onReintentar = resultadoViewModel::reintentar,
+                            onVerAcciones = { navegarPrincipal(DestinoPrincipal.ACCIONES) },
+                            onAprender = { contenidoId ->
+                                navController.navigate("contenido/$contenidoId") {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onVolver = { navController.popBackStack() }
+                        )
+                    }
+                }
+
+                composable(
+                    route = RUTA_CONTENIDO,
+                    arguments = listOf(navArgument("contenidoId") { type = NavType.StringType })
+                ) { entrada ->
+                    val contenidoId = entrada.arguments?.getString("contenidoId").orEmpty()
+                    val contenedor =
+                        (LocalContext.current.applicationContext as TioTecApplication).contenedor
+                    val contenido = remember(contenidoId) {
+                        contenedor.catalogoRepository.contenido(contenidoId)
+                    }
+
+                    ContenidoScreen(
+                        contenido = contenido,
+                        onVolver = { navController.popBackStack() }
+                    )
                 }
             }
         }
