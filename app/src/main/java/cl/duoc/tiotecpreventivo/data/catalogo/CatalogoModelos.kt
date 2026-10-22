@@ -31,8 +31,9 @@ data class Pregunta(
     val categoria: Categoria,
     val texto: String,                       // redactada para que "Sí" sea la buena práctica
     val ayuda: String,                       // explicación breve bajo la pregunta
-    val puntajes: Map<ValorRespuesta, Int>,  // provisionales; TT-10 define los definitivos
-    val orden: Int                           // orden dentro de su categoría
+    val puntajes: Map<ValorRespuesta, Int>,  // definidos en TT-10 (ver docs/TT-10-reglas-riesgo.md)
+    val orden: Int,                          // orden dentro de su categoría
+    val clave: Boolean = false               // práctica clave: si no se aplica, la categoría es al menos riesgo medio
 )
 
 data class Recomendacion(

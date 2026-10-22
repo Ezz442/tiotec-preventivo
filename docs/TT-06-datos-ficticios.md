@@ -48,7 +48,7 @@ Acceso: interfaz `repository/CatalogoRepository.kt`, implementada por `data/cata
 | IDs estables | Preguntas `RES/ACT/AUT/RCU-NN`; recomendaciones `REC-` + ID de su pregunta; contenidos `CON-` + prefijo de categoría + `-NN`. Un ID publicado no se cambia ni se reutiliza, porque Room guarda `preguntaId` y `recomendacionId` en el historial. Se usa `RCU` (y no `REC`) para Recuperación, para no confundirlo con el prefijo de recomendaciones. |
 | Redacción | Cada pregunta está escrita para que **"Sí" sea la buena práctica**. Lenguaje simple, segunda persona, sin tecnicismos innecesarios. |
 | Activación | Cada recomendación se activa con **"No" o "No lo sé"**; nunca con "Sí". |
-| Puntajes | Provisionales e iguales para todas: Sí = 0, No lo sé = 1, No = 2. Los puntajes y umbrales definitivos los fija **TT-10**. |
+| Puntajes | Definidos en **TT-10** (`docs/TT-10-reglas-riesgo.md`): normal Sí = 0, No lo sé = 1, No = 2; práctica clave Sí = 0, No lo sé = 2, No = 3. |
 | Prioridad y revisión | Alta = 7 días, Media = 14 días, Baja = 30 días hasta la fecha de revisión de la acción. |
 | Orden | Recomendaciones: Alta → Media → Baja, luego por categoría y orden de la pregunta. Preguntas: por categoría y luego por `orden`. |
 | Contenido enlazado | Cada recomendación apunta a un contenido de **su misma categoría** (botón *Aprender cómo hacerlo*). |
@@ -81,7 +81,7 @@ Ejecutar en Android Studio: clic derecho sobre `CatalogoLocalTest` → **Run**, 
 
 | Tarea | Usa |
 |---|---|
-| TT-10 | Ajusta `puntajes` y define umbrales de riesgo |
+| TT-10 | Puntajes definitivos, prácticas clave y `domain/ReglasRiesgo.kt` |
 | TT-11 | `preguntas()` / `preguntasDe(categoria)` |
 | TT-12 | `recomendacionesPara(respuestas)` |
 | TT-13 | `prioridad` y `diasParaRevision` para crear acciones |

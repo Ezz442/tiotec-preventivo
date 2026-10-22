@@ -12,11 +12,21 @@ package cl.duoc.tiotecpreventivo.data.catalogo
  */
 object CatalogoLocal {
 
-    /** Puntajes provisionales para todas las preguntas. TT-10 define los puntajes y umbrales finales. */
-    val PUNTAJES_BASE: Map<ValorRespuesta, Int> = mapOf(
+    /**
+     * Puntajes definitivos (TT-10). Más puntaje = más riesgo.
+     * "No lo sé" suma menos que "No", pero cuenta como riesgo hasta que se confirme.
+     */
+    val PUNTAJES_NORMAL: Map<ValorRespuesta, Int> = mapOf(
         ValorRespuesta.SI to 0,
         ValorRespuesta.NO_SE to 1,
         ValorRespuesta.NO to 2
+    )
+
+    /** Prácticas clave: pesan más y, si no se aplican, la categoría queda al menos en riesgo medio. */
+    val PUNTAJES_CLAVE: Map<ValorRespuesta, Int> = mapOf(
+        ValorRespuesta.SI to 0,
+        ValorRespuesta.NO_SE to 2,
+        ValorRespuesta.NO to 3
     )
 
     private val ACTIVAN_CON_RIESGO = setOf(ValorRespuesta.NO, ValorRespuesta.NO_SE)
@@ -34,15 +44,16 @@ object CatalogoLocal {
             categoria = Categoria.RESPALDOS,
             texto = "¿Tienes una copia de seguridad de tus fotos y documentos importantes?",
             ayuda = "Una copia de seguridad es un duplicado de tus archivos guardado en otro lugar, como la nube o un disco externo.",
-            puntajes = PUNTAJES_BASE,
-            orden = 1
+            puntajes = PUNTAJES_CLAVE,
+            orden = 1,
+            clave = true
         ),
         Pregunta(
             id = "RES-02",
             categoria = Categoria.RESPALDOS,
             texto = "¿Tus copias de seguridad se hacen de forma automática?",
             ayuda = "Las copias automáticas se guardan solas cada cierto tiempo, sin que tengas que acordarte.",
-            puntajes = PUNTAJES_BASE,
+            puntajes = PUNTAJES_NORMAL,
             orden = 2
         ),
         Pregunta(
@@ -50,7 +61,7 @@ object CatalogoLocal {
             categoria = Categoria.RESPALDOS,
             texto = "¿Has comprobado alguna vez que puedes recuperar un archivo desde tu copia?",
             ayuda = "Una copia solo sirve si se puede abrir. Probar con un archivo de vez en cuando confirma que funciona.",
-            puntajes = PUNTAJES_BASE,
+            puntajes = PUNTAJES_NORMAL,
             orden = 3
         ),
 
@@ -60,15 +71,16 @@ object CatalogoLocal {
             categoria = Categoria.ACTUALIZACIONES,
             texto = "¿Instalas las actualizaciones del sistema cuando el dispositivo las ofrece?",
             ayuda = "Las actualizaciones del sistema corrigen fallas de seguridad conocidas.",
-            puntajes = PUNTAJES_BASE,
-            orden = 1
+            puntajes = PUNTAJES_CLAVE,
+            orden = 1,
+            clave = true
         ),
         Pregunta(
             id = "ACT-02",
             categoria = Categoria.ACTUALIZACIONES,
             texto = "¿Tienes activadas las actualizaciones automáticas de las aplicaciones?",
             ayuda = "Así las aplicaciones reciben sus correcciones sin que tengas que revisarlas una por una.",
-            puntajes = PUNTAJES_BASE,
+            puntajes = PUNTAJES_NORMAL,
             orden = 2
         ),
         Pregunta(
@@ -76,7 +88,7 @@ object CatalogoLocal {
             categoria = Categoria.ACTUALIZACIONES,
             texto = "¿Instalas aplicaciones solo desde la tienda oficial de tu dispositivo?",
             ayuda = "Por ejemplo, Google Play, App Store o Microsoft Store. Las aplicaciones de otras fuentes pueden venir modificadas.",
-            puntajes = PUNTAJES_BASE,
+            puntajes = PUNTAJES_NORMAL,
             orden = 3
         ),
 
@@ -86,23 +98,25 @@ object CatalogoLocal {
             categoria = Categoria.AUTENTICACION,
             texto = "¿Tu dispositivo pide PIN, patrón, contraseña o huella para desbloquearse?",
             ayuda = "El bloqueo de pantalla evita que otra persona use tu dispositivo si lo pierdes o lo dejas sin vigilar.",
-            puntajes = PUNTAJES_BASE,
-            orden = 1
+            puntajes = PUNTAJES_CLAVE,
+            orden = 1,
+            clave = true
         ),
         Pregunta(
             id = "AUT-02",
             categoria = Categoria.AUTENTICACION,
             texto = "¿Tienes activada la verificación en dos pasos en tu correo principal?",
             ayuda = "Además de la contraseña, pide un código o una confirmación en tu teléfono al iniciar sesión.",
-            puntajes = PUNTAJES_BASE,
-            orden = 2
+            puntajes = PUNTAJES_CLAVE,
+            orden = 2,
+            clave = true
         ),
         Pregunta(
             id = "AUT-03",
             categoria = Categoria.AUTENTICACION,
             texto = "¿Usas una contraseña distinta para cada cuenta importante?",
             ayuda = "Si una contraseña se filtra, las demás cuentas siguen protegidas.",
-            puntajes = PUNTAJES_BASE,
+            puntajes = PUNTAJES_NORMAL,
             orden = 3
         ),
 
@@ -112,15 +126,16 @@ object CatalogoLocal {
             categoria = Categoria.RECUPERACION,
             texto = "¿Tu correo principal tiene un teléfono o correo de recuperación actualizado?",
             ayuda = "Es la vía que usa el servicio para devolverte el acceso si olvidas la contraseña.",
-            puntajes = PUNTAJES_BASE,
-            orden = 1
+            puntajes = PUNTAJES_CLAVE,
+            orden = 1,
+            clave = true
         ),
         Pregunta(
             id = "RCU-02",
             categoria = Categoria.RECUPERACION,
             texto = "¿Guardaste en un lugar seguro los códigos de respaldo de tu verificación en dos pasos?",
             ayuda = "Estos códigos te permiten entrar si pierdes el teléfono que recibe las confirmaciones.",
-            puntajes = PUNTAJES_BASE,
+            puntajes = PUNTAJES_NORMAL,
             orden = 2
         ),
         Pregunta(
@@ -128,7 +143,7 @@ object CatalogoLocal {
             categoria = Categoria.RECUPERACION,
             texto = "¿Sabes qué pasos seguir si pierdes el acceso a tu cuenta principal?",
             ayuda = "Conocer el proceso de recuperación antes de necesitarlo ahorra tiempo y evita errores.",
-            puntajes = PUNTAJES_BASE,
+            puntajes = PUNTAJES_NORMAL,
             orden = 3
         )
     )
