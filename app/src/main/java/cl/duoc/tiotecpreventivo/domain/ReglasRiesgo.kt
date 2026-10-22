@@ -45,13 +45,8 @@ class ReglasRiesgo(private val catalogo: CatalogoRepository) {
         val resultados = catalogo.categorias().map { resultadoCategoria(it, respuestas) }
         val nivelPorCategoria = resultados.associate { it.categoria to it.nivel }
 
-        val recomendaciones = catalogo.recomendacionesPara(respuestas).sortedWith(
-            compareBy<Recomendacion> { it.prioridad.ordinal }
-                .thenByDescending { recomendacion ->
-                    catalogo.pregunta(recomendacion.preguntaId)
-                        ?.let { nivelPorCategoria[it.categoria]?.ordinal } ?: 0
-                }
-            // sortedWith es estable: dentro del mismo nivel se mantiene el orden del catálogo.
+        val recomendaciones = ordenarRecomendaciones(
+            catalogo.recomendacionesPara(respuestas), nivelPorCategoria
         )
 
         return ResultadoReglas.Completa(
@@ -60,6 +55,27 @@ class ReglasRiesgo(private val catalogo: CatalogoRepository) {
             recomendaciones = recomendaciones
         )
     }
+
+    /**
+     * Orden de las recomendaciones: prioridad (Alta → Media → Baja) y, dentro de la misma
+     * prioridad, primero la categoría con más riesgo. Lo usan [evaluar] y la pantalla de
+     * resultados (TT-12), para que ambos muestren siempre el mismo orden.
+     */
+    fun ordenarRecomendaciones(
+        recomendaciones: List<Recomendacion>,
+        nivelPorCategoria: Map<Categoria, NivelRiesgo>
+    ): List<Recomendacion> = recomendaciones.sortedWith(
+        compareBy<Recomendacion> { it.prioridad.ordinal }
+            .thenByDescending { recomendacion ->
+                catalogo.pregunta(recomendacion.preguntaId)
+                    ?.let { nivelPorCategoria[it.categoria]?.ordinal } ?: 0
+            }
+        // sortedWith es estable: dentro del mismo nivel se mantiene el orden del catálogo.
+    )
+
+    /** Puntaje máximo posible de una categoría (todas sus preguntas con la peor respuesta). */
+    fun puntajeMaximo(categoria: Categoria): Int =
+        catalogo.preguntasDe(categoria).sumOf { pregunta -> pregunta.puntajes.values.max() }
 
     /** IDs de preguntas sin responder, en el orden del cuestionario. Los IDs desconocidos se ignoran. */
     fun preguntasFaltantes(respuestas: Map<String, ValorRespuesta>): List<String> =
@@ -77,7 +93,7 @@ class ReglasRiesgo(private val catalogo: CatalogoRepository) {
         }
 
         val puntaje = respondidas.sumOf { (pregunta, valor) -> pregunta.puntajes.getValue(valor) }
-        val maximo = preguntas.sumOf { pregunta -> pregunta.puntajes.values.max() }
+        val maximo = puntajeMaximo(categoria)
         val porcentaje = if (maximo == 0) 0 else puntaje * 100 / maximo
 
         val claveSinAplicar = respondidas.any { (pregunta, valor) ->
