@@ -5,8 +5,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
 
 /** TT-18: foto en curso. La app de cámara escribe en `rutaTemporal` y se confirma al volver. */
 data class CapturaFoto(
-    val dispositivoId: Long,
-    val rutaTemporal: String
+    val dispositivoId: Long, val rutaTemporal: String
 )
 
 data class DispositivosUiState(
@@ -29,5 +28,6 @@ data class DispositivosUiState(
     val capturaFoto: CapturaFoto? = null,
     /** TT-18: dispositivo cuya foto se pidió quitar (diálogo de confirmación). */
     val dispositivoQuitarFoto: DispositivoEntity? = null,
-    val procesandoFoto: Boolean = false
+    val procesandoFoto: Boolean = false,
+    val dispositivoGaleriaId: Long? = null
 )

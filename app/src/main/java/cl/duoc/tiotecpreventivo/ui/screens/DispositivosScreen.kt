@@ -55,11 +55,13 @@ fun DispositivosScreen(
     /** TT-18: convierte la ruta guardada en Room en el archivo de la foto. */
     archivoImagen: (String) -> File? = { null },
     onTomarFoto: (Long) -> Unit = {},
+    onElegirImagen: (Long) -> Unit = {},
     onSolicitarQuitarFoto: (Long) -> Unit = {},
     onConfirmarQuitarFoto: () -> Unit = {},
     onCancelarQuitarFoto: () -> Unit = {}
 ) {
-    val fotoOcupada = uiState.procesandoFoto || uiState.capturaFoto != null
+    val fotoOcupada =
+        uiState.procesandoFoto || uiState.capturaFoto != null || uiState.dispositivoGaleriaId != null
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.mensaje) {
@@ -149,7 +151,7 @@ fun DispositivosScreen(
                     item {
                         Button(
                             onClick = onAgregar,
-                            enabled = !uiState.eliminando,
+                            enabled = !uiState.eliminando && !fotoOcupada,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Agregar dispositivo")
@@ -204,16 +206,24 @@ fun DispositivosScreen(
                                     }
                                 }
 
+                                OutlinedButton(
+                                    onClick = { onElegirImagen(dispositivo.id) },
+                                    enabled = !uiState.eliminando && !fotoOcupada,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("Elegir imagen de galería")
+                                }
+
                                 Button(
                                     onClick = { onEvaluar(dispositivo.id) },
-                                    enabled = !uiState.eliminando
+                                    enabled = !uiState.eliminando && !fotoOcupada
                                 ) {
                                     Text("Evaluar dispositivo")
                                 }
 
                                 OutlinedButton(
                                     onClick = { onEditar(dispositivo.id) },
-                                    enabled = !uiState.eliminando
+                                    enabled = !uiState.eliminando && !fotoOcupada
                                 ) {
                                     Text("Editar")
                                 }
@@ -221,7 +231,7 @@ fun DispositivosScreen(
                                 TextButton(
                                     onClick = {
                                         onSolicitarEliminar(dispositivo.id)
-                                    }, enabled = !uiState.eliminando
+                                    }, enabled = !uiState.eliminando && !fotoOcupada
                                 ) {
                                     Text("Eliminar")
                                 }
@@ -257,8 +267,7 @@ fun DispositivosScreen(
                 TextButton(onClick = onCancelarQuitarFoto, enabled = !uiState.procesandoFoto) {
                     Text("Cancelar")
                 }
-            }
-        )
+            })
     }
 
     uiState.dispositivoAEliminar?.let { dispositivo ->
