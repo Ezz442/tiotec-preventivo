@@ -1,20 +1,15 @@
 package cl.duoc.tiotecpreventivo.viewmodel
 
 import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenesLocal
-import cl.duoc.tiotecpreventivo.data.local.dao.DispositivoDao
-import cl.duoc.tiotecpreventivo.data.local.dao.PerfilDao
 import cl.duoc.tiotecpreventivo.data.local.entity.DispositivoEntity
-import cl.duoc.tiotecpreventivo.data.local.entity.ExperienciaDigital
-import cl.duoc.tiotecpreventivo.data.local.entity.PerfilEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
+import cl.duoc.tiotecpreventivo.repository.DispositivoDaoFalso
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
+import cl.duoc.tiotecpreventivo.repository.PerfilDaoFalso
+import cl.duoc.tiotecpreventivo.repository.perfilDePrueba
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -50,7 +45,7 @@ class DispositivosFotoViewModelTest {
         )
         viewModel = DispositivosViewModel(
             dispositivoRepository = DispositivoRepository(dao) { 1_000L },
-            perfilRepository = PerfilRepository(PerfilDaoFalso()),
+            perfilRepository = PerfilRepository(PerfilDaoFalso(perfilDePrueba())),
             almacenImagenes = almacen
         )
     }
@@ -182,7 +177,7 @@ class DispositivosFotoViewModelTest {
         val ruta = viewModel.prepararFoto(1)!!
         camaraGuarda(ruta)
         viewModel.fotoTomada(true)
-        dao.evaluaciones = 2
+        dao.evaluaciones[1] = 2
 
         viewModel.solicitarEliminacion(1)
         viewModel.confirmarEliminacion()
@@ -190,42 +185,4 @@ class DispositivosFotoViewModelTest {
         assertTrue(dao.filas.value.single().archivado)
         assertTrue(almacen.existe(ruta))
     }
-}
-
-private class PerfilDaoFalso : PerfilDao {
-    private val perfil = MutableStateFlow<PerfilEntity?>(
-        PerfilEntity(id = 1, alias = "Tío Prueba", experienciaDigital = ExperienciaDigital.PRINCIPIANTE,
-            creadoEn = 0, actualizadoEn = 0)
-    )
-    override fun observar(): Flow<PerfilEntity?> = perfil
-    override suspend fun obtener(): PerfilEntity? = perfil.value
-    override suspend fun insertar(perfil: PerfilEntity): Long = 1
-    override suspend fun actualizar(perfil: PerfilEntity) {}
-}
-
-private class DispositivoDaoFalso : DispositivoDao() {
-    val filas = MutableStateFlow<List<DispositivoEntity>>(emptyList())
-    var evaluaciones = 0
-
-    override fun observarActivos(): Flow<List<DispositivoEntity>> = filas.map { l -> l.filter { !it.archivado } }
-    override fun observar(id: Long): Flow<DispositivoEntity?> = filas.map { l -> l.find { it.id == id } }
-    override fun observarTodos(): Flow<List<DispositivoEntity>> = filas
-    override suspend fun obtener(id: Long): DispositivoEntity? = filas.value.find { it.id == id }
-    override suspend fun existeNombreActivo(nombre: String, excluirId: Long): Boolean = false
-    override suspend fun insertar(dispositivo: DispositivoEntity): Long = error("No se usa")
-    override suspend fun actualizar(dispositivo: DispositivoEntity) {
-        filas.value = filas.value.map { if (it.id == dispositivo.id) dispositivo else it }
-    }
-    override suspend fun actualizarImagen(id: Long, ruta: String?, fecha: Long) {
-        filas.value = filas.value.map { if (it.id == id) it.copy(imagenRuta = ruta, actualizadoEn = fecha) else it }
-    }
-    override suspend fun contarEvaluaciones(id: Long): Int = evaluaciones
-    override suspend fun borrar(id: Long): Int {
-        filas.value = filas.value.filterNot { it.id == id }
-        return 1
-    }
-    override suspend fun marcarArchivado(id: Long, fecha: Long) {
-        filas.value = filas.value.map { if (it.id == id) it.copy(archivado = true) else it }
-    }
-    override suspend fun cancelarRecordatoriosDe(id: Long): Int = 0
 }
