@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TT-18: carpetas que FileProvider puede compartir con la app de cámara.
+     Solo imagenes/ dentro del almacenamiento privado de la app. -->
+<paths>
+    <files-path
+        name="imagenes"
+        path="imagenes/" />
+</paths>
