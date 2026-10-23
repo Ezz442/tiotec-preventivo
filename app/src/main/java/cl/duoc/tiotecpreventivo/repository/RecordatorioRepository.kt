@@ -7,8 +7,8 @@ import cl.duoc.tiotecpreventivo.data.local.entity.TipoRecordatorio
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Recordatorios guardados localmente (TT-04, 4.7). La programación del aviso del
- * sistema se agrega en TT-16; aquí solo se persisten.
+ * Recordatorios guardados localmente (TT-04, 4.7). Aquí solo se persisten; el aviso
+ * del sistema lo programa GestorRecordatorios con WorkManager (TT-16).
  *
  * Los errores de formulario por campo los muestra el ViewModel (TT-26); estas
  * validaciones son la última barrera y lanzan IllegalArgumentException.
@@ -58,7 +58,7 @@ class RecordatorioRepository(
     suspend fun cancelar(id: Long): Boolean =
         dao.cambiarEstado(id, EstadoRecordatorio.CANCELADO) > 0
 
-    /** Lo usará TT-16 cuando el aviso se muestre. */
+    /** Lo llama RecordatorioWorker cuando llega la hora del aviso (TT-16). */
     suspend fun marcarEnviado(id: Long): Boolean =
         dao.cambiarEstado(id, EstadoRecordatorio.ENVIADO) > 0
 
