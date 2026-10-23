@@ -40,7 +40,7 @@ import cl.duoc.tiotecpreventivo.ui.screens.AjustesRuta
 import cl.duoc.tiotecpreventivo.ui.screens.AjustesScreen
 import cl.duoc.tiotecpreventivo.ui.screens.AprendeScreen
 import cl.duoc.tiotecpreventivo.ui.screens.ContenidoScreen
-import cl.duoc.tiotecpreventivo.ui.screens.DispositivosScreen
+import cl.duoc.tiotecpreventivo.ui.screens.DispositivosRuta
 import cl.duoc.tiotecpreventivo.ui.screens.HistorialScreen
 import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
@@ -444,7 +444,8 @@ fun TioTecApp(
                         val factory = remember(contenedor) {
                             DispositivosViewModelFactory(
                                 dispositivoRepository = contenedor.dispositivoRepository,
-                                perfilRepository = contenedor.perfilRepository
+                                perfilRepository = contenedor.perfilRepository,
+                                almacenImagenes = contenedor.almacenImagenes
                             )
                         }
 
@@ -452,20 +453,10 @@ fun TioTecApp(
                             factory = factory
                         )
 
-                        val uiState by dispositivosViewModel.uiState.collectAsState()
-
-                        DispositivosScreen(
-                            uiState = uiState,
-                            onAgregar = dispositivosViewModel::abrirNuevo,
-                            onEditar = dispositivosViewModel::editarDispositivo,
-                            onSolicitarEliminar = dispositivosViewModel::solicitarEliminacion,
-                            onConfirmarEliminar = dispositivosViewModel::confirmarEliminacion,
-                            onCancelarEliminar = dispositivosViewModel::cancelarEliminacion,
-                            onNombreChange = dispositivosViewModel::onNombreChange,
-                            onSistemaChange = dispositivosViewModel::onSistemaOperativoChange,
-                            onGuardar = dispositivosViewModel::guardarDispositivo,
-                            onCancelarFormulario = dispositivosViewModel::cancelarFormulario,
-                            onReintentar = dispositivosViewModel::reintentarCarga,
+                        // TT-18: la ruta agrega la cámara a la pantalla de TT-09.
+                        DispositivosRuta(
+                            viewModel = dispositivosViewModel,
+                            almacenImagenes = contenedor.almacenImagenes,
                             onEvaluar = { dispositivoId ->
                                 navController.navigate("evaluacion/$dispositivoId") {
                                     launchSingleTop = true
@@ -473,8 +464,7 @@ fun TioTecApp(
                             },
                             onIrAPerfil = {
                                 navegarPrincipal(DestinoPrincipal.PERFIL)
-                            },
-                            onConsumirMensaje = dispositivosViewModel::consumirMensaje
+                            }
                         )
                     }
 

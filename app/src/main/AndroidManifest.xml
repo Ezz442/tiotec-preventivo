@@ -5,6 +5,20 @@
     <!-- TT-16: avisos de recordatorios (Android 13+ lo pide en tiempo de ejecución). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- TT-18: la app usa la cámara del teléfono, pero no es obligatoria para instalarla.
+         No se declara el permiso CAMERA: TakePicture abre la app de cámara, que ya tiene
+         su propio permiso, y el archivo se comparte solo mediante FileProvider. -->
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+
+    <!-- Android 11+: permite saber si hay una app de cámara instalada. -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
+
     <application
         android:name=".TioTecApplication"
         android:allowBackup="true"
@@ -28,6 +42,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- TT-18: entrega a la app de cámara una URI temporal para guardar la foto. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.archivos"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/rutas_archivos" />
+        </provider>
     </application>
 
 </manifest>

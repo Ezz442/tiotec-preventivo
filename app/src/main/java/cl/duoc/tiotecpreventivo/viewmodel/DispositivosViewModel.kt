@@ -13,10 +13,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
 import cl.duoc.tiotecpreventivo.repository.ResultadoEliminacion
+import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenes
 
 class DispositivosViewModel(
     private val dispositivoRepository: DispositivoRepository,
-    private val perfilRepository: PerfilRepository
+    private val perfilRepository: PerfilRepository,
+    /** TT-18: archivos de las fotos. */
+    private val almacenImagenes: AlmacenImagenes
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DispositivosUiState())
@@ -293,6 +296,12 @@ class DispositivosViewModel(
             try {
                 val resultado = dispositivoRepository.eliminar(dispositivo.id)
 
+                // TT-18: sin evaluaciones el registro se borra; su foto también.
+                // Si se archiva, la foto se conserva junto con su historial.
+                if (resultado is ResultadoEliminacion.Eliminado) {
+                    almacenImagenes.borrar(resultado.imagenRuta)
+                }
+
                 _uiState.update { actual ->
                     when (resultado) {
                         is ResultadoEliminacion.Eliminado -> actual.copy(
@@ -330,6 +339,114 @@ class DispositivosViewModel(
     fun consumirMensaje() {
         _uiState.update {
             it.copy(mensaje = null)
+        }
+    }
+
+    // ---------- TT-18: foto con la cámara ----------
+
+    private fun ocupado(estado: DispositivosUiState) =
+        estado.cargando || estado.guardando || estado.eliminando || estado.procesandoFoto ||
+            estado.capturaFoto != null || estado.formularioVisible
+
+    /**
+     * Reserva una ruta para la foto y la devuelve para que la pantalla abra la cámara.
+     * Devuelve null si no se puede tomar ahora (otra operación en curso).
+     */
+    fun prepararFoto(dispositivoId: Long): String? {
+        val estado = _uiState.value
+        if (ocupado(estado) || estado.dispositivos.none { it.id == dispositivoId }) return null
+
+        return try {
+            val ruta = almacenImagenes.nuevaRuta(dispositivoId)
+            _uiState.update {
+                it.copy(
+                    capturaFoto = CapturaFoto(dispositivoId, ruta),
+                    errorOperacion = null,
+                    mensaje = null
+                )
+            }
+            ruta
+        } catch (e: Exception) {
+            _uiState.update { it.copy(errorOperacion = "No pudimos preparar la foto. Inténtalo nuevamente.") }
+            null
+        }
+    }
+
+    /**
+     * Resultado de la cámara. `exito = false` si la persona canceló o la cámara falló:
+     * se borra el archivo temporal y la foto anterior se conserva.
+     */
+    fun fotoTomada(exito: Boolean) {
+        val captura = _uiState.value.capturaFoto ?: return
+
+        if (!exito || !almacenImagenes.existe(captura.rutaTemporal)) {
+            almacenImagenes.borrar(captura.rutaTemporal)
+            _uiState.update {
+                it.copy(capturaFoto = null, mensaje = "No se tomó la foto. La imagen anterior se mantiene.")
+            }
+            return
+        }
+
+        _uiState.update { it.copy(procesandoFoto = true) }
+        viewModelScope.launch {
+            try {
+                val anterior = dispositivoRepository.obtener(captura.dispositivoId)?.imagenRuta
+                dispositivoRepository.actualizarImagen(captura.dispositivoId, captura.rutaTemporal)
+                // Se reemplazó: el archivo anterior ya no lo usa nadie.
+                if (anterior != null && anterior != captura.rutaTemporal) almacenImagenes.borrar(anterior)
+                _uiState.update { it.copy(mensaje = "Foto guardada.") }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                almacenImagenes.borrar(captura.rutaTemporal)
+                _uiState.update { it.copy(errorOperacion = "No pudimos guardar la foto. Inténtalo nuevamente.") }
+            } finally {
+                _uiState.update { it.copy(capturaFoto = null, procesandoFoto = false) }
+            }
+        }
+    }
+
+    /** El teléfono no tiene app de cámara: se avisa sin bloquear el resto de la app. */
+    fun camaraNoDisponible() {
+        _uiState.value.capturaFoto?.let { almacenImagenes.borrar(it.rutaTemporal) }
+        _uiState.update {
+            it.copy(
+                capturaFoto = null,
+                errorOperacion = "Este dispositivo no tiene una cámara disponible."
+            )
+        }
+    }
+
+    fun solicitarQuitarFoto(dispositivoId: Long) {
+        val estado = _uiState.value
+        if (ocupado(estado)) return
+        val dispositivo = estado.dispositivos.find { it.id == dispositivoId } ?: return
+        if (dispositivo.imagenRuta == null) return
+        _uiState.update { it.copy(dispositivoQuitarFoto = dispositivo, errorOperacion = null, mensaje = null) }
+    }
+
+    fun cancelarQuitarFoto() {
+        if (_uiState.value.procesandoFoto) return
+        _uiState.update { it.copy(dispositivoQuitarFoto = null) }
+    }
+
+    fun confirmarQuitarFoto() {
+        val dispositivo = _uiState.value.dispositivoQuitarFoto ?: return
+        if (_uiState.value.procesandoFoto) return
+
+        _uiState.update { it.copy(procesandoFoto = true) }
+        viewModelScope.launch {
+            try {
+                dispositivoRepository.actualizarImagen(dispositivo.id, null)
+                almacenImagenes.borrar(dispositivo.imagenRuta)
+                _uiState.update { it.copy(dispositivoQuitarFoto = null, mensaje = "Foto quitada.") }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorOperacion = "No pudimos quitar la foto. Inténtalo nuevamente.") }
+            } finally {
+                _uiState.update { it.copy(procesandoFoto = false) }
+            }
         }
     }
 }

@@ -1,6 +1,9 @@
 package cl.duoc.tiotecpreventivo.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import java.io.File
+import cl.duoc.tiotecpreventivo.ui.components.ImagenDispositivo
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,8 +51,15 @@ fun DispositivosScreen(
     onCancelarFormulario: () -> Unit = {},
     onReintentar: () -> Unit = {},
     onIrAPerfil: () -> Unit = {},
-    onConsumirMensaje: () -> Unit = {}
+    onConsumirMensaje: () -> Unit = {},
+    /** TT-18: convierte la ruta guardada en Room en el archivo de la foto. */
+    archivoImagen: (String) -> File? = { null },
+    onTomarFoto: (Long) -> Unit = {},
+    onSolicitarQuitarFoto: (Long) -> Unit = {},
+    onConfirmarQuitarFoto: () -> Unit = {},
+    onCancelarQuitarFoto: () -> Unit = {}
 ) {
+    val fotoOcupada = uiState.procesandoFoto || uiState.capturaFoto != null
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.mensaje) {
@@ -170,6 +180,30 @@ fun DispositivosScreen(
 
                                 Text(dispositivo.sistemaOperativo.etiqueta)
 
+                                // TT-18: foto del objeto de prueba asociada al dispositivo.
+                                dispositivo.imagenRuta?.let { ruta ->
+                                    ImagenDispositivo(
+                                        archivo = archivoImagen(ruta),
+                                        descripcion = "Foto de ${dispositivo.nombre}"
+                                    )
+                                }
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    OutlinedButton(
+                                        onClick = { onTomarFoto(dispositivo.id) },
+                                        enabled = !uiState.eliminando && !fotoOcupada
+                                    ) {
+                                        Text(if (dispositivo.imagenRuta == null) "Tomar foto" else "Reemplazar foto")
+                                    }
+                                    if (dispositivo.imagenRuta != null) {
+                                        TextButton(
+                                            onClick = { onSolicitarQuitarFoto(dispositivo.id) },
+                                            enabled = !uiState.eliminando && !fotoOcupada
+                                        ) {
+                                            Text("Quitar foto")
+                                        }
+                                    }
+                                }
+
                                 Button(
                                     onClick = { onEvaluar(dispositivo.id) },
                                     enabled = !uiState.eliminando
@@ -207,6 +241,24 @@ fun DispositivosScreen(
                 }
             }
         }
+    }
+
+    uiState.dispositivoQuitarFoto?.let { dispositivo ->
+        AlertDialog(
+            onDismissRequest = onCancelarQuitarFoto,
+            title = { Text("Quitar foto") },
+            text = { Text("¿Quitar la foto de «${dispositivo.nombre}»? El archivo se borrará del teléfono.") },
+            confirmButton = {
+                TextButton(onClick = onConfirmarQuitarFoto, enabled = !uiState.procesandoFoto) {
+                    Text(if (uiState.procesandoFoto) "Quitando…" else "Quitar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onCancelarQuitarFoto, enabled = !uiState.procesandoFoto) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 
     uiState.dispositivoAEliminar?.let { dispositivo ->

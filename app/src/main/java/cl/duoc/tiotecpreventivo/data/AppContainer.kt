@@ -8,6 +8,8 @@ import cl.duoc.tiotecpreventivo.repository.AccionRepository
 import cl.duoc.tiotecpreventivo.repository.CatalogoRepository
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.EvaluacionRepository
+import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenes
+import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenesLocal
 import cl.duoc.tiotecpreventivo.repository.GestorRecordatorios
 import cl.duoc.tiotecpreventivo.notificaciones.ProgramadorWorkManager
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
@@ -55,6 +57,9 @@ class AppContainer(context: Context) {
     val gestorRecordatorios: GestorRecordatorios by lazy {
         GestorRecordatorios(recordatorioRepository, ProgramadorWorkManager(context))
     }
+
+    /** TT-18/19: fotos de dispositivos en el almacenamiento privado de la app. */
+    val almacenImagenes: AlmacenImagenes by lazy { AlmacenImagenesLocal(context.filesDir) }
 
     val solicitudRepository: SolicitudRepository by lazy {
         SolicitudRepository(baseDeDatos.solicitudDao())

@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
+import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenes
 
 class DispositivosViewModelFactory(
     private val dispositivoRepository: DispositivoRepository,
-    private val perfilRepository: PerfilRepository
+    private val perfilRepository: PerfilRepository,
+    private val almacenImagenes: AlmacenImagenes
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -15,7 +17,8 @@ class DispositivosViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return DispositivosViewModel(
                 dispositivoRepository = dispositivoRepository,
-                perfilRepository = perfilRepository
+                perfilRepository = perfilRepository,
+                almacenImagenes = almacenImagenes
             ) as T
         }
 
