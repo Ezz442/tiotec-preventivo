@@ -70,5 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.window)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // TT-16: avisos programados que sobreviven a cerrar la app y reiniciar el teléfono.
+    implementation(libs.androidx.work.runtime.ktx)
 
 }
