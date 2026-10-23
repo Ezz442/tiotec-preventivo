@@ -58,6 +58,8 @@ import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasUiState
 import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModelFactory
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
@@ -92,7 +94,8 @@ fun TioTecApp(
     val enResultado = rutaActual == RUTA_RESULTADO
     val enContenido = rutaActual == RUTA_CONTENIDO
     val enHistorial = rutaActual == RUTA_HISTORIAL
-    val enPantallaSecundaria = enDispositivos || enAjustes || enResultado || enContenido || enHistorial
+    val enPantallaSecundaria =
+        enDispositivos || enAjustes || enResultado || enContenido || enHistorial
     val esCompacto = windowWidthSizeClass == WindowWidthSizeClass.Compact
 
     val destinoSeleccionado = when {
@@ -211,16 +214,15 @@ fun TioTecApp(
 
                     val uiState by inicioViewModel.uiState.collectAsState()
 
-                    InicioScreen(
-                        uiState = uiState, onVerDispositivos = {
-                            navController.navigate(GRAFO_DISPOSITIVOS) {
-                                launchSingleTop = true
-                            }
-                        }, onVerHistorial = {
-                            navController.navigate(RUTA_HISTORIAL) {
-                                launchSingleTop = true
-                            }
-                        })
+                    InicioScreen(uiState = uiState, onVerDispositivos = {
+                        navController.navigate(GRAFO_DISPOSITIVOS) {
+                            launchSingleTop = true
+                        }
+                    }, onVerHistorial = {
+                        navController.navigate(RUTA_HISTORIAL) {
+                            launchSingleTop = true
+                        }
+                    })
                 }
 
                 composable(RUTA_HISTORIAL) {
@@ -275,7 +277,25 @@ fun TioTecApp(
                 }
 
                 composable(DestinoPrincipal.APRENDE.ruta) {
-                    AprendeScreen()
+                    val context = LocalContext.current
+                    val contenedor = (context.applicationContext as TioTecApplication).contenedor
+
+                    val factory = remember(contenedor) {
+                        AprendeViewModelFactory(contenedor.catalogoRepository)
+                    }
+
+                    val aprendeViewModel: AprendeViewModel = viewModel(factory = factory)
+                    val uiState by aprendeViewModel.uiState.collectAsState()
+
+                    AprendeScreen(
+                        uiState = uiState,
+                        onCategoriaChange = aprendeViewModel::seleccionarCategoria,
+                        onReintentar = aprendeViewModel::reintentar,
+                        onAbrirContenido = { contenidoId ->
+                            navController.navigate("contenido/$contenidoId") {
+                                launchSingleTop = true
+                            }
+                        })
                 }
 
                 composable(DestinoPrincipal.PERFIL.ruta) {
