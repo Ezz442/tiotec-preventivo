@@ -1,9 +1,12 @@
 <#
+  Archivo solo con caracteres ASCII a proposito: Windows PowerShell 5.1 lee los .ps1
+  sin BOM como ANSI y las tildes rompen el script.
+
   TT-21: compila y ejecuta las pruebas desde una copia limpia del repositorio.
 
   Uso (PowerShell, desde cualquier carpeta):
       powershell -ExecutionPolicy Bypass -File scripts\verificar-copia-limpia.ps1
-  Con emulador encendido, agrega -ConEmulador para correr también las pruebas de Room:
+  Con emulador encendido, agrega -ConEmulador para correr tambien las pruebas de Room:
       powershell -ExecutionPolicy Bypass -File scripts\verificar-copia-limpia.ps1 -ConEmulador
 
   Deja el resultado en verificacion-TT21.txt dentro de la copia limpia y abre los
@@ -16,7 +19,7 @@ param(
 )
 
 # "Continue": git y Gradle escriben avisos normales en stderr; con "Stop" PowerShell 5
-# los trataría como errores. El resultado se revisa con $LASTEXITCODE.
+# los trataria como errores. El resultado se revisa con $LASTEXITCODE.
 $ErrorActionPreference = "Continue"
 $repo = "https://github.com/Ezz442/tiotec-preventivo.git"
 
@@ -27,7 +30,7 @@ if ($LASTEXITCODE -ne 0) { Write-Host "No se pudo clonar el repositorio." -Foreg
 Set-Location $Destino
 
 $log = Join-Path $Destino "verificacion-TT21.txt"
-"TT-21 · Verificación desde copia limpia" | Out-File $log -Encoding utf8
+"TT-21 - Verificacion desde copia limpia" | Out-File $log -Encoding utf8
 "Fecha: $(Get-Date -Format 'yyyy-MM-dd HH:mm')" | Out-File $log -Append -Encoding utf8
 "Commit: $(git rev-parse --short HEAD) ($Rama)" | Out-File $log -Append -Encoding utf8
 
@@ -35,8 +38,8 @@ function Paso($titulo, $tareas) {
     Write-Host $titulo
     & .\gradlew.bat @tareas --console=plain 2>&1 | Tee-Object -FilePath $log -Append
     if ($LASTEXITCODE -ne 0) {
-        "RESULTADO: FALLÓ en '$titulo'" | Out-File $log -Append -Encoding utf8
-        Write-Host "Falló: $titulo. Revisa $log" -ForegroundColor Red
+        "RESULTADO: FALLO en '$titulo'" | Out-File $log -Append -Encoding utf8
+        Write-Host "Fallo: $titulo. Revisa $log" -ForegroundColor Red
         exit $LASTEXITCODE
     }
 }
