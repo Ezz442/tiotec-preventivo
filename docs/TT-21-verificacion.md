@@ -53,9 +53,9 @@ El script clona `main` en una carpeta temporal nueva (sin archivos de Android St
 | Ejecución | Dónde | Resultado |
 |---|---|---|
 | Pruebas JVM sin DataStore (152 pruebas, 19 clases) | Entorno de verificación del PR (Kotlin 2.2.10, JUnit 4.13.2) | ✅ 152/152 |
-| `testDebugUnitTest` completo desde copia limpia | PC de Enzo | ☐ completar: __/__ |
-| `connectedDebugAndroidTest` (27 pruebas en 7 clases) | Emulador de Gerard | ☐ completar: __/__ |
-| `assembleDebug` desde copia limpia | PC de Enzo | ☐ completar |
+| `assembleDebug` desde copia limpia (`feat/TT-21-verificacion`) | PC de Enzo · 23-10-2026 | ✅ BUILD SUCCESSFUL (1 min 26 s) |
+| `testDebugUnitTest` completo desde copia limpia | PC de Enzo · 23-10-2026 | ✅ **164/164** (0 fallos, 0 omitidas, 2,8 s) |
+| `connectedDebugAndroidTest` (27 pruebas en 7 clases) | Emulador de Gerard | ☐ completar: __/27 |
 
 Adjuntar en Trello: captura del reporte `app/build/reports/tests/testDebugUnitTest/index.html` y de `androidTests/connected/debug/index.html`, más el archivo `verificacion-TT21.txt`.
 
