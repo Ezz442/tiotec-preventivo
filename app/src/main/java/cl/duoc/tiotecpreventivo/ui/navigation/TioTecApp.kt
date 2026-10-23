@@ -15,6 +15,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -33,7 +34,8 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import cl.duoc.tiotecpreventivo.TioTecApplication
 import cl.duoc.tiotecpreventivo.data.local.InicioRepositoryLocal
-import cl.duoc.tiotecpreventivo.ui.screens.AccionesScreen
+import cl.duoc.tiotecpreventivo.notificaciones.Avisos
+import cl.duoc.tiotecpreventivo.ui.screens.AccionesRuta
 import cl.duoc.tiotecpreventivo.ui.screens.AjustesRuta
 import cl.duoc.tiotecpreventivo.ui.screens.AjustesScreen
 import cl.duoc.tiotecpreventivo.ui.screens.AprendeScreen
@@ -43,9 +45,13 @@ import cl.duoc.tiotecpreventivo.ui.screens.HistorialScreen
 import cl.duoc.tiotecpreventivo.ui.screens.InicioScreen
 import cl.duoc.tiotecpreventivo.ui.screens.PerfilScreen
 import cl.duoc.tiotecpreventivo.ui.screens.ResultadoScreen
+import cl.duoc.tiotecpreventivo.ui.screens.SolicitudDetalleScreen
+import cl.duoc.tiotecpreventivo.ui.screens.SolicitudesScreen
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.AccionesViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.AccionesViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.HistorialViewModel
@@ -56,15 +62,14 @@ import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.PerfilViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasUiState
 import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
-import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModel
-import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModelFactory
-import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.RecordatorioViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.RecordatorioViewModelFactory
-import cl.duoc.tiotecpreventivo.ui.screens.AccionesRuta
-import cl.duoc.tiotecpreventivo.notificaciones.Avisos
-import androidx.compose.runtime.LaunchedEffect
-import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.SolicitudDetalleViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.SolicitudDetalleViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.SolicitudesViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.SolicitudesViewModelFactory
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
@@ -73,6 +78,8 @@ private const val RUTA_EVALUACION = "evaluacion/{dispositivoId}"
 private const val RUTA_RESULTADO = "resultado/{evaluacionId}"
 private const val RUTA_CONTENIDO = "contenido/{contenidoId}"
 private const val RUTA_HISTORIAL = "historial"
+private const val RUTA_SOLICITUDES = "solicitudes"
+private const val RUTA_SOLICITUD_DETALLE = "solicitud/{solicitudId}"
 
 private enum class DestinoPrincipal(
     val ruta: String, val titulo: String, val simbolo: String
@@ -90,8 +97,7 @@ fun TioTecApp(
     /** Lo crea MainActivity para que Ajustes y el tema usen la misma instancia. Null en previews. */
     preferenciasViewModel: PreferenciasViewModel? = null,
     /** TT-16: pantalla que pidió abrir un aviso (por ejemplo "acciones"); null si ninguna. */
-    destinoPendiente: String? = null,
-    onDestinoConsumido: () -> Unit = {}
+    destinoPendiente: String? = null, onDestinoConsumido: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
@@ -102,13 +108,15 @@ fun TioTecApp(
     val enResultado = rutaActual == RUTA_RESULTADO
     val enContenido = rutaActual == RUTA_CONTENIDO
     val enHistorial = rutaActual == RUTA_HISTORIAL
+    val enSolicitudes = rutaActual == RUTA_SOLICITUDES
+    val enSolicitudDetalle = rutaActual == RUTA_SOLICITUD_DETALLE
     val enPantallaSecundaria =
-        enDispositivos || enAjustes || enResultado || enContenido || enHistorial
+        enDispositivos || enAjustes || enResultado || enContenido || enHistorial || enSolicitudes || enSolicitudDetalle
     val esCompacto = windowWidthSizeClass == WindowWidthSizeClass.Compact
 
     val destinoSeleccionado = when {
         enDispositivos || enResultado || enHistorial -> DestinoPrincipal.INICIO.ruta
-        enAjustes -> DestinoPrincipal.PERFIL.ruta
+        enAjustes || enSolicitudes || enSolicitudDetalle -> DestinoPrincipal.PERFIL.ruta
         enContenido -> DestinoPrincipal.APRENDE.ruta
         else -> rutaActual
     }
@@ -168,6 +176,8 @@ fun TioTecApp(
                             enResultado -> "Resultados"
                             enContenido -> "Aprende"
                             enHistorial -> "Historial"
+                            enSolicitudes -> "Solicitudes"
+                            enSolicitudDetalle -> "Detalle de solicitud"
                             else -> "TíoTec Preventivo"
                         }
                     )
@@ -342,6 +352,11 @@ fun TioTecApp(
                             navController.navigate(RUTA_AJUSTES) {
                                 launchSingleTop = true
                             }
+                        },
+                        onAbrirSolicitudes = {
+                            navController.navigate(RUTA_SOLICITUDES) {
+                                launchSingleTop = true
+                            }
                         })
                 }
 
@@ -355,6 +370,66 @@ fun TioTecApp(
                             onTemaChange = {},
                             onAvisosChange = {})
                     }
+                }
+                composable(RUTA_SOLICITUDES) {
+                    val contenedor =
+                        (LocalContext.current.applicationContext as TioTecApplication).contenedor
+
+                    val factory = remember(contenedor) {
+                        SolicitudesViewModelFactory(
+                            solicitudRepository = contenedor.solicitudRepository,
+                            perfilRepository = contenedor.perfilRepository
+                        )
+                    }
+
+                    val solicitudesViewModel: SolicitudesViewModel = viewModel(factory = factory)
+                    val uiState by solicitudesViewModel.uiState.collectAsState()
+
+                    SolicitudesScreen(
+                        uiState = uiState,
+                        onNuevaSolicitud = solicitudesViewModel::abrirFormulario,
+                        onCategoriaChange = solicitudesViewModel::seleccionarCategoria,
+                        onGuardar = solicitudesViewModel::guardar,
+                        onCerrarFormulario = solicitudesViewModel::cerrarFormulario,
+                        onReintentar = solicitudesViewModel::cargar,
+                        onMensajeConsumido = solicitudesViewModel::limpiarMensaje,
+                        onAbrirDetalle = { solicitudId ->
+                            navController.navigate("solicitud/$solicitudId") {
+                                launchSingleTop = true
+                            }
+                        },
+                        onIrPerfil = {
+                            navegarPrincipal(DestinoPrincipal.PERFIL)
+                        })
+                }
+
+                composable(
+                    route = RUTA_SOLICITUD_DETALLE, arguments = listOf(
+                        navArgument("solicitudId") {
+                            type = NavType.LongType
+                        })
+                ) { entrada ->
+                    val solicitudId = requireNotNull(entrada.arguments).getLong("solicitudId")
+                    val contenedor =
+                        (LocalContext.current.applicationContext as TioTecApplication).contenedor
+
+                    val factory = remember(contenedor, solicitudId) {
+                        SolicitudDetalleViewModelFactory(
+                            solicitudId = solicitudId, repository = contenedor.solicitudRepository
+                        )
+                    }
+
+                    val detalleViewModel: SolicitudDetalleViewModel = viewModel(factory = factory)
+                    val uiState by detalleViewModel.uiState.collectAsState()
+
+                    SolicitudDetalleScreen(
+                        uiState = uiState,
+                        onSolicitarCambio = detalleViewModel::solicitarCambio,
+                        onConfirmarCambio = detalleViewModel::confirmarCambio,
+                        onCancelarCambio = detalleViewModel::cancelarCambio,
+                        onReintentar = detalleViewModel::cargar,
+                        onMensajeConsumido = detalleViewModel::limpiarMensaje
+                    )
                 }
 
                 navigation(
