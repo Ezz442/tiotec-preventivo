@@ -22,12 +22,33 @@ param(
 # los trataria como errores. El resultado se revisa con $LASTEXITCODE.
 $ErrorActionPreference = "Continue"
 $repo = "https://github.com/Ezz442/tiotec-preventivo.git"
+# Proyecto desde el que se ejecuta el script (carpeta padre de scripts\).
+$origen = Split-Path -Parent $PSScriptRoot
 
 if (Test-Path $Destino) { Remove-Item $Destino -Recurse -Force }
 Write-Host "1/4 Clonando $repo ($Rama) en $Destino"
-git clone --depth 1 --branch $Rama $repo $Destino 2>&1 | Out-Host
+# cmd /c: asi PowerShell 5.1 no muestra en rojo los avisos normales que git escribe en stderr.
+cmd /c "git clone --depth 1 --branch $Rama $repo `"$Destino`" 2>&1" | Out-Host
 if ($LASTEXITCODE -ne 0) { Write-Host "No se pudo clonar el repositorio." -ForegroundColor Red; exit 1 }
 Set-Location $Destino
+
+# local.properties (ruta del Android SDK) no se sube a GitHub: la copia limpia no lo trae.
+# Se copia el del proyecto o, si no existe, se usa la ruta por defecto de Android Studio.
+if (-not $env:ANDROID_HOME) {
+    $propiedades = Join-Path $origen "local.properties"
+    $sdkPorDefecto = Join-Path $env:LOCALAPPDATA "Android\Sdk"
+    if (Test-Path $propiedades) {
+        Copy-Item $propiedades (Join-Path $Destino "local.properties")
+        Write-Host "    SDK: se copio local.properties del proyecto"
+    } elseif (Test-Path $sdkPorDefecto) {
+        "sdk.dir=" + ($sdkPorDefecto -replace '\\', '\\' -replace ':', '\:') |
+            Out-File (Join-Path $Destino "local.properties") -Encoding ascii
+        Write-Host "    SDK: $sdkPorDefecto"
+    } else {
+        Write-Host "No se encontro el Android SDK. Abre el proyecto una vez en Android Studio o define ANDROID_HOME." -ForegroundColor Red
+        exit 1
+    }
+}
 
 $log = Join-Path $Destino "verificacion-TT21.txt"
 "TT-21 - Verificacion desde copia limpia" | Out-File $log -Encoding utf8
@@ -36,7 +57,7 @@ $log = Join-Path $Destino "verificacion-TT21.txt"
 
 function Paso($titulo, $tareas) {
     Write-Host $titulo
-    & .\gradlew.bat @tareas --console=plain 2>&1 | Tee-Object -FilePath $log -Append
+    cmd /c ".\gradlew.bat $($tareas -join ' ') --console=plain 2>&1" | Tee-Object -FilePath $log -Append
     if ($LASTEXITCODE -ne 0) {
         "RESULTADO: FALLO en '$titulo'" | Out-File $log -Append -Encoding utf8
         Write-Host "Fallo: $titulo. Revisa $log" -ForegroundColor Red
