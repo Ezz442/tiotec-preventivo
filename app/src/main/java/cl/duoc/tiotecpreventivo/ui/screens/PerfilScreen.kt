@@ -38,7 +38,8 @@ fun PerfilScreen(
     onExperienciaChange: (ExperienciaDigital) -> Unit = {},
     onGuardar: () -> Unit = {},
     onReintentar: () -> Unit = {},
-    onAbrirAjustes: () -> Unit = {}
+    onAbrirAjustes: () -> Unit = {},
+    onAbrirSolicitudes: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -156,6 +157,12 @@ fun PerfilScreen(
                     Text(text = mensaje)
                 }
             }
+        }
+
+        OutlinedButton(
+            onClick = onAbrirSolicitudes, modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Solicitudes de asistencia")
         }
 
         OutlinedButton(
