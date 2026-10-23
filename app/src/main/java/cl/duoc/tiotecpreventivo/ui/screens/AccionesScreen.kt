@@ -17,11 +17,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cl.duoc.tiotecpreventivo.data.local.entity.AccionEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoAccion
+import cl.duoc.tiotecpreventivo.data.local.entity.RecordatorioEntity
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.AccionesUiState
 import java.text.DateFormat
@@ -33,7 +36,12 @@ fun AccionesScreen(
     uiState: AccionesUiState = AccionesUiState(),
     onFiltroChange: (EstadoAccion) -> Unit = {},
     onCambiarEstado: (Long) -> Unit = {},
-    onReintentar: () -> Unit = {}
+    onReintentar: () -> Unit = {},
+    /** TT-16: accionId → recordatorio programado. */
+    recordatorios: Map<Long, RecordatorioEntity> = emptyMap(),
+    /** TT-16: true si el teléfono no permite mostrar avisos. */
+    avisosBloqueados: Boolean = false,
+    onRecordar: (AccionEntity) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -64,6 +72,17 @@ fun AccionesScreen(
                         enabled = uiState.actualizandoId == null,
                         label = { Text("Completadas") })
                 }
+            }
+        }
+
+        if (avisosBloqueados && recordatorios.isNotEmpty()) {
+            item {
+                Text(
+                    text = "Las notificaciones están desactivadas: tus recordatorios se guardan, " +
+                        "pero no verás el aviso. Puedes activarlas en Ajustes del teléfono.",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
 
@@ -142,6 +161,27 @@ fun AccionesScreen(
                                         "Marcar como completada"
                                     }, modifier = Modifier.padding(top = 12.dp)
                                 )
+                            }
+
+                            // TT-16: recordatorio solo para acciones pendientes.
+                            if (accion.estado == EstadoAccion.PENDIENTE) {
+                                val recordatorio = recordatorios[accion.id]
+                                recordatorio?.let {
+                                    Text(
+                                        text = "Recordatorio: ${
+                                            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+                                                .format(Date(it.fechaHora))
+                                        }",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                TextButton(
+                                    onClick = { onRecordar(accion) },
+                                    enabled = uiState.actualizandoId == null
+                                ) {
+                                    Text(if (recordatorio == null) "Programar recordatorio" else "Editar recordatorio")
+                                }
                             }
                         }
                     }
