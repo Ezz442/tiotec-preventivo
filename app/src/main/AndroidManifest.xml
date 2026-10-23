@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- TT-16: avisos de recordatorios (Android 13+ lo pide en tiempo de ejecución). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".TioTecApplication"
         android:allowBackup="true"
@@ -16,6 +19,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.TioTecPreventivo"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

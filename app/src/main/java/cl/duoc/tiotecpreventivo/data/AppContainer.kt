@@ -8,6 +8,8 @@ import cl.duoc.tiotecpreventivo.repository.AccionRepository
 import cl.duoc.tiotecpreventivo.repository.CatalogoRepository
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.EvaluacionRepository
+import cl.duoc.tiotecpreventivo.repository.GestorRecordatorios
+import cl.duoc.tiotecpreventivo.notificaciones.ProgramadorWorkManager
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import cl.duoc.tiotecpreventivo.repository.PreferenciasRepository
 import cl.duoc.tiotecpreventivo.repository.RecordatorioRepository
@@ -47,6 +49,11 @@ class AppContainer(context: Context) {
 
     val recordatorioRepository: RecordatorioRepository by lazy {
         RecordatorioRepository(baseDeDatos.recordatorioDao())
+    }
+
+    /** TT-16: guarda el recordatorio en Room y programa su aviso con WorkManager. */
+    val gestorRecordatorios: GestorRecordatorios by lazy {
+        GestorRecordatorios(recordatorioRepository, ProgramadorWorkManager(context))
     }
 
     val solicitudRepository: SolicitudRepository by lazy {

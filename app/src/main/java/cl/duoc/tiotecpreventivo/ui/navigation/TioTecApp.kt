@@ -59,6 +59,11 @@ import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.ResultadoViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.RecordatorioViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.RecordatorioViewModelFactory
+import cl.duoc.tiotecpreventivo.ui.screens.AccionesRuta
+import cl.duoc.tiotecpreventivo.notificaciones.Avisos
+import androidx.compose.runtime.LaunchedEffect
 import cl.duoc.tiotecpreventivo.viewmodel.AprendeViewModelFactory
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
@@ -83,7 +88,10 @@ private enum class DestinoPrincipal(
 fun TioTecApp(
     windowWidthSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
     /** Lo crea MainActivity para que Ajustes y el tema usen la misma instancia. Null en previews. */
-    preferenciasViewModel: PreferenciasViewModel? = null
+    preferenciasViewModel: PreferenciasViewModel? = null,
+    /** TT-16: pantalla que pidió abrir un aviso (por ejemplo "acciones"); null si ninguna. */
+    destinoPendiente: String? = null,
+    onDestinoConsumido: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
@@ -112,6 +120,14 @@ fun TioTecApp(
             }
             launchSingleTop = true
             restoreState = true
+        }
+    }
+
+    // TT-16: al tocar un aviso de recordatorio la app abre Mis acciones.
+    LaunchedEffect(destinoPendiente) {
+        if (destinoPendiente == Avisos.DESTINO_ACCIONES) {
+            navegarPrincipal(DestinoPrincipal.ACCIONES)
+            onDestinoConsumido()
         }
     }
 
@@ -266,13 +282,16 @@ fun TioTecApp(
                     }
 
                     val accionesViewModel: AccionesViewModel = viewModel(factory = factory)
-                    val uiState by accionesViewModel.uiState.collectAsState()
 
-                    AccionesScreen(
-                        uiState = uiState,
-                        onFiltroChange = accionesViewModel::cambiarFiltro,
-                        onCambiarEstado = accionesViewModel::cambiarEstado,
-                        onReintentar = accionesViewModel::reintentarCarga
+                    val factoryRecordatorios = remember(contenedor) {
+                        RecordatorioViewModelFactory(contenedor.gestorRecordatorios)
+                    }
+                    val recordatorioViewModel: RecordatorioViewModel =
+                        viewModel(factory = factoryRecordatorios)
+
+                    AccionesRuta(
+                        accionesViewModel = accionesViewModel,
+                        recordatorioViewModel = recordatorioViewModel
                     )
                 }
 
