@@ -67,10 +67,7 @@ fun SolicitudesScreen(
         ) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = "Solicitudes de asistencia",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                    // TT-27: el título "Solicitudes de asistencia" ya está en la barra superior.
                     Text(
                         "Simulación local: las solicitudes no se envían a ningún servicio."
                     )
