@@ -55,7 +55,7 @@ El script clona `main` en una carpeta temporal nueva (sin archivos de Android St
 | Pruebas JVM sin DataStore (152 pruebas, 19 clases) | Entorno de verificación del PR (Kotlin 2.2.10, JUnit 4.13.2) | ✅ 152/152 |
 | `assembleDebug` desde copia limpia (`feat/TT-21-verificacion`) | PC de Enzo · 23-10-2026 | ✅ BUILD SUCCESSFUL (1 min 26 s) |
 | `testDebugUnitTest` completo desde copia limpia | PC de Enzo · 23-10-2026 | ✅ **164/164** (0 fallos, 0 omitidas, 2,8 s) |
-| `connectedDebugAndroidTest` (27 pruebas en 7 clases) | Emulador de Gerard | ☐ completar: __/27 |
+| `connectedDebugAndroidTest` (27 pruebas en 7 clases) | Emulador de Gerard | ✅ 27/27, 0 fallos y 0 omitidas; ejecución local tras corregir la expectativa de puntajes|
 
 Adjuntar en Trello: captura del reporte `app/build/reports/tests/testDebugUnitTest/index.html` y de `androidTests/connected/debug/index.html`, más el archivo `verificacion-TT21.txt`.
 
@@ -67,7 +67,7 @@ Adjuntar en Trello: captura del reporte `app/build/reports/tests/testDebugUnitTe
 | TT-11 | Conflicto en el PR por ramas mezcladas en otro orden | GitHub | Merge de `main` en la rama (Gerard) |
 | TT-14 | El filtro del historial mostraba el nombre antiguo tras renombrar sin reevaluar | Prueba manual (Gerard) | `nombresActuales` + prueba de regresión en JVM y Room (21955cc) |
 
-En TT-21 no aparecieron fallos nuevos: las 48 pruebas agregadas pasaron con el código actual.
+La prueba en emulador detectó una expectativa desactualizada: esperaba 2 puntos para todas las respuestas «No», pero las preguntas clave valen 3. Se corrigió RepositoriosRoomTest para comparar el puntaje y el texto con el catálogo. Después de la corrección, las 27 pruebas de Android pasaron.
 
 ### Observaciones abiertas (no bloquean)
 
