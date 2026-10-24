@@ -60,7 +60,10 @@ fun DispositivosScreen(
     onElegirImagen: (Long) -> Unit = {},
     onSolicitarQuitarFoto: (Long) -> Unit = {},
     onConfirmarQuitarFoto: () -> Unit = {},
-    onCancelarQuitarFoto: () -> Unit = {}
+    onCancelarQuitarFoto: () -> Unit = {},
+    /** TT-26: confirmar o no el descarte de cambios sin guardar. */
+    onDescartarCambios: () -> Unit = {},
+    onSeguirEditando: () -> Unit = {}
 ) {
     val fotoOcupada =
         uiState.procesandoFoto || uiState.capturaFoto != null || uiState.dispositivoGaleriaId != null
@@ -255,6 +258,26 @@ fun DispositivosScreen(
                 }
             }
         }
+    }
+
+    // TT-26: cancelar con cambios sin guardar pide confirmación.
+    if (uiState.confirmarDescartar) {
+        AlertDialog(
+            onDismissRequest = onSeguirEditando,
+            title = { Text("¿Descartar cambios?") },
+            text = {
+                Text(
+                    if (uiState.dispositivoEnEdicionId == null) "El dispositivo no se agregará."
+                    else "Los cambios de este dispositivo no se guardarán."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = onDescartarCambios) { Text("Descartar") }
+            },
+            dismissButton = {
+                TextButton(onClick = onSeguirEditando) { Text("Seguir editando") }
+            }
+        )
     }
 
     uiState.dispositivoQuitarFoto?.let { dispositivo ->

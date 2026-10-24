@@ -112,6 +112,8 @@ fun DispositivosRuta(
         onElegirImagen = abrirGaleria,
         onSolicitarQuitarFoto = viewModel::solicitarQuitarFoto,
         onConfirmarQuitarFoto = viewModel::confirmarQuitarFoto,
-        onCancelarQuitarFoto = viewModel::cancelarQuitarFoto
+        onCancelarQuitarFoto = viewModel::cancelarQuitarFoto,
+        onDescartarCambios = viewModel::descartarCambios,
+        onSeguirEditando = viewModel::seguirEditando
     )
 }

@@ -99,7 +99,7 @@ fun MensajeError(
     }
 }
 
-/** Mensaje informativo (perfil guardado, fecha de un recordatorio) que aparece y se va suavemente. */
+/** Mensaje informativo (por ejemplo, la fecha de un recordatorio) que aparece y se va suavemente. */
 @Composable
 fun MensajeInformativo(
     texto: String?,

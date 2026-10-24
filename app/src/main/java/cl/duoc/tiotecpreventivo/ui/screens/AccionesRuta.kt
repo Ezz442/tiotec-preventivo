@@ -91,7 +91,9 @@ fun AccionesRuta(
                 }
             },
             onCancelarRecordatorio = recordatorioViewModel::cancelarRecordatorio,
-            onCerrar = recordatorioViewModel::cerrarFormulario
+            onCerrar = recordatorioViewModel::cerrarFormulario,
+            onPedirCancelacion = recordatorioViewModel::pedirCancelacion,
+            onVolverDeCancelacion = recordatorioViewModel::volverDeCancelacion
         )
     }
 }

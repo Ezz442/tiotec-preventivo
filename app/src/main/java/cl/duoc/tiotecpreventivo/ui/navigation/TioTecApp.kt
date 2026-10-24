@@ -348,6 +348,7 @@ fun TioTecApp(
                         onExperienciaChange = perfilViewModel::onExperienciaChange,
                         onGuardar = perfilViewModel::guardarPerfil,
                         onReintentar = perfilViewModel::reintentarCarga,
+                        onConsumirMensaje = perfilViewModel::consumirMensaje,
                         onAbrirAjustes = {
                             navController.navigate(RUTA_AJUSTES) {
                                 launchSingleTop = true
