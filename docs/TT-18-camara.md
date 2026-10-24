@@ -22,7 +22,7 @@
 |---|---|---|
 | API | `ActivityResultContracts.TakePicture` (Activity Result API) | Forma moderna de pedir un resultado a otra app; reemplaza `startActivityForResult`. Devuelve `true`/`false`. |
 | URI | `FileProvider` (`${applicationId}.archivos`, `res/xml/rutas_archivos.xml`) | Desde Android 7 no se puede compartir una ruta `file://`. FileProvider entrega una URI `content://` con permiso temporal solo para esa foto. |
-| Permiso CAMERA | **No se declara** | La foto la toma la app de cámara, que ya tiene su permiso. Si la app declarara CAMERA, Android obligaría a pedirlo aunque no se use directamente. Menos permisos = menos riesgo. |
+| Permiso CAMERA | **Se pide en tiempo de ejecución** (`RequestPermission`) antes de abrir la cámara | Se agregó después de TT-18 para mostrar el flujo de permiso. Si se declara CAMERA en el manifiesto, Android lo exige también para `TakePicture`, así que la app revisa `checkSelfPermission` y, si falta, muestra el diálogo del sistema. Si se rechaza, avisa y se puede usar la galería, que no necesita permiso. |
 | `uses-feature camera.any` | `required="false"` | La app se puede instalar en equipos sin cámara; en ellos se muestra el aviso. |
 | Dónde se guarda | `filesDir/imagenes/disp_{id}_{marca}.jpg` (almacenamiento privado) | No pide permisos de almacenamiento, otras apps no lo ven y se borra al desinstalar. |
 | Qué guarda Room | Solo la **ruta relativa** en `dispositivo.imagenRuta` | La base no crece con imágenes; la ruta sigue válida al reabrir la app. |
@@ -68,4 +68,5 @@ El emulador trae una cámara virtual (una sala 3D): sirve como "objeto de prueba
 5. Cerrar la app desde Recientes y abrirla: la foto sigue en la tarjeta.
 6. Rotar la pantalla con la cámara abierta y aceptar la foto: se guarda igual.
 7. Eliminar un dispositivo **sin** evaluaciones que tenga foto: en **Device Explorer** (`data/data/cl.duoc.tiotecpreventivo/files/imagenes`) el archivo ya no está.
-8. (Opcional) Emulador sin cámara (AVD Manager → Camera: None): aparece "Este dispositivo no tiene una cámara disponible.".
+8. **Permiso:** la primera vez que se toca *Tomar foto* aparece "¿Permitir que TíoTec tome fotos y grabe video?". *Permitir* abre la cámara. *No permitir* muestra "Sin permiso de cámara no se puede tomar la foto…" y la app sigue funcionando. Para repetirlo: Ajustes del teléfono → Apps → TíoTec → Permisos → Cámara → No permitir.
+9. (Opcional) Emulador sin cámara (AVD Manager → Camera: None): aparece "Este dispositivo no tiene una cámara disponible.".

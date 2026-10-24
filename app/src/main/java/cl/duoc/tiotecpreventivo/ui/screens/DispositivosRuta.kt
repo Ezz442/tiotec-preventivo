@@ -1,5 +1,6 @@
 package cl.duoc.tiotecpreventivo.ui.screens
 
+import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -7,7 +8,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenes
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
@@ -16,9 +21,10 @@ import androidx.activity.result.PickVisualMediaRequest
 /**
  * Mis dispositivos con cámara (TT-09 + TT-18).
  *
- * Usa la Activity Result API (`TakePicture`): abre la app de cámara del teléfono y le
- * entrega, mediante FileProvider, una URI temporal dentro del almacenamiento privado
- * de la app. No se pide el permiso CAMERA porque la foto la toma la app de cámara.
+ * Usa la Activity Result API: primero `RequestPermission` pide el permiso CAMERA (si
+ * falta) y luego `TakePicture` abre la app de cámara del teléfono y le entrega, mediante
+ * FileProvider, una URI temporal dentro del almacenamiento privado de la app.
+ * Si el permiso se rechaza, se avisa y se puede seguir usando la galería.
  */
 @Composable
 fun DispositivosRuta(
@@ -50,11 +56,8 @@ fun DispositivosRuta(
             viewModel.fotoTomada(exito)
         }
 
-    val abrirCamara: (Long) -> Unit = abrir@{ dispositivoId ->
-        if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            viewModel.camaraNoDisponible()
-            return@abrir
-        }
+    // Abre la app de cámara; solo se llama con el permiso ya concedido.
+    val lanzarCamara: (Long) -> Unit = abrir@{ dispositivoId ->
         val ruta = viewModel.prepararFoto(dispositivoId) ?: return@abrir
         val archivo = almacenImagenes.archivo(ruta)
         if (archivo == null) {
@@ -70,6 +73,37 @@ fun DispositivosRuta(
         } catch (e: IllegalArgumentException) {
             // La ruta no está configurada en FileProvider: no se bloquea la app.
             viewModel.camaraNoDisponible()
+        } catch (e: SecurityException) {
+            // El permiso se revocó justo antes de abrir la cámara.
+            viewModel.permisoCamaraDenegado()
+        }
+    }
+
+    // Dispositivo que espera la respuesta del diálogo de permiso (sobrevive a la rotación).
+    var esperandoPermisoPara by rememberSaveable { mutableStateOf<Long?>(null) }
+
+    val pedirPermisoCamara = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { concedido ->
+        val dispositivoId = esperandoPermisoPara
+        esperandoPermisoPara = null
+        if (dispositivoId == null) return@rememberLauncherForActivityResult
+        if (concedido) lanzarCamara(dispositivoId) else viewModel.permisoCamaraDenegado()
+    }
+
+    // 1) ¿hay cámara? 2) ¿hay permiso? Si no, se pide con el diálogo del sistema.
+    val abrirCamara: (Long) -> Unit = abrir@{ dispositivoId ->
+        if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+            viewModel.camaraNoDisponible()
+            return@abrir
+        }
+        val tienePermiso = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED
+        if (tienePermiso) {
+            lanzarCamara(dispositivoId)
+        } else {
+            esperandoPermisoPara = dispositivoId
+            pedirPermisoCamara.launch(Manifest.permission.CAMERA)
         }
     }
 

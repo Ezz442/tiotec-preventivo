@@ -22,6 +22,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
+/** Mensaje cuando se rechaza el permiso de cámara. */
+const val PERMISO_CAMARA_DENEGADO =
+    "Sin permiso de cámara no se puede tomar la foto. Puedes elegir una imagen de galería " +
+        "o activar el permiso en Ajustes del teléfono."
+
 class DispositivosViewModel(
     private val dispositivoRepository: DispositivoRepository,
     private val perfilRepository: PerfilRepository,
@@ -536,6 +541,17 @@ class DispositivosViewModel(
             it.copy(
                 capturaFoto = null,
                 errorOperacion = "Este dispositivo no tiene una cámara disponible."
+            )
+        }
+    }
+
+    /** La persona no concedió el permiso de cámara: se avisa y se puede usar la galería. */
+    fun permisoCamaraDenegado() {
+        _uiState.value.capturaFoto?.let { almacenImagenes.borrar(it.rutaTemporal) }
+        _uiState.update {
+            it.copy(
+                capturaFoto = null,
+                errorOperacion = PERMISO_CAMARA_DENEGADO
             )
         }
     }
