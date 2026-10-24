@@ -1,5 +1,6 @@
 package cl.duoc.tiotecpreventivo.ui.navigation
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,7 +12,8 @@ import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -21,6 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +36,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import cl.duoc.tiotecpreventivo.R
 import cl.duoc.tiotecpreventivo.TioTecApplication
 import cl.duoc.tiotecpreventivo.data.local.InicioRepositoryLocal
 import cl.duoc.tiotecpreventivo.notificaciones.Avisos
@@ -81,13 +86,23 @@ private const val RUTA_HISTORIAL = "historial"
 private const val RUTA_SOLICITUDES = "solicitudes"
 private const val RUTA_SOLICITUD_DETALLE = "solicitud/{solicitudId}"
 
+/** TT-27: cada destino usa un ícono vectorial Material junto a su etiqueta visible. */
 private enum class DestinoPrincipal(
-    val ruta: String, val titulo: String, val simbolo: String
+    val ruta: String, val titulo: String, @DrawableRes val icono: Int
 ) {
-    INICIO("inicio", "Inicio", "⌂"), ACCIONES("acciones", "Mis acciones", "✓"), APRENDE(
-        "aprende", "Aprende", "?"
-    ),
-    PERFIL("perfil", "Perfil", "○")
+    INICIO("inicio", "Inicio", R.drawable.ic_nav_inicio),
+    ACCIONES("acciones", "Mis acciones", R.drawable.ic_nav_acciones),
+    APRENDE("aprende", "Aprende", R.drawable.ic_nav_aprende),
+    PERFIL("perfil", "Perfil", R.drawable.ic_nav_perfil)
+}
+
+/**
+ * Ícono de navegación. Es decorativo (`contentDescription = null`) porque la etiqueta
+ * visible ya nombra el destino: así TalkBack no lo lee dos veces.
+ */
+@Composable
+private fun IconoDestino(destino: DestinoPrincipal) {
+    Icon(painter = painterResource(destino.icono), contentDescription = null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,7 +169,7 @@ fun TioTecApp(
                             label = {
                                 Text(destino.titulo)
                             }, icon = {
-                                Text(destino.simbolo)
+                                IconoDestino(destino)
                             }, selected = destinoSeleccionado == destino.ruta, onClick = {
                                 navegarPrincipal(destino)
                             }, modifier = Modifier.padding(horizontal = 12.dp)
@@ -175,19 +190,23 @@ fun TioTecApp(
                             enEvaluacion -> "Evaluación preventiva"
                             enResultado -> "Resultados"
                             enContenido -> "Aprende"
-                            enHistorial -> "Historial"
-                            enSolicitudes -> "Solicitudes"
+                            enHistorial -> "Historial de evaluaciones"
+                            enSolicitudes -> "Solicitudes de asistencia"
                             enSolicitudDetalle -> "Detalle de solicitud"
                             else -> "TíoTec Preventivo"
-                        }
+                        },
+                        // TT-27: con texto aumentado el título no empuja ni tapa la flecha.
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }, navigationIcon = {
+                    // TT-27: flecha Material que se invierte en idiomas de derecha a izquierda.
                     if (enPantallaSecundaria) {
-                        TextButton(
-                            onClick = {
-                                navController.popBackStack()
-                            }) {
-                            Text("← Volver")
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_volver),
+                                contentDescription = "Volver"
+                            )
                         }
                     }
                 })
@@ -201,12 +220,7 @@ fun TioTecApp(
                                 onClick = {
                                     navegarPrincipal(destino)
                                 },
-                                icon = {
-                                    Text(
-                                        text = destino.simbolo,
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                },
+                                icon = { IconoDestino(destino) },
                                 label = {
                                     Text(destino.titulo)
                                 })
@@ -550,6 +564,39 @@ fun TioTecCompactPreview() {
         TioTecApp(
             windowWidthSizeClass = WindowWidthSizeClass.Compact
         )
+    }
+}
+
+// TT-27: previews para revisar claro/oscuro, texto aumentado y los tres tamaños.
+@Preview(
+    showBackground = true, widthDp = 360, heightDp = 800, name = "Navegación Compact oscuro",
+    backgroundColor = 0xFF101820
+)
+@Composable
+fun TioTecCompactOscuroPreview() {
+    TioTecPreventivoTheme(darkTheme = true) {
+        TioTecApp(windowWidthSizeClass = WindowWidthSizeClass.Compact)
+    }
+}
+
+@Preview(
+    showBackground = true, widthDp = 360, heightDp = 800, fontScale = 1.5f,
+    name = "Navegación Compact texto 150 %"
+)
+@Composable
+fun TioTecTextoAumentadoPreview() {
+    TioTecPreventivoTheme {
+        TioTecApp(windowWidthSizeClass = WindowWidthSizeClass.Compact)
+    }
+}
+
+@Preview(
+    showBackground = true, widthDp = 700, heightDp = 1000, name = "Navegación Medium (tablet vertical)"
+)
+@Composable
+fun TioTecMediumPreview() {
+    TioTecPreventivoTheme {
+        TioTecApp(windowWidthSizeClass = WindowWidthSizeClass.Medium)
     }
 }
 
