@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
+import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosUiState
 
@@ -47,8 +48,10 @@ fun DispositivoFormulario(
             enabled = !uiState.guardando,
             isError = uiState.errorNombre != null,
             supportingText = {
+                // TT-26: el error viene del ViewModel; si no hay error se muestra la regla y el contador.
                 Text(
-                    uiState.errorNombre ?: "Entre 2 y 30 caracteres. Ejemplo: Teléfono de prueba."
+                    uiState.errorNombre
+                        ?: "Entre 2 y 30 caracteres. Ejemplo: Teléfono de prueba. · ${ValidadorFormularios.contador(uiState.nombre)}"
                 )
             },
             trailingIcon = {

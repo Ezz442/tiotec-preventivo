@@ -19,6 +19,8 @@ data class DispositivosUiState(
     val sistemaOperativo: SistemaOperativo? = null,
     val errorNombre: String? = null,
     val errorSistemaOperativo: String? = null,
+    /** TT-26: AlertDialog "¿Descartar cambios?" al cancelar con cambios sin guardar. */
+    val confirmarDescartar: Boolean = false,
     val guardando: Boolean = false,
     val dispositivoAEliminar: DispositivoEntity? = null,
     val eliminando: Boolean = false,

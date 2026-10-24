@@ -12,7 +12,6 @@ Las animaciones **solo muestran el estado que ya calculó el ViewModel**. No val
 | Evaluación guiada | Barra *Respondidas X de 12* | `animateFloatAsState` + `LinearProgressIndicator` | El progreso avanza en lugar de saltar |
 | Evaluación, Perfil, Dispositivos | Opción elegida (Sí/No/No lo sé, experiencia, sistema operativo): fondo, borde, grosor y texto | `animateColorAsState` + `animateDpAsState` | La selección se ve con más que el punto del RadioButton |
 | Todos los formularios | Error por campo con ícono y texto: aparece y se va | `AnimatedVisibility` (`fadeIn` + `expandVertically`) | El error no "salta"; TalkBack lo lee (`liveRegion`) |
-| Perfil | "Perfil guardado correctamente." | `AnimatedVisibility` | Confirmación visible sin tapar el formulario |
 | Botones que guardan | Indicador pequeño junto al texto mientras guarda | `AnimatedVisibility` + `CircularProgressIndicator` | Carga ligada a `guardando`, no a un tiempo fijo |
 | Mis acciones | Contador de pendientes: el número sube o baja | `AnimatedContent` + `slideInVertically` | Se ve el efecto de completar una acción |
 | Mis acciones | Tarjeta: cambia de color al completarse y sale de *Pendientes* suavemente | `animateColorAsState` + `Modifier.animateItem()` | La acción no desaparece de golpe |
@@ -61,7 +60,7 @@ Grabar la pantalla del emulador (botón ⋮ → *Record screen*) en estos recorr
 
 1. **Evaluación:** responder 3 preguntas → la pregunta entra por la derecha y la barra avanza. *Anterior* → entra por la izquierda. Tocar *Siguiente* sin responder → el error aparece con ícono; al elegir una opción desaparece. Tocar rápido *Siguiente* y una opción durante la transición → la respuesta queda en la pregunta nueva.
 2. **Opciones:** al elegir Sí/No/No lo sé, el fondo y el borde cambian suavemente. Lo mismo en Perfil (experiencia) y en Agregar dispositivo (sistema operativo).
-3. **Guardar:** en Perfil, *Guardar perfil* muestra el indicador solo mientras guarda y luego aparece *Perfil guardado correctamente.*. Con el alias vacío, el error aparece bajo el campo.
+3. **Guardar:** en Perfil, *Guardar perfil* muestra el indicador solo mientras guarda y luego aparece el Snackbar *Perfil guardado correctamente.* (desde TT-26). Con el alias vacío, el error aparece bajo el campo.
 4. **Resultados:** al finalizar, las barras por categoría se llenan con el color de su nivel.
 5. **Mis acciones:** marcar una acción → la tarjeta sale de *Pendientes* y el contador baja. En *Completadas*, desmarcarla → cambia de color y sale de la lista. Programar un recordatorio → la fecha aparece en la tarjeta.
 6. **Listas:** en Historial y Aprende, cambiar de filtro → las tarjetas entran y salen sin saltos.

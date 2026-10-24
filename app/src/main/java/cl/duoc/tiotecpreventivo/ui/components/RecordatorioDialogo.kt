@@ -44,7 +44,10 @@ fun RecordatorioDialogo(
     onHoraChange: (hora: Int, minuto: Int) -> Unit,
     onGuardar: () -> Unit,
     onCancelarRecordatorio: (recordatorioId: Long) -> Unit,
-    onCerrar: () -> Unit
+    onCerrar: () -> Unit,
+    /** TT-26: abre el AlertDialog de confirmación antes de cancelar. */
+    onPedirCancelacion: () -> Unit = {},
+    onVolverDeCancelacion: () -> Unit = {}
 ) {
     var eligiendoFecha by rememberSaveable { mutableStateOf(false) }
     var eligiendoHora by rememberSaveable { mutableStateOf(false) }
@@ -83,8 +86,8 @@ fun RecordatorioDialogo(
 
                 MensajeError(errorOperacion, estilo = MaterialTheme.typography.bodySmall)
 
-                formulario.recordatorioId?.let { id ->
-                    TextButton(onClick = { onCancelarRecordatorio(id) }, enabled = !guardando) {
+                formulario.recordatorioId?.let {
+                    TextButton(onClick = onPedirCancelacion, enabled = !guardando) {
                         Text("Cancelar recordatorio", color = MaterialTheme.colorScheme.error)
                     }
                 }
@@ -99,6 +102,24 @@ fun RecordatorioDialogo(
             TextButton(onClick = onCerrar, enabled = !guardando) { Text("Cerrar") }
         }
     )
+
+    // TT-26: cancelar borra el aviso programado, así que se confirma primero.
+    val recordatorioId = formulario.recordatorioId
+    if (formulario.confirmandoCancelacion && recordatorioId != null) {
+        AlertDialog(
+            onDismissRequest = { if (!guardando) onVolverDeCancelacion() },
+            title = { Text("¿Cancelar este recordatorio?") },
+            text = { Text("No recibirás el aviso de «${formulario.titulo}». La acción sigue pendiente.") },
+            confirmButton = {
+                TextButton(onClick = { onCancelarRecordatorio(recordatorioId) }, enabled = !guardando) {
+                    TextoConCarga(texto = "Sí, cancelar", cargando = guardando, textoCargando = "Cancelando…")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onVolverDeCancelacion, enabled = !guardando) { Text("Volver") }
+            }
+        )
+    }
 
     if (eligiendoFecha) {
         val estadoFecha = rememberDatePickerState(

@@ -1,5 +1,6 @@
 package cl.duoc.tiotecpreventivo.viewmodel
 
+import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.duoc.tiotecpreventivo.data.catalogo.Categoria
@@ -116,10 +117,12 @@ class SolicitudesViewModel(
             return
         }
 
+        // TT-26: la regla de selección obligatoria vive en ValidadorFormularios.
+        val errorCategoria = ValidadorFormularios.validarSolicitud(estado.categoriaSeleccionada)
         val categoria = estado.categoriaSeleccionada
-        if (categoria == null) {
+        if (errorCategoria != null || categoria == null) {
             _uiState.update {
-                it.copy(errorCategoria = "Selecciona una categoría.")
+                it.copy(errorCategoria = errorCategoria)
             }
             return
         }

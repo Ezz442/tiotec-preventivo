@@ -130,6 +130,37 @@ class RecordatorioViewModelTest {
     }
 
     @Test
+    fun cancelarPideConfirmacionYVolverNoBorraNada() {
+        viewModel.abrirNuevo(3, "Crear una copia de seguridad")
+        llenarYGuardar()
+        val id = viewModel.uiState.value.porAccion.getValue(3).id
+        viewModel.abrirNuevo(3, "Crear una copia de seguridad")
+
+        // TT-26: primero el AlertDialog de confirmación.
+        viewModel.pedirCancelacion()
+        assertTrue(viewModel.uiState.value.formulario!!.confirmandoCancelacion)
+
+        viewModel.volverDeCancelacion()
+        assertFalse(viewModel.uiState.value.formulario!!.confirmandoCancelacion)
+        assertEquals(id, viewModel.uiState.value.porAccion.getValue(3).id)
+        assertEquals(1, programador.programados.size)
+
+        viewModel.pedirCancelacion()
+        viewModel.cancelarRecordatorio(id)
+        assertNull(viewModel.uiState.value.formulario)
+        assertTrue(viewModel.uiState.value.porAccion.isEmpty())
+    }
+
+    @Test
+    fun unRecordatorioNuevoNoPideConfirmacionDeCancelar() {
+        viewModel.abrirNuevo(3, "Crear una copia de seguridad")
+
+        viewModel.pedirCancelacion()
+
+        assertFalse(viewModel.uiState.value.formulario!!.confirmandoCancelacion)
+    }
+
+    @Test
     fun cerrarElFormularioNoGuardaNada() {
         viewModel.abrirNuevo(3, "Crear una copia de seguridad")
         viewModel.onFechaChange(manana.first)
