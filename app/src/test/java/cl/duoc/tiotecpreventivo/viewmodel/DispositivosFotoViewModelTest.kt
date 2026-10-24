@@ -126,6 +126,23 @@ class DispositivosFotoViewModelTest {
     }
 
     @Test
+    fun permisoDeCamaraRechazadoAvisaYNoGuardaNada() {
+        val primera = viewModel.prepararFoto(1)!!
+        camaraGuarda(primera)
+        viewModel.fotoTomada(true)
+
+        val temporal = viewModel.prepararFoto(1)!!
+        viewModel.permisoCamaraDenegado()
+
+        assertEquals(PERMISO_CAMARA_DENEGADO, viewModel.uiState.value.errorOperacion)
+        assertNull(viewModel.uiState.value.capturaFoto)
+        assertEquals(primera, imagenGuardada())
+        assertFalse(almacen.archivo(temporal)!!.exists())
+        // Se puede volver a intentar después.
+        assertNotNull(viewModel.prepararFoto(1))
+    }
+
+    @Test
     fun noSePreparaOtraFotoMientrasHayUnaEnCurso() {
         assertNotNull(viewModel.prepararFoto(1))
         assertNull(viewModel.prepararFoto(1))

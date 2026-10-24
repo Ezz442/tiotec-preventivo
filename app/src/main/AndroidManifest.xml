@@ -5,9 +5,12 @@
     <!-- TT-16: avisos de recordatorios (Android 13+ lo pide en tiempo de ejecución). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- TT-18: la app usa la cámara del teléfono, pero no es obligatoria para instalarla.
-         No se declara el permiso CAMERA: TakePicture abre la app de cámara, que ya tiene
-         su propio permiso, y el archivo se comparte solo mediante FileProvider. -->
+    <!-- TT-18: permiso de cámara pedido en tiempo de ejecución antes de abrir la cámara.
+         Si se declara, Android exige que esté concedido también para TakePicture. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- La cámara no es obligatoria para instalar la app; el archivo se comparte solo
+         mediante FileProvider. -->
     <uses-feature
         android:name="android.hardware.camera.any"
         android:required="false" />
