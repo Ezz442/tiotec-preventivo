@@ -2,23 +2,17 @@ package cl.duoc.tiotecpreventivo.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
@@ -69,58 +63,22 @@ fun DispositivoFormulario(
             text = "Sistema operativo", style = MaterialTheme.typography.titleMedium
         )
 
-        Column(
-            modifier = Modifier.selectableGroup()
-        ) {
-            SistemaOperativo.entries.forEach { sistema ->
-                val seleccionado = uiState.sistemaOperativo == sistema
+        GrupoOpciones(
+            opciones = SistemaOperativo.entries,
+            seleccionada = uiState.sistemaOperativo,
+            etiqueta = { it.etiqueta },
+            habilitado = !uiState.guardando,
+            onSeleccionar = onSistemaChange
+        )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = seleccionado,
-                            enabled = !uiState.guardando,
-                            role = Role.RadioButton,
-                            onClick = { onSistemaChange(sistema) })
-                        .padding(vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    RadioButton(
-                        selected = seleccionado, onClick = null, enabled = !uiState.guardando
-                    )
+        MensajeError(uiState.errorSistemaOperativo)
 
-                    Text(sistema.etiqueta)
-                }
-            }
-        }
-
-        uiState.errorSistemaOperativo?.let { error ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconoErrorDispositivo()
-
-                Text(
-                    text = error, color = MaterialTheme.colorScheme.error
-                )
-            }
-        }
-
-        uiState.errorOperacion?.let { error ->
-            Text(
-                text = error, color = MaterialTheme.colorScheme.error
-            )
-        }
+        MensajeError(uiState.errorOperacion)
 
         Button(
             onClick = onGuardar, enabled = !uiState.guardando, modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                if (uiState.guardando) "Guardando…"
-                else "Guardar dispositivo"
-            )
+            TextoConCarga(texto = "Guardar dispositivo", cargando = uiState.guardando)
         }
 
         OutlinedButton(

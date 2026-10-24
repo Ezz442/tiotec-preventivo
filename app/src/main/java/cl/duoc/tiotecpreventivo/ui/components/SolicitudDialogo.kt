@@ -2,16 +2,12 @@ package cl.duoc.tiotecpreventivo.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.res.painterResource
-import cl.duoc.tiotecpreventivo.R
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -51,34 +47,17 @@ fun SolicitudDialogo(
                     label = { Text(categoria.nombre) })
             }
 
-            uiState.errorCategoria?.let { error ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_riesgo_medio),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                    Text(
-                        text = error, color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
+            MensajeError(uiState.errorCategoria)
 
             Text("Estado inicial: Pendiente")
 
-            uiState.errorOperacion?.let { error ->
-                Text(
-                    text = error, color = MaterialTheme.colorScheme.error
-                )
-            }
+            MensajeError(uiState.errorOperacion)
         }
     }, confirmButton = {
         Button(
             onClick = onGuardar, enabled = !uiState.guardando
         ) {
-            Text(if (uiState.guardando) "Guardando..." else "Guardar")
+            TextoConCarga(texto = "Guardar", cargando = uiState.guardando)
         }
     }, dismissButton = {
         TextButton(

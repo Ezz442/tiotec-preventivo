@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cl.duoc.tiotecpreventivo.ui.components.TextoConCarga
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoSolicitud
 import cl.duoc.tiotecpreventivo.viewmodel.SolicitudDetalleUiState
 import java.text.DateFormat
@@ -191,7 +192,7 @@ fun SolicitudDetalleScreen(
             Button(
                 onClick = onConfirmarCambio, enabled = !uiState.actualizando
             ) {
-                Text(if (uiState.actualizando) "Guardando..." else "Confirmar")
+                TextoConCarga(texto = "Confirmar", cargando = uiState.actualizando)
             }
         }, dismissButton = {
             TextButton(

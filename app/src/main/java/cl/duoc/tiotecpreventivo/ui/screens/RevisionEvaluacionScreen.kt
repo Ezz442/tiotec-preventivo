@@ -18,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cl.duoc.tiotecpreventivo.ui.components.TextoConCarga
 import cl.duoc.tiotecpreventivo.viewmodel.EvaluacionUiState
 
 @Composable
@@ -107,10 +108,7 @@ fun RevisionEvaluacionScreen(
                 Button(
                     onClick = onFinalizar, enabled = habilitado, modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        if (uiState.guardando) "Guardando…"
-                        else "Finalizar evaluación"
-                    )
+                    TextoConCarga(texto = "Finalizar evaluación", cargando = uiState.guardando)
                 }
 
                 OutlinedButton(
