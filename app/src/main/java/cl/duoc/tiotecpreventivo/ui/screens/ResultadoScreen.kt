@@ -42,7 +42,10 @@ import cl.duoc.tiotecpreventivo.domain.ResultadoCategoriaVista
 import cl.duoc.tiotecpreventivo.domain.ResultadoEvaluacion
 import cl.duoc.tiotecpreventivo.domain.RespuestaVista
 import cl.duoc.tiotecpreventivo.domain.ReglasRiesgo
+import cl.duoc.tiotecpreventivo.ui.components.BarraAnimada
+import cl.duoc.tiotecpreventivo.ui.components.Movimiento
 import cl.duoc.tiotecpreventivo.ui.components.NivelRiesgoIndicador
+import cl.duoc.tiotecpreventivo.ui.components.colorNivel
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.ResultadoUiState
 import java.text.DateFormat
@@ -194,6 +197,13 @@ private fun TarjetaCategoria(categoria: ResultadoCategoriaVista, modifier: Modif
                 style = MaterialTheme.typography.titleMedium
             )
             NivelRiesgoIndicador(categoria.nivel)
+            // TT-25: la barra se llena al abrir el resultado; el texto de abajo dice el puntaje.
+            BarraAnimada(
+                fraccion = Movimiento.fraccion(categoria.puntaje, categoria.puntajeMaximo),
+                color = colorNivel(categoria.nivel),
+                desdeCero = true,
+                duracion = Movimiento.DURACION_LARGA
+            )
             Text(
                 text = "Puntaje de riesgo: ${categoria.puntaje} de ${categoria.puntajeMaximo}",
                 style = MaterialTheme.typography.bodySmall

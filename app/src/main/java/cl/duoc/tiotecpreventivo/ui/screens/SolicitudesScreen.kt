@@ -130,7 +130,7 @@ fun SolicitudesScreen(
                     }
 
                     items(uiState.solicitudes, key = { it.id }) { solicitud ->
-                        Card(modifier = Modifier.fillMaxWidth()) {
+                        Card(modifier = Modifier.fillMaxWidth().animateItem()) {
                             Column(
                                 modifier = Modifier.padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)

@@ -1,32 +1,35 @@
 package cl.duoc.tiotecpreventivo.ui.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.data.catalogo.ValorRespuesta
+import cl.duoc.tiotecpreventivo.ui.components.BarraAnimada
+import cl.duoc.tiotecpreventivo.ui.components.GrupoOpciones
+import cl.duoc.tiotecpreventivo.ui.components.MensajeError
+import cl.duoc.tiotecpreventivo.ui.components.Movimiento
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.EvaluacionUiState
 
@@ -83,70 +86,56 @@ fun EvaluacionScreen(
                         "Pregunta ${uiState.indiceActual + 1} de $total"
                     )
 
-                    LinearProgressIndicator(
-                        progress = { respondidas.toFloat() / total },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    BarraAnimada(fraccion = Movimiento.fraccion(respondidas, total))
 
                     Text("Respondidas: $respondidas de $total")
 
-                    Text(
-                        text = pregunta.categoria.nombre,
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    // TT-25: al avanzar, la pregunta nueva entra por la derecha; al volver, por la izquierda.
+                    AnimatedContent(
+                        targetState = uiState.indiceActual,
+                        transitionSpec = {
+                            val sentido = Movimiento.direccion(initialState, targetState)
+                            val duracion = tween<IntOffset>(Movimiento.DURACION_MEDIA)
+                            (slideInHorizontally(duracion) { ancho -> sentido * ancho / 4 } +
+                                fadeIn(tween(Movimiento.DURACION_MEDIA))) togetherWith
+                                (slideOutHorizontally(duracion) { ancho -> -sentido * ancho / 4 } +
+                                    fadeOut(tween(Movimiento.DURACION_CORTA)))
+                        },
+                        label = "Cambio de pregunta"
+                    ) { indice ->
+                        val mostrada = uiState.preguntas.getOrNull(indice)
+                        if (mostrada != null) {
+                            // La pregunta que sale no recibe toques: la respuesta sería para otra pregunta.
+                            val esActual = indice == uiState.indiceActual
 
-                    Text(
-                        text = pregunta.texto, style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Text(
-                        text = pregunta.ayuda, style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Column(
-                        modifier = Modifier.selectableGroup()
-                    ) {
-                        ValorRespuesta.entries.forEach { respuesta ->
-                            val seleccionada = uiState.respuestas[pregunta.id] == respuesta
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .selectable(
-                                        selected = seleccionada,
-                                        enabled = habilitado,
-                                        role = Role.RadioButton,
-                                        onClick = {
-                                            onRespuestaChange(respuesta)
-                                        })
-                                    .padding(vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                RadioButton(
-                                    selected = seleccionada, onClick = null, enabled = habilitado
+                            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                Text(
+                                    text = mostrada.categoria.nombre,
+                                    style = MaterialTheme.typography.titleMedium
                                 )
 
-                                Text(respuesta.etiqueta)
+                                Text(
+                                    text = mostrada.texto,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+
+                                Text(
+                                    text = mostrada.ayuda,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+
+                                GrupoOpciones(
+                                    opciones = ValorRespuesta.entries,
+                                    seleccionada = uiState.respuestas[mostrada.id],
+                                    etiqueta = { it.etiqueta },
+                                    habilitado = habilitado && esActual,
+                                    onSeleccionar = onRespuestaChange
+                                )
                             }
                         }
                     }
 
-                    uiState.errorPregunta?.let { error ->
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(
-                                    android.R.drawable.ic_dialog_alert
-                                ), contentDescription = null, tint = MaterialTheme.colorScheme.error
-                            )
-
-                            Text(
-                                text = error, color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
+                    MensajeError(uiState.errorPregunta)
 
                     OutlinedButton(
                         onClick = onAnterior,

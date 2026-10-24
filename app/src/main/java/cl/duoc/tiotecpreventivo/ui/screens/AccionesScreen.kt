@@ -1,6 +1,13 @@
 package cl.duoc.tiotecpreventivo.ui.screens
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
@@ -19,12 +27,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.data.local.entity.AccionEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoAccion
 import cl.duoc.tiotecpreventivo.data.local.entity.RecordatorioEntity
+import cl.duoc.tiotecpreventivo.ui.components.MensajeError
+import cl.duoc.tiotecpreventivo.ui.components.MensajeInformativo
+import cl.duoc.tiotecpreventivo.ui.components.Movimiento
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.AccionesUiState
 import java.text.DateFormat
@@ -54,8 +66,17 @@ fun AccionesScreen(
                     text = "Mis acciones", style = MaterialTheme.typography.headlineMedium
                 )
 
+                // TT-25: el número sube o baja según cambie la cantidad de pendientes.
                 AnimatedContent(
-                    targetState = uiState.pendientes, label = "Contador de pendientes"
+                    targetState = uiState.pendientes,
+                    transitionSpec = {
+                        val sentido = Movimiento.direccion(initialState, targetState)
+                        (slideInVertically(tween(Movimiento.DURACION_MEDIA)) { alto -> sentido * alto } +
+                            fadeIn(tween(Movimiento.DURACION_MEDIA))) togetherWith
+                            (slideOutVertically(tween(Movimiento.DURACION_MEDIA)) { alto -> -sentido * alto } +
+                                fadeOut(tween(Movimiento.DURACION_CORTA)))
+                    },
+                    label = "Contador de pendientes"
                 ) { cantidad ->
                     Text("Acciones pendientes: $cantidad")
                 }
@@ -72,6 +93,9 @@ fun AccionesScreen(
                         enabled = uiState.actualizandoId == null,
                         label = { Text("Completadas") })
                 }
+
+                // Dentro de la cabecera: sin error no ocupa espacio en la lista.
+                MensajeError(uiState.errorOperacion)
             }
         }
 
@@ -110,14 +134,6 @@ fun AccionesScreen(
             }
 
             else -> {
-                uiState.errorOperacion?.let { error ->
-                    item {
-                        Text(
-                            text = error, color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-
                 if (uiState.acciones.isEmpty()) {
                     item {
                         Text(
@@ -131,7 +147,23 @@ fun AccionesScreen(
                 }
 
                 items(uiState.acciones, key = { it.id }) { accion ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    val completada = accion.estado == EstadoAccion.COMPLETADA
+                    // TT-25: la tarjeta cambia de color al completarse y entra o sale de la lista con animateItem.
+                    val fondo by animateColorAsState(
+                        targetValue = if (completada) {
+                            MaterialTheme.colorScheme.secondaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainerHighest
+                        },
+                        animationSpec = tween(Movimiento.DURACION_CORTA),
+                        label = "Fondo de la acción"
+                    )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateItem(),
+                        colors = CardDefaults.cardColors(containerColor = fondo)
+                    ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -150,12 +182,12 @@ fun AccionesScreen(
 
                             Row {
                                 Checkbox(
-                                    checked = accion.estado == EstadoAccion.COMPLETADA,
+                                    checked = completada,
                                     onCheckedChange = { onCambiarEstado(accion.id) },
                                     enabled = uiState.actualizandoId == null
                                 )
                                 Text(
-                                    text = if (accion.estado == EstadoAccion.COMPLETADA) {
+                                    text = if (completada) {
                                         "Completada"
                                     } else {
                                         "Marcar como completada"
@@ -166,16 +198,15 @@ fun AccionesScreen(
                             // TT-16: recordatorio solo para acciones pendientes.
                             if (accion.estado == EstadoAccion.PENDIENTE) {
                                 val recordatorio = recordatorios[accion.id]
-                                recordatorio?.let {
-                                    Text(
-                                        text = "Recordatorio: ${
-                                            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
-                                                .format(Date(it.fechaHora))
-                                        }",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                                // TT-25: la fecha del recordatorio aparece o se va al programarlo o cancelarlo.
+                                MensajeInformativo(
+                                    texto = recordatorio?.let {
+                                        "Recordatorio: " + DateFormat
+                                            .getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+                                            .format(Date(it.fechaHora))
+                                    },
+                                    estilo = MaterialTheme.typography.bodySmall
+                                )
                                 TextButton(
                                     onClick = { onRecordar(accion) },
                                     enabled = uiState.actualizandoId == null
