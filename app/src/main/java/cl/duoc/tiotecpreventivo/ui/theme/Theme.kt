@@ -7,30 +7,87 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
+/*
+ * TT-27: esquemas completos. Además de primary/secondary/tertiary se definen los
+ * contenedores (selecciones y tarjetas destacadas), surfaceVariant/onSurfaceVariant,
+ * los contornos y los surfaceContainer* que usan tarjetas, barras y diálogos.
+ * Así ningún color queda con el valor por defecto morado de Material.
+ */
+
+internal val DarkColorScheme = darkColorScheme(
     primary = AzulClaro,
-    onPrimary = Color(0xFF003258),
+    onPrimary = SobreAzulOscuro,
+    primaryContainer = ContenedorAzulOscuro,
+    onPrimaryContainer = SobreContenedorAzulOscuro,
+    inversePrimary = AzulPrincipal,
     secondary = GrisAzuladoClaro,
-    onSecondary = Color(0xFF243349),
+    onSecondary = SobreGrisOscuro,
+    secondaryContainer = ContenedorGrisOscuro,
+    onSecondaryContainer = SobreContenedorGrisOscuro,
     tertiary = VerdeClaro,
-    onTertiary = Color(0xFF073730),
+    onTertiary = SobreVerdeOscuro,
+    tertiaryContainer = ContenedorVerdeOscuro,
+    onTertiaryContainer = SobreContenedorVerdeOscuro,
+    error = ErrorOscuro,
+    onError = SobreErrorOscuro,
+    errorContainer = ContenedorErrorOscuro,
+    onErrorContainer = SobreContenedorErrorOscuro,
     background = FondoOscuro,
     onBackground = TextoClaro,
     surface = SuperficieOscura,
-    onSurface = TextoClaro
+    onSurface = TextoClaro,
+    surfaceVariant = VarianteSuperficieOscura,
+    onSurfaceVariant = SobreVarianteOscura,
+    surfaceTint = AzulClaro,
+    inverseSurface = TextoClaro,
+    inverseOnSurface = SuperficieOscura,
+    outline = ContornoOscuro,
+    outlineVariant = ContornoSuaveOscuro,
+    surfaceDim = FondoOscuro,
+    surfaceBright = SuperficieOscuraBrillante,
+    surfaceContainerLowest = SuperficieOscuraMasBaja,
+    surfaceContainerLow = SuperficieOscuraBaja,
+    surfaceContainer = SuperficieOscuraMedia,
+    surfaceContainerHigh = SuperficieOscuraAlta,
+    surfaceContainerHighest = SuperficieOscuraMasAlta
 )
 
-private val LightColorScheme = lightColorScheme(
+internal val LightColorScheme = lightColorScheme(
     primary = AzulPrincipal,
     onPrimary = Color.White,
+    primaryContainer = ContenedorAzulClaro,
+    onPrimaryContainer = SobreContenedorAzulClaro,
+    inversePrimary = AzulClaro,
     secondary = GrisAzulado,
     onSecondary = Color.White,
+    secondaryContainer = ContenedorGrisClaro,
+    onSecondaryContainer = SobreContenedorGrisClaro,
     tertiary = VerdePrincipal,
     onTertiary = Color.White,
+    tertiaryContainer = ContenedorVerdeClaro,
+    onTertiaryContainer = SobreContenedorVerdeClaro,
+    error = ErrorClaro,
+    onError = Color.White,
+    errorContainer = ContenedorErrorClaro,
+    onErrorContainer = SobreContenedorErrorClaro,
     background = FondoClaro,
     onBackground = TextoOscuro,
     surface = Color.White,
-    onSurface = TextoOscuro
+    onSurface = TextoOscuro,
+    surfaceVariant = VarianteSuperficieClara,
+    onSurfaceVariant = SobreVarianteClara,
+    surfaceTint = AzulPrincipal,
+    inverseSurface = TextoOscuro,
+    inverseOnSurface = FondoClaro,
+    outline = ContornoClaro,
+    outlineVariant = ContornoSuaveClaro,
+    surfaceDim = SuperficieClaraTenue,
+    surfaceBright = Color.White,
+    surfaceContainerLowest = SuperficieClaraMasBaja,
+    surfaceContainerLow = SuperficieClaraBaja,
+    surfaceContainer = SuperficieClaraMedia,
+    surfaceContainerHigh = SuperficieClaraAlta,
+    surfaceContainerHighest = SuperficieClaraMasAlta
 )
 
 @Composable

@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.R
 import cl.duoc.tiotecpreventivo.data.local.entity.NivelRiesgo
+import cl.duoc.tiotecpreventivo.ui.theme.RiesgoMedioClaro
+import cl.duoc.tiotecpreventivo.ui.theme.RiesgoMedioOscuro
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 
 /** Ícono de cada nivel: el riesgo se entiende por texto + ícono, no solo por el color (TT-12). */
@@ -39,7 +41,8 @@ fun colorNivel(nivel: NivelRiesgo): Color {
     val esOscuro = MaterialTheme.colorScheme.background.luminance() < 0.5f
     return when (nivel) {
         NivelRiesgo.RIESGO_BAJO -> MaterialTheme.colorScheme.tertiary
-        NivelRiesgo.RIESGO_MEDIO -> if (esOscuro) Color(0xFFFFB870) else Color(0xFF8A5100)
+        // TT-27: el color de advertencia vive en el tema (Color.kt), no en la pantalla.
+        NivelRiesgo.RIESGO_MEDIO -> if (esOscuro) RiesgoMedioOscuro else RiesgoMedioClaro
         NivelRiesgo.RIESGO_ALTO -> MaterialTheme.colorScheme.error
     }
 }
