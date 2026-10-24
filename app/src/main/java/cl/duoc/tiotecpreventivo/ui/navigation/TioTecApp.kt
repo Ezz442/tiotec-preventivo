@@ -88,7 +88,7 @@ private const val RUTA_SOLICITUD_DETALLE = "solicitud/{solicitudId}"
 
 /** TT-27: cada destino usa un ícono vectorial Material junto a su etiqueta visible. */
 private enum class DestinoPrincipal(
-    val ruta: String, val titulo: String, @DrawableRes val icono: Int
+    val ruta: String, val titulo: String, @param:DrawableRes val icono: Int
 ) {
     INICIO("inicio", "Inicio", R.drawable.ic_nav_inicio),
     ACCIONES("acciones", "Mis acciones", R.drawable.ic_nav_acciones),
