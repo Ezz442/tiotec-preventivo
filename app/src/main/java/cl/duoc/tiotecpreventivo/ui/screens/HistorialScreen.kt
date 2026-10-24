@@ -121,7 +121,8 @@ fun HistorialScreen(
                 }
 
                 items(uiState.visibles, key = { it.id }) { evaluacion ->
-                    TarjetaEvaluacion(evaluacion, onAbrirEvaluacion, ancho)
+                    // TT-25: al filtrar por dispositivo las tarjetas entran y salen suavemente.
+                    TarjetaEvaluacion(evaluacion, onAbrirEvaluacion, ancho.animateItem())
                 }
             }
         }

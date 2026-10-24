@@ -29,6 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cl.duoc.tiotecpreventivo.ui.components.TextoConCarga
+import cl.duoc.tiotecpreventivo.ui.components.MensajeError
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
 import cl.duoc.tiotecpreventivo.ui.components.DispositivoFormulario
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
@@ -169,7 +171,9 @@ fun DispositivosScreen(
                     items(
                         items = uiState.dispositivos, key = { it.id }) { dispositivo ->
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateItem()
                         ) {
                             Column(
                                 modifier = Modifier.padding(16.dp),
@@ -260,7 +264,7 @@ fun DispositivosScreen(
             text = { Text("¿Quitar la foto de «${dispositivo.nombre}»? El archivo se borrará del teléfono.") },
             confirmButton = {
                 TextButton(onClick = onConfirmarQuitarFoto, enabled = !uiState.procesandoFoto) {
-                    Text(if (uiState.procesandoFoto) "Quitando…" else "Quitar")
+                    TextoConCarga(texto = "Quitar", cargando = uiState.procesandoFoto, textoCargando = "Quitando…")
                 }
             },
             dismissButton = {
@@ -283,20 +287,13 @@ fun DispositivosScreen(
                     "Si tiene evaluaciones, se archivará y conservará su historial. " + "Si no tiene evaluaciones, se eliminará."
                 )
 
-                uiState.errorOperacion?.let { error ->
-                    Text(
-                        text = error, color = MaterialTheme.colorScheme.error
-                    )
-                }
+                MensajeError(uiState.errorOperacion)
             }
         }, confirmButton = {
             TextButton(
                 onClick = onConfirmarEliminar, enabled = !uiState.eliminando
             ) {
-                Text(
-                    if (uiState.eliminando) "Procesando…"
-                    else "Confirmar"
-                )
+                TextoConCarga(texto = "Confirmar", cargando = uiState.eliminando, textoCargando = "Procesando…")
             }
         }, dismissButton = {
             TextButton(

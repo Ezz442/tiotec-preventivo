@@ -2,15 +2,12 @@ package cl.duoc.tiotecpreventivo.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -23,12 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cl.duoc.tiotecpreventivo.R
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.FormularioRecordatorio
 import java.text.SimpleDateFormat
@@ -71,7 +65,7 @@ fun RecordatorioDialogo(
                 ) {
                     Text(formulario.fechaUtc?.let { "Fecha: ${formatearFechaUtc(it)}" } ?: "Elegir fecha")
                 }
-                formulario.errorFecha?.let { ErrorCampo(it) }
+                MensajeError(formulario.errorFecha, estilo = MaterialTheme.typography.bodySmall)
 
                 OutlinedButton(
                     onClick = { eligiendoHora = true },
@@ -85,9 +79,9 @@ fun RecordatorioDialogo(
                         else "Elegir hora"
                     )
                 }
-                formulario.errorHora?.let { ErrorCampo(it) }
+                MensajeError(formulario.errorHora, estilo = MaterialTheme.typography.bodySmall)
 
-                errorOperacion?.let { ErrorCampo(it) }
+                MensajeError(errorOperacion, estilo = MaterialTheme.typography.bodySmall)
 
                 formulario.recordatorioId?.let { id ->
                     TextButton(onClick = { onCancelarRecordatorio(id) }, enabled = !guardando) {
@@ -98,7 +92,7 @@ fun RecordatorioDialogo(
         },
         confirmButton = {
             Button(onClick = onGuardar, enabled = !guardando) {
-                Text(if (guardando) "Guardando…" else "Guardar")
+                TextoConCarga(texto = "Guardar", cargando = guardando)
             }
         },
         dismissButton = {
@@ -146,22 +140,6 @@ fun RecordatorioDialogo(
                 TextButton(onClick = { eligiendoHora = false }) { Text("Cancelar") }
             }
         )
-    }
-}
-
-@Composable
-private fun ErrorCampo(texto: String) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_riesgo_alto),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.error,
-            modifier = Modifier.size(18.dp)
-        )
-        Text(texto, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
     }
 }
 

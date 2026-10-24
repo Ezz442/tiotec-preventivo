@@ -93,7 +93,8 @@ fun AprendeScreen(
                 }
 
                 items(uiState.contenidos, key = { it.id }) { contenido ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    // TT-25: al cambiar de categoría las tarjetas entran y salen suavemente.
+                    Card(modifier = Modifier.fillMaxWidth().animateItem()) {
                         Column(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
