@@ -1,5 +1,6 @@
 package cl.duoc.tiotecpreventivo.viewmodel
 
+import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import cl.duoc.tiotecpreventivo.data.local.entity.ExperienciaDigital
 import cl.duoc.tiotecpreventivo.repository.PerfilDaoFalso
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
@@ -103,6 +104,35 @@ class PerfilViewModelTest {
         assertEquals(1L, dao.perfil.value!!.id)
         assertEquals("Tía Demo 2", dao.perfil.value!!.alias)
         assertEquals(ExperienciaDigital.AVANZADO, dao.perfil.value!!.experienciaDigital)
+    }
+
+    @Test
+    fun aliasConCorreoTelefonoORutNoSeGuarda() {
+        val dao = PerfilDaoFalso()
+        val viewModel = crear(dao)
+        viewModel.onExperienciaChange(ExperienciaDigital.PRINCIPIANTE)
+
+        listOf("tia@correo.cl", "912345678", "12.345.678-9").forEach { alias ->
+            viewModel.onAliasChange(alias)
+            viewModel.guardarPerfil()
+            assertEquals(alias, ValidadorFormularios.ALIAS_PERSONAL, viewModel.uiState.value.errorAlias)
+        }
+        assertNull(dao.perfil.value)
+    }
+
+    @Test
+    fun elMensajeDelSnackbarSeConsumeUnaVez() {
+        val viewModel = crear()
+        viewModel.onAliasChange("Tía Demo")
+        viewModel.onExperienciaChange(ExperienciaDigital.AVANZADO)
+        viewModel.guardarPerfil()
+        assertEquals("Perfil guardado correctamente.", viewModel.uiState.value.mensaje)
+
+        viewModel.consumirMensaje()
+
+        assertNull(viewModel.uiState.value.mensaje)
+        // Los datos guardados siguen en el formulario.
+        assertEquals("Tía Demo", viewModel.uiState.value.alias)
     }
 
     @Test

@@ -3,6 +3,7 @@ package cl.duoc.tiotecpreventivo.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.duoc.tiotecpreventivo.data.local.entity.ExperienciaDigital
+import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +50,11 @@ class PerfilViewModel(
         }
     }
 
+    /** El Snackbar ya mostró el mensaje. */
+    fun consumirMensaje() {
+        _uiState.update { it.copy(mensaje = null) }
+    }
+
     fun reintentarCarga() {
         if (_uiState.value.cargando || _uiState.value.guardando) return
 
@@ -83,28 +89,20 @@ class PerfilViewModel(
 
         if (estado.cargando || estado.guardando) return
 
-        val aliasLimpio = estado.alias.trim()
-        val experiencia = estado.experienciaDigital
-
-        val errorAlias = when {
-            aliasLimpio.isBlank() -> "Ingresa un alias ficticio."
-            aliasLimpio.length !in 2..30 -> "El alias debe tener entre 2 y 30 caracteres."
-            else -> null
-        }
-
-        val errorExperiencia = if (experiencia == null) {
-            "Selecciona tu nivel de experiencia digital."
-        } else {
-            null
-        }
+        // TT-26: las reglas viven en ValidadorFormularios; aquí solo se copian los errores.
+        val validacion = ValidadorFormularios.validarPerfil(estado.alias, estado.experienciaDigital)
+        val aliasLimpio = validacion.aliasLimpio
 
         _uiState.update {
             it.copy(
-                errorAlias = errorAlias, errorExperiencia = errorExperiencia, mensaje = null
+                errorAlias = validacion.errorAlias,
+                errorExperiencia = validacion.errorExperiencia,
+                mensaje = null
             )
         }
 
-        if (errorAlias != null || experiencia == null) return
+        val experiencia = estado.experienciaDigital
+        if (!validacion.valida || experiencia == null) return
 
         _uiState.update {
             it.copy(guardando = true, errorGeneral = null)

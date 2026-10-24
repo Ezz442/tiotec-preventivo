@@ -25,7 +25,9 @@ data class FormularioRecordatorio(
     val hora: Int? = null,
     val minuto: Int? = null,
     val errorFecha: String? = null,
-    val errorHora: String? = null
+    val errorHora: String? = null,
+    /** TT-26: AlertDialog "¿Cancelar este recordatorio?" antes de borrarlo. */
+    val confirmandoCancelacion: Boolean = false
 )
 
 data class RecordatoriosUiState(
@@ -174,6 +176,13 @@ class RecordatorioViewModel(
         }
     }
 
+    /** TT-26: cancelar un recordatorio programado pide confirmación primero. */
+    fun pedirCancelacion() = actualizarFormulario {
+        if (it.recordatorioId == null) it else it.copy(confirmandoCancelacion = true)
+    }
+
+    fun volverDeCancelacion() = actualizarFormulario { it.copy(confirmandoCancelacion = false) }
+
     fun cancelarRecordatorio(recordatorioId: Long) {
         if (_uiState.value.guardando) return
         _uiState.update { it.copy(guardando = true, errorOperacion = null) }
@@ -184,7 +193,12 @@ class RecordatorioViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorOperacion = "No pudimos cancelar el recordatorio.") }
+                _uiState.update {
+                    it.copy(
+                        errorOperacion = "No pudimos cancelar el recordatorio.",
+                        formulario = it.formulario?.copy(confirmandoCancelacion = false)
+                    )
+                }
             } finally {
                 _uiState.update { it.copy(guardando = false) }
             }

@@ -2,6 +2,7 @@ package cl.duoc.tiotecpreventivo.viewmodel
 
 import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenesLocal
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
+import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import cl.duoc.tiotecpreventivo.repository.DispositivoDaoFalso
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.PerfilDaoFalso
@@ -138,10 +139,69 @@ class DispositivosViewModelTest {
         viewModel.abrirNuevo()
         llenar("Tablet de prueba")
 
+        // TT-26: con cambios sin guardar primero se pide confirmación.
         viewModel.cancelarFormulario()
+        assertTrue(viewModel.uiState.value.confirmarDescartar)
+        assertTrue(viewModel.uiState.value.formularioVisible)
+
+        viewModel.descartarCambios()
 
         assertFalse(viewModel.uiState.value.formularioVisible)
+        assertFalse(viewModel.uiState.value.confirmarDescartar)
         assertEquals(1, dao.filas.value.size)
+    }
+
+    @Test
+    fun cancelarSinCambiosCierraSinPreguntar() {
+        viewModel.abrirNuevo()
+        viewModel.cancelarFormulario()
+        assertFalse(viewModel.uiState.value.formularioVisible)
+        assertFalse(viewModel.uiState.value.confirmarDescartar)
+
+        // Editar y cancelar sin tocar nada tampoco pregunta.
+        viewModel.editarDispositivo(1)
+        viewModel.cancelarFormulario()
+        assertFalse(viewModel.uiState.value.formularioVisible)
+        assertFalse(viewModel.uiState.value.confirmarDescartar)
+    }
+
+    @Test
+    fun seguirEditandoConservaLoEscrito() {
+        viewModel.editarDispositivo(1)
+        viewModel.onNombreChange("Teléfono renombrado")
+
+        viewModel.cancelarFormulario()
+        assertTrue(viewModel.uiState.value.confirmarDescartar)
+        viewModel.seguirEditando()
+
+        val estado = viewModel.uiState.value
+        assertFalse(estado.confirmarDescartar)
+        assertTrue(estado.formularioVisible)
+        assertEquals("Teléfono renombrado", estado.nombre)
+        assertEquals("Teléfono de prueba", dao.filas.value.single().nombre)
+    }
+
+    @Test
+    fun nombreConCorreoOTelefonoNoSeGuarda() {
+        viewModel.abrirNuevo()
+        llenar("tio@correo.cl")
+        viewModel.guardarDispositivo()
+        assertEquals(ValidadorFormularios.NOMBRE_PERSONAL, viewModel.uiState.value.errorNombre)
+
+        viewModel.onNombreChange("+56 9 1234 5678")
+        viewModel.guardarDispositivo()
+        assertEquals(ValidadorFormularios.NOMBRE_PERSONAL, viewModel.uiState.value.errorNombre)
+        assertEquals(1, dao.filas.value.size)
+    }
+
+    @Test
+    fun espaciosDeMasSeNormalizanAlGuardar() {
+        viewModel.abrirNuevo()
+        llenar("  Tablet   de   prueba  ")
+
+        viewModel.guardarDispositivo()
+
+        assertTrue(dao.filas.value.any { it.nombre == "Tablet de prueba" })
     }
 
     @Test

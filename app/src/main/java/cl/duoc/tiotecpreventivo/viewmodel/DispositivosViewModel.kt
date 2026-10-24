@@ -2,6 +2,7 @@ package cl.duoc.tiotecpreventivo.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import kotlinx.coroutines.CancellationException
@@ -118,9 +119,41 @@ class DispositivosViewModel(
         }
     }
 
+    /**
+     * TT-26: si hay cambios sin guardar, primero se pide confirmación con un AlertDialog;
+     * si no hay cambios, el formulario se cierra de inmediato.
+     */
     fun cancelarFormulario() {
-        if (_uiState.value.guardando) return
+        val estado = _uiState.value
+        if (estado.guardando || !estado.formularioVisible) return
 
+        val guardado = estado.dispositivoEnEdicionId?.let { id -> estado.dispositivos.find { it.id == id } }
+        val hayCambios = ValidadorFormularios.hayCambiosDispositivo(
+            nombre = estado.nombre,
+            sistema = estado.sistemaOperativo,
+            nombreGuardado = guardado?.nombre,
+            sistemaGuardado = guardado?.sistemaOperativo
+        )
+
+        if (hayCambios) {
+            _uiState.update { it.copy(confirmarDescartar = true) }
+        } else {
+            cerrarFormulario()
+        }
+    }
+
+    /** Confirmó descartar: se cierra sin guardar. */
+    fun descartarCambios() {
+        if (_uiState.value.guardando) return
+        cerrarFormulario()
+    }
+
+    /** Eligió seguir editando: el formulario queda igual. */
+    fun seguirEditando() {
+        _uiState.update { it.copy(confirmarDescartar = false) }
+    }
+
+    private fun cerrarFormulario() {
         _uiState.update {
             it.copy(
                 formularioVisible = false,
@@ -129,7 +162,8 @@ class DispositivosViewModel(
                 sistemaOperativo = null,
                 errorNombre = null,
                 errorSistemaOperativo = null,
-                errorOperacion = null
+                errorOperacion = null,
+                confirmarDescartar = false
             )
         }
     }
@@ -163,33 +197,23 @@ class DispositivosViewModel(
         if (estado.cargando || estado.errorCarga != null || estado.guardando || estado.eliminando || !estado.formularioVisible) return
 
         val perfilId = estado.perfilId ?: return
-        val nombreLimpio = estado.nombre.trim()
-        val sistema = estado.sistemaOperativo
         val idEnEdicion = estado.dispositivoEnEdicionId
 
-        val errorNombre = when {
-            nombreLimpio.isBlank() -> "Ingresa un nombre ficticio."
-            nombreLimpio.length !in 2..30 -> "El nombre debe tener entre 2 y 30 caracteres."
-
-            else -> null
-        }
-
-        val errorSistema = if (sistema == null) {
-            "Selecciona un sistema operativo."
-        } else {
-            null
-        }
+        // TT-26: las reglas viven en ValidadorFormularios; aquí solo se copian los errores.
+        val validacion = ValidadorFormularios.validarDispositivo(estado.nombre, estado.sistemaOperativo)
+        val nombreLimpio = validacion.nombreLimpio
+        val sistema = estado.sistemaOperativo
 
         _uiState.update {
             it.copy(
-                errorNombre = errorNombre,
-                errorSistemaOperativo = errorSistema,
+                errorNombre = validacion.errorNombre,
+                errorSistemaOperativo = validacion.errorSistemaOperativo,
                 errorOperacion = null,
                 mensaje = null
             )
         }
 
-        if (errorNombre != null || sistema == null) return
+        if (!validacion.valida || sistema == null) return
 
         _uiState.update {
             it.copy(guardando = true)
@@ -204,7 +228,7 @@ class DispositivosViewModel(
                 if (nombreRepetido) {
                     _uiState.update {
                         it.copy(
-                            errorNombre = "Ya existe un dispositivo con ese nombre."
+                            errorNombre = ValidadorFormularios.NOMBRE_REPETIDO
                         )
                     }
                     return@launch
