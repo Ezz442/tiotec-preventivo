@@ -22,8 +22,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.data.local.entity.EvaluacionEntity
@@ -59,11 +57,7 @@ fun HistorialScreen(
 
         item {
             Column(ancho, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "Historial de evaluaciones",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.semantics { heading() }
-                )
+                // TT-27: el título "Historial de evaluaciones" ya está en la barra superior.
                 Text(
                     text = "Cada evaluación conserva sus respuestas y resultados tal como se guardaron.",
                     style = MaterialTheme.typography.bodyMedium
