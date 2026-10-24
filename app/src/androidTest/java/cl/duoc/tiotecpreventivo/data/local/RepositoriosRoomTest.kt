@@ -58,8 +58,7 @@ class RepositoriosRoomTest {
     @Before
     fun crearBase() {
         db = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            TioTecDatabase::class.java
+            ApplicationProvider.getApplicationContext(), TioTecDatabase::class.java
         ).build()
         perfiles = PerfilRepository(db.perfilDao(), reloj)
         dispositivos = DispositivoRepository(db.dispositivoDao(), reloj)
@@ -112,8 +111,7 @@ class RepositoriosRoomTest {
         // Leer: ordenados por nombre
         assertEquals(
             listOf("Computador de prueba", "Teléfono de prueba"),
-            dispositivos.observarActivos().first().map { it.nombre }
-        )
+            dispositivos.observarActivos().first().map { it.nombre })
 
         // Nombre repetido entre activos, sin importar mayúsculas ni espacios
         assertTrue(dispositivos.existeNombreActivo("  teléfono DE prueba "))
@@ -136,7 +134,9 @@ class RepositoriosRoomTest {
     @Test
     fun dispositivo_conEvaluaciones_seArchivaYConservaElHistorial(): Unit = runBlocking {
         val (_, id) = crearPerfilYDispositivo("Teléfono de la abuela")
-        evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO))
+        evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO)
+        )
         ahora += 1
         recordatorios.crearProximaEvaluacion(id, "Volver a evaluar", fechaHora = ahora + 60_000)
 
@@ -145,7 +145,9 @@ class RepositoriosRoomTest {
 
         assertEquals(ResultadoEliminacion.Archivado, dispositivos.eliminar(id))
 
-        assertTrue("No debe aparecer en Mis dispositivos", dispositivos.observarActivos().first().isEmpty())
+        assertTrue(
+            "No debe aparecer en Mis dispositivos", dispositivos.observarActivos().first().isEmpty()
+        )
         assertTrue("El registro sigue existiendo", dispositivos.obtener(id)!!.archivado)
 
         val historial = evaluaciones.observarHistorial().first()
@@ -153,12 +155,16 @@ class RepositoriosRoomTest {
         assertEquals("Teléfono de la abuela", historial.first().nombreDispositivo)
         assertEquals(SistemaOperativo.ANDROID, historial.first().sistemaOperativoDispositivo)
 
-        assertTrue("Sus recordatorios se cancelan", recordatorios.observarActivos().first().isEmpty())
+        assertTrue(
+            "Sus recordatorios se cancelan", recordatorios.observarActivos().first().isEmpty()
+        )
 
         // Un dispositivo archivado no se puede volver a evaluar
         assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
-                evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.SI), resultados(NivelRiesgo.RIESGO_BAJO))
+                evaluaciones.guardarEvaluacion(
+                    id, todasLasRespuestas(ValorRespuesta.SI), resultados(NivelRiesgo.RIESGO_BAJO)
+                )
             }
         }
     }
@@ -179,20 +185,26 @@ class RepositoriosRoomTest {
 
         val futuro = ahora + 3_600_000
         // Del dispositivo que se archivará: ambos tipos.
-        val deAccion = recordatorios.crearParaAccion(accionesDelDispositivo[0].id, "Revisar acción", futuro)
-        val deProximaEvaluacion = recordatorios.crearProximaEvaluacion(id, "Volver a evaluar", futuro)
+        val deAccion =
+            recordatorios.crearParaAccion(accionesDelDispositivo[0].id, "Revisar acción", futuro)
+        val deProximaEvaluacion =
+            recordatorios.crearProximaEvaluacion(id, "Volver a evaluar", futuro)
         // Ya enviado: debe quedar como ENVIADO, no como CANCELADO.
-        val yaEnviado = recordatorios.crearParaAccion(accionesDelDispositivo[1].id, "Ya avisado", futuro)
+        val yaEnviado =
+            recordatorios.crearParaAccion(accionesDelDispositivo[1].id, "Ya avisado", futuro)
         recordatorios.marcarEnviado(yaEnviado)
         // Del otro dispositivo: no se deben tocar.
-        val otroDeAccion = recordatorios.crearParaAccion(accionDelOtro.id, "Acción del otro", futuro)
+        val otroDeAccion =
+            recordatorios.crearParaAccion(accionDelOtro.id, "Acción del otro", futuro)
         val otroDeProxima = recordatorios.crearProximaEvaluacion(otroId, "Evaluar el otro", futuro)
 
         assertEquals(ResultadoEliminacion.Archivado, dispositivos.eliminar(id))
 
         // Ambos tipos de recordatorio del dispositivo archivado quedan cancelados.
         assertEquals(EstadoRecordatorio.CANCELADO, recordatorios.obtener(deAccion)!!.estado)
-        assertEquals(EstadoRecordatorio.CANCELADO, recordatorios.obtener(deProximaEvaluacion)!!.estado)
+        assertEquals(
+            EstadoRecordatorio.CANCELADO, recordatorios.obtener(deProximaEvaluacion)!!.estado
+        )
         assertEquals(EstadoRecordatorio.ENVIADO, recordatorios.obtener(yaEnviado)!!.estado)
 
         // Los del otro dispositivo siguen programados.
@@ -225,12 +237,26 @@ class RepositoriosRoomTest {
             ResultadoCalculado(Categoria.RECUPERACION, 0, NivelRiesgo.RIESGO_BAJO, "d")
         )
 
-        val evaluacionId = evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.NO), resultadosMixtos)
+        val evaluacionId = evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.NO), resultadosMixtos
+        )
         val detalle = evaluaciones.obtenerDetalle(evaluacionId)!!
 
         assertEquals(NivelRiesgo.RIESGO_ALTO, detalle.evaluacion.nivelGlobal)
         assertEquals(CatalogoLocal.preguntas.size, detalle.respuestas.size)
-        assertTrue(detalle.respuestas.all { it.puntaje == 2 && it.textoPregunta.isNotBlank() })
+        val preguntasPorId = CatalogoLocal.preguntas.associateBy { it.id }
+
+        detalle.respuestas.forEach { respuesta ->
+            val pregunta = preguntasPorId.getValue(respuesta.preguntaId)
+
+            assertEquals(ValorRespuesta.NO, respuesta.valor)
+            assertEquals(
+                "Puntaje incorrecto para ${respuesta.preguntaId}",
+                pregunta.puntajes.getValue(ValorRespuesta.NO),
+                respuesta.puntaje
+            )
+            assertEquals(pregunta.texto, respuesta.textoPregunta)
+        }
         assertEquals(4, detalle.resultados.size)
         assertEquals(CatalogoLocal.recomendaciones.size, detalle.acciones.size)
         assertEquals(CatalogoLocal.recomendaciones.size, acciones.contarPendientes().first())
@@ -243,7 +269,9 @@ class RepositoriosRoomTest {
     @Test
     fun evaluacion_sinRiesgo_noCreaAcciones(): Unit = runBlocking {
         val (_, id) = crearPerfilYDispositivo()
-        val evaluacionId = evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.SI), resultados(NivelRiesgo.RIESGO_BAJO))
+        val evaluacionId = evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.SI), resultados(NivelRiesgo.RIESGO_BAJO)
+        )
         assertTrue(evaluaciones.obtenerDetalle(evaluacionId)!!.acciones.isEmpty())
     }
 
@@ -252,7 +280,9 @@ class RepositoriosRoomTest {
         assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
                 val (_, id) = crearPerfilYDispositivo()
-                evaluaciones.guardarEvaluacion(id, mapOf("AUT-01" to ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO))
+                evaluaciones.guardarEvaluacion(
+                    id, mapOf("AUT-01" to ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO)
+                )
             }
         }
     }
@@ -261,36 +291,52 @@ class RepositoriosRoomTest {
     fun evaluacion_siFallaLaTransaccion_noQuedaNadaGuardado(): Unit = runBlocking {
         val (_, id) = crearPerfilYDispositivo()
         val accionRepetida = AccionEntity(
-            recomendacionId = "REC-AUT-01", titulo = "x", descripcion = "x",
-            prioridad = Prioridad.ALTA, fechaRevision = ahora, actualizadoEn = ahora
+            recomendacionId = "REC-AUT-01",
+            titulo = "x",
+            descripcion = "x",
+            prioridad = Prioridad.ALTA,
+            fechaRevision = ahora,
+            actualizadoEn = ahora
         )
         val evaluacion = EvaluacionEntity(
-            dispositivoId = id, nombreDispositivo = "x",
+            dispositivoId = id,
+            nombreDispositivo = "x",
             sistemaOperativoDispositivo = SistemaOperativo.ANDROID,
-            fecha = ahora, nivelGlobal = NivelRiesgo.RIESGO_ALTO
+            fecha = ahora,
+            nivelGlobal = NivelRiesgo.RIESGO_ALTO
         )
 
         var fallo = false
         try {
             // La misma recomendación dos veces viola el índice único → la transacción se revierte.
-            db.evaluacionDao().guardarCompleta(evaluacion, emptyList(), emptyList(), listOf(accionRepetida, accionRepetida))
+            db.evaluacionDao().guardarCompleta(
+                evaluacion, emptyList(), emptyList(), listOf(accionRepetida, accionRepetida)
+            )
         } catch (e: Exception) {
             fallo = true
         }
 
         assertTrue("Debió fallar por la acción repetida", fallo)
-        assertTrue("No debe quedar la evaluación a medias", evaluaciones.observarHistorial().first().isEmpty())
+        assertTrue(
+            "No debe quedar la evaluación a medias",
+            evaluaciones.observarHistorial().first().isEmpty()
+        )
         assertEquals(0, acciones.contarPendientes().first())
     }
 
     @Test
     fun historial_muestraLaMasRecientePrimero(): Unit = runBlocking {
         val (_, id) = crearPerfilYDispositivo()
-        val primera = evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO))
+        val primera = evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO)
+        )
         ahora += 86_400_000
-        val segunda = evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.SI), resultados(NivelRiesgo.RIESGO_BAJO))
+        val segunda = evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.SI), resultados(NivelRiesgo.RIESGO_BAJO)
+        )
 
-        assertEquals(listOf(segunda, primera), evaluaciones.observarHistorial().first().map { it.id })
+        assertEquals(
+            listOf(segunda, primera), evaluaciones.observarHistorial().first().map { it.id })
         assertEquals(segunda, evaluaciones.observarUltima().first()?.id)
     }
 
@@ -299,7 +345,9 @@ class RepositoriosRoomTest {
     @Test
     fun acciones_ordenadasPorPrioridadYCambioDeEstado(): Unit = runBlocking {
         val (_, id) = crearPerfilYDispositivo()
-        evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO))
+        evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO)
+        )
 
         val pendientes = acciones.observarPorEstado(EstadoAccion.PENDIENTE).first()
         val prioridades = pendientes.map { it.prioridad.ordinal }
@@ -312,7 +360,9 @@ class RepositoriosRoomTest {
         assertEquals(pendientes.size - 1, acciones.contarPendientes().first())
 
         assertTrue(acciones.cambiarEstado(accion.id, EstadoAccion.PENDIENTE))
-        assertNull("Al volver a pendiente se borra la fecha", acciones.obtener(accion.id)!!.completadaEn)
+        assertNull(
+            "Al volver a pendiente se borra la fecha", acciones.obtener(accion.id)!!.completadaEn
+        )
     }
 
     // ---------- Recordatorios ----------
@@ -320,17 +370,22 @@ class RepositoriosRoomTest {
     @Test
     fun recordatorios_crearModificarYCancelar(): Unit = runBlocking {
         val (_, id) = crearPerfilYDispositivo()
-        val evaluacionId = evaluaciones.guardarEvaluacion(id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO))
+        val evaluacionId = evaluaciones.guardarEvaluacion(
+            id, todasLasRespuestas(ValorRespuesta.NO), resultados(NivelRiesgo.RIESGO_ALTO)
+        )
         val accionId = evaluaciones.obtenerDetalle(evaluacionId)!!.acciones.first().id
 
-        val recordatorioId = recordatorios.crearParaAccion(accionId, "Revisar acción", ahora + 3_600_000)
+        val recordatorioId =
+            recordatorios.crearParaAccion(accionId, "Revisar acción", ahora + 3_600_000)
         assertTrue(recordatorios.modificar(recordatorioId, "Revisar mañana", ahora + 86_400_000))
         assertEquals("Revisar mañana", recordatorios.obtener(recordatorioId)!!.titulo)
         assertEquals(1, recordatorios.observarActivos().first().size)
 
         assertTrue(recordatorios.cancelar(recordatorioId))
         assertTrue(recordatorios.observarActivos().first().isEmpty())
-        assertFalse("Un cancelado no se modifica", recordatorios.modificar(recordatorioId, "x", ahora + 10))
+        assertFalse(
+            "Un cancelado no se modifica", recordatorios.modificar(recordatorioId, "x", ahora + 10)
+        )
     }
 
     @Test
@@ -361,8 +416,7 @@ class RepositoriosRoomTest {
         assertEquals(EstadoSolicitud.EN_REVISION, conHistorial!!.solicitud.estado)
         assertEquals(
             listOf(EstadoSolicitud.PENDIENTE, EstadoSolicitud.EN_REVISION),
-            conHistorial.historial.sortedBy { it.fecha }.map { it.estado }
-        )
+            conHistorial.historial.sortedBy { it.fecha }.map { it.estado })
         assertFalse(solicitudes.cambiarEstado(999, EstadoSolicitud.RESUELTA))
     }
 }
