@@ -141,3 +141,20 @@ No mostrar una evaluación como guardada hasta confirmar la operación.
 - Revisión del recorrido completo.
 - Enlace al pull request de TT-27.
 - Revisión de Enzo Morales.
+
+## Estado de implementación frente al diseño (TT-22)
+
+Revisado contra `main` al cierre de TT-19. Este diseño describe la propuesta; esta tabla indica qué quedó **implementado**, qué se implementó **de otra forma** y qué está **pendiente**, para no presentar como terminado lo que es solo boceto.
+
+| Elemento del diseño | Estado | Detalle |
+|---|---|---|
+| Cuatro destinos principales y botón Volver | ✅ Implementado | `NavigationBar` en Compact y `PermanentNavigationDrawer` en Medium/Expanded (TT-05). |
+| Perfil, Preferencias, Dispositivos, Evaluación, Resultados, Mis acciones, Historial, Aprende, Asistencia simulada | ✅ Implementado | TT-08, TT-09, TT-11 a TT-15 y TT-17. |
+| Imagen opcional con cámara o galería, reemplazar y quitar | ✅ Implementado | En la tarjeta del dispositivo, no dentro del formulario (TT-18, TT-19). |
+| Riesgo con texto e ícono, además del color | ✅ Implementado | `NivelRiesgoIndicador` (TT-12). |
+| Reglas de navegación (sin perfil, conservar respuestas, confirmar salida, historial sin crear evaluaciones, volver al resultado desde un contenido) | ✅ Implementado | TT-09, TT-11, TT-12, TT-14 y TT-15. |
+| Inicio con "última evaluación" y botón *Evaluar dispositivo* | 🔄 Distinto | Inicio muestra el alias, las acciones pendientes y los accesos a Mis dispositivos e Historial; se evalúa desde cada dispositivo. |
+| Recordatorios (pantalla propia, próxima evaluación) | 🔄 Distinto | Se crean, editan y cancelan desde cada acción en Mis acciones. El recordatorio de próxima evaluación existe en el modelo, pero no tiene pantalla (TT-16). |
+| Primer uso con bienvenida y aviso de datos ficticios | ⏳ Pendiente | La preferencia `primeraEjecucion` existe en DataStore (TT-08), pero no hay pantalla de bienvenida. Sin perfil, las pantallas guían a crearlo. |
+| Animaciones previstas | ⚠️ Parcial | Hay contador animado en Mis acciones y `AnimatedVisibility` en las respuestas del resultado. Faltan los mensajes de validación, el progreso y el cambio pendiente → completada (TT-25). |
+| Estado "Sin recordatorios" | 🔄 Distinto | No aplica: no hay lista de recordatorios separada. |
