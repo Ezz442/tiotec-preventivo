@@ -75,6 +75,9 @@ import cl.duoc.tiotecpreventivo.viewmodel.SolicitudDetalleViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.SolicitudDetalleViewModelFactory
 import cl.duoc.tiotecpreventivo.viewmodel.SolicitudesViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.SolicitudesViewModelFactory
+import cl.duoc.tiotecpreventivo.viewmodel.PostsViewModel
+import cl.duoc.tiotecpreventivo.viewmodel.PostsViewModelFactory
+import cl.duoc.tiotecpreventivo.ui.screens.ComunidadScreen
 
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
@@ -85,6 +88,7 @@ private const val RUTA_CONTENIDO = "contenido/{contenidoId}"
 private const val RUTA_HISTORIAL = "historial"
 private const val RUTA_SOLICITUDES = "solicitudes"
 private const val RUTA_SOLICITUD_DETALLE = "solicitud/{solicitudId}"
+private const val RUTA_COMUNIDAD = "comunidad"
 
 /** TT-27: cada destino usa un ícono vectorial Material junto a su etiqueta visible. */
 private enum class DestinoPrincipal(
@@ -125,14 +129,15 @@ fun TioTecApp(
     val enHistorial = rutaActual == RUTA_HISTORIAL
     val enSolicitudes = rutaActual == RUTA_SOLICITUDES
     val enSolicitudDetalle = rutaActual == RUTA_SOLICITUD_DETALLE
+    val enComunidad = rutaActual == RUTA_COMUNIDAD
     val enPantallaSecundaria =
-        enDispositivos || enAjustes || enResultado || enContenido || enHistorial || enSolicitudes || enSolicitudDetalle
+        enDispositivos || enAjustes || enResultado || enContenido || enHistorial || enSolicitudes || enSolicitudDetalle || enComunidad
     val esCompacto = windowWidthSizeClass == WindowWidthSizeClass.Compact
 
     val destinoSeleccionado = when {
         enDispositivos || enResultado || enHistorial -> DestinoPrincipal.INICIO.ruta
         enAjustes || enSolicitudes || enSolicitudDetalle -> DestinoPrincipal.PERFIL.ruta
-        enContenido -> DestinoPrincipal.APRENDE.ruta
+        enContenido || enComunidad -> DestinoPrincipal.APRENDE.ruta
         else -> rutaActual
     }
 
@@ -193,6 +198,7 @@ fun TioTecApp(
                             enHistorial -> "Historial de evaluaciones"
                             enSolicitudes -> "Solicitudes de asistencia"
                             enSolicitudDetalle -> "Detalle de solicitud"
+                            enComunidad -> "Comunidad"
                             else -> "TíoTec Preventivo"
                         },
                         // TT-27: con texto aumentado el título no empuja ni tapa la flecha.
@@ -334,6 +340,9 @@ fun TioTecApp(
                         uiState = uiState,
                         onCategoriaChange = aprendeViewModel::seleccionarCategoria,
                         onReintentar = aprendeViewModel::reintentar,
+                        onAbrirComunidad = {
+                            navController.navigate(RUTA_COMUNIDAD) { launchSingleTop = true }
+                        },
                         onAbrirContenido = { contenidoId ->
                             navController.navigate("contenido/$contenidoId") {
                                 launchSingleTop = true
@@ -373,6 +382,21 @@ fun TioTecApp(
                                 launchSingleTop = true
                             }
                         })
+                }
+
+                composable(RUTA_COMUNIDAD) {
+                    val contenedor =
+                        (LocalContext.current.applicationContext as TioTecApplication).contenedor
+                    val factory = remember(contenedor) {
+                        PostsViewModelFactory(contenedor.postsRepository)
+                    }
+                    val postsViewModel: PostsViewModel = viewModel(factory = factory)
+                    val uiState by postsViewModel.uiState.collectAsState()
+
+                    ComunidadScreen(
+                        uiState = uiState,
+                        onReintentar = postsViewModel::cargar
+                    )
                 }
 
                 composable(RUTA_AJUSTES) {

@@ -16,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,7 +33,8 @@ fun AprendeScreen(
     uiState: AprendeUiState = AprendeUiState(),
     onCategoriaChange: (Categoria?) -> Unit = {},
     onAbrirContenido: (String) -> Unit = {},
-    onReintentar: () -> Unit = {}
+    onReintentar: () -> Unit = {},
+    onAbrirComunidad: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -45,6 +47,9 @@ fun AprendeScreen(
                     text = "Aprende", style = MaterialTheme.typography.headlineMedium
                 )
                 Text("Consejos para proteger tus dispositivos y tus cuentas.")
+                OutlinedButton(onClick = onAbrirComunidad) {
+                    Text("Consejos de la comunidad (API externa)")
+                }
 
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
