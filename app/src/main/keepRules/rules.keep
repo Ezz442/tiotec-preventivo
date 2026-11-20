@@ -10,3 +10,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# TT-29: el APK release usa R8. Gson lee y escribe estas clases por reflexión (nombres de campos)
+# y Retrofit necesita conservar las interfaces de los servicios; sin esto el JSON llega vacío o falla.
+-keepattributes Signature, *Annotation*
+-keep class cl.duoc.tiotecpreventivo.data.remote.model.** { *; }
+-keep interface cl.duoc.tiotecpreventivo.data.remote.*Api { *; }

@@ -20,7 +20,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-/** TT-21 (TT-17): solicitudes simuladas, categoría obligatoria y transiciones de estado. */
+/** TT-21 (TT-17): solicitudes, categoría obligatoria y transiciones de estado (repositorio solo local). */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SolicitudesViewModelTest {
 
@@ -74,7 +74,7 @@ class SolicitudesViewModelTest {
         assertEquals(EstadoSolicitud.PENDIENTE, solicitud.estado)
         assertEquals(1, dao.historial.value.size)
         assertFalse(vm.uiState.value.mostrarFormulario)
-        assertTrue(vm.uiState.value.mensaje!!.contains("No se envió a ningún servicio"))
+        assertEquals("Solicitud registrada en el servicio.", vm.uiState.value.mensaje)
     }
 
     @Test
@@ -128,7 +128,7 @@ class SolicitudesViewModelTest {
             listOf(EstadoSolicitud.PENDIENTE, EstadoSolicitud.EN_REVISION, EstadoSolicitud.RESUELTA),
             estado.historial.map { it.estado }
         )
-        assertEquals("Estado actualizado en la simulación.", detalle.uiState.value.mensaje)
+        assertEquals("Estado actualizado en el servicio.", detalle.uiState.value.mensaje)
     }
 
     @Test

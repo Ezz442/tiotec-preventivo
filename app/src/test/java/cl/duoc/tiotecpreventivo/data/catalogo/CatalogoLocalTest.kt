@@ -206,12 +206,12 @@ class CatalogoLocalTest {
     // ---------- Uso sin conexión ----------
 
     @Test
-    fun manifiestoNoPideAccesoAInternet() {
+    fun manifiestoDeclaraInternetParaLosMicroservicios() {
         // Las pruebas unitarias se ejecutan desde la carpeta del módulo app.
         val manifiesto = File("src/main/AndroidManifest.xml")
         assertTrue("No se encontró el manifiesto", manifiesto.exists())
-        assertFalse(
-            "La app no debe declarar el permiso INTERNET en EP2",
+        assertTrue(
+            "La app debe declarar INTERNET para hablar con los microservicios (EP4)",
             manifiesto.readText().contains("android.permission.INTERNET")
         )
     }

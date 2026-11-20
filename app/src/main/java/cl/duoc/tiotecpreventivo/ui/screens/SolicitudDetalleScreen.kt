@@ -15,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -25,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cl.duoc.tiotecpreventivo.ui.components.AvisoSincronizacion
 import cl.duoc.tiotecpreventivo.ui.components.TextoConCarga
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoSolicitud
 import cl.duoc.tiotecpreventivo.viewmodel.SolicitudDetalleUiState
@@ -39,6 +41,10 @@ fun SolicitudDetalleScreen(
     onCancelarCambio: () -> Unit,
     onReintentar: () -> Unit,
     onMensajeConsumido: () -> Unit,
+    onSolicitarEliminar: () -> Unit,
+    onConfirmarEliminar: () -> Unit,
+    onCancelarEliminar: () -> Unit,
+    onVolver: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -46,6 +52,11 @@ fun SolicitudDetalleScreen(
         DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
     }
     val detalle = uiState.detalle
+
+    // TT-29: al eliminar la solicitud ya no hay nada que mostrar; se vuelve a la lista.
+    LaunchedEffect(uiState.eliminada) {
+        if (uiState.eliminada) onVolver()
+    }
 
     LaunchedEffect(uiState.mensaje) {
         uiState.mensaje?.let { mensaje ->
@@ -68,6 +79,11 @@ fun SolicitudDetalleScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Demostración académica. No envía solicitudes a especialistas reales.")
+                    AvisoSincronizacion(
+                        sincronizando = uiState.sincronizando,
+                        error = uiState.errorSincronizacion,
+                        onReintentar = onReintentar
+                    )
                 }
             }
 
@@ -116,7 +132,7 @@ fun SolicitudDetalleScreen(
                     item {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = "Simular cambio de estado",
+                                text = "Cambiar estado",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text("Selecciona un estado y confirma el cambio.")
@@ -137,6 +153,16 @@ fun SolicitudDetalleScreen(
                                     )
                                 }
                             }
+                        }
+                    }
+
+                    item {
+                        OutlinedButton(
+                            onClick = onSolicitarEliminar,
+                            enabled = !uiState.actualizando && !uiState.eliminando,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Eliminar solicitud")
                         }
                     }
 
@@ -180,7 +206,7 @@ fun SolicitudDetalleScreen(
             if (!uiState.actualizando) onCancelarCambio()
         }, title = { Text("Confirmar cambio") }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("¿Cambiar el estado a «${estado.etiqueta}» en esta simulación?")
+                Text("¿Cambiar el estado a «${estado.etiqueta}»?")
 
                 uiState.errorOperacion?.let { error ->
                     Text(
@@ -201,5 +227,37 @@ fun SolicitudDetalleScreen(
                 Text("Cancelar")
             }
         })
+    }
+
+    if (uiState.confirmarEliminar) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!uiState.eliminando) onCancelarEliminar()
+            },
+            title = { Text("Eliminar solicitud") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("¿Eliminar esta solicitud y su historial? Esta acción no se puede deshacer.")
+
+                    uiState.errorOperacion?.let { error ->
+                        Text(text = error, color = MaterialTheme.colorScheme.error)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = onConfirmarEliminar, enabled = !uiState.eliminando
+                ) {
+                    TextoConCarga(texto = "Eliminar", cargando = uiState.eliminando)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onCancelarEliminar, enabled = !uiState.eliminando
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }

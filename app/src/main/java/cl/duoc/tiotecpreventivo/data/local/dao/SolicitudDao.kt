@@ -35,6 +35,10 @@ abstract class SolicitudDao {
     @Insert
     abstract suspend fun insertarHistorial(historial: HistorialSolicitudEntity): Long
 
+    /** Borra la solicitud; su historial se borra en cascada (clave foránea). */
+    @Query("DELETE FROM solicitud WHERE id = :id")
+    abstract suspend fun borrar(id: Long): Int
+
     @Query("UPDATE solicitud SET estado = :estado WHERE id = :id")
     abstract suspend fun actualizarEstado(id: Long, estado: EstadoSolicitud): Int
 

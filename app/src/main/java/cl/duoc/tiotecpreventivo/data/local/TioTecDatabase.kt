@@ -5,11 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import cl.duoc.tiotecpreventivo.data.local.dao.AccionDao
 import cl.duoc.tiotecpreventivo.data.local.dao.DispositivoDao
 import cl.duoc.tiotecpreventivo.data.local.dao.EvaluacionDao
 import cl.duoc.tiotecpreventivo.data.local.dao.PerfilDao
 import cl.duoc.tiotecpreventivo.data.local.dao.RecordatorioDao
+import cl.duoc.tiotecpreventivo.data.local.dao.SincronizacionDao
 import cl.duoc.tiotecpreventivo.data.local.dao.SolicitudDao
 import cl.duoc.tiotecpreventivo.data.local.entity.AccionEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.DispositivoEntity
@@ -40,7 +42,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.SolicitudEntity
         SolicitudEntity::class,
         HistorialSolicitudEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class TioTecDatabase : RoomDatabase() {
@@ -51,12 +53,25 @@ abstract class TioTecDatabase : RoomDatabase() {
     abstract fun accionDao(): AccionDao
     abstract fun recordatorioDao(): RecordatorioDao
     abstract fun solicitudDao(): SolicitudDao
+    abstract fun sincronizacionDao(): SincronizacionDao
 
     companion object {
         const val NOMBRE = "tiotec_preventivo.db"
 
-        /** Migraciones entre versiones. Vacío mientras la base siga en la versión 1. */
-        val MIGRACIONES: Array<Migration> = emptyArray()
+        /**
+         * TT-29 (versión 1 → 2): las solicitudes pasan a guardarse en solicitudes-service y Room solo
+         * conserva una copia con los mismos ids del servicio. El esquema no cambia; se descartan las
+         * solicitudes simuladas de la versión anterior para que sus ids no choquen con los del servicio.
+         */
+        val MIGRACION_1_2: Migration = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("DELETE FROM historial_solicitud")
+                db.execSQL("DELETE FROM solicitud")
+            }
+        }
+
+        /** Migraciones entre versiones. */
+        val MIGRACIONES: Array<Migration> = arrayOf(MIGRACION_1_2)
 
         @Volatile
         private var instancia: TioTecDatabase? = null
