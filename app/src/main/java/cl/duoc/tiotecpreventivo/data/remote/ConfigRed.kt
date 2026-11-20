@@ -13,4 +13,7 @@ object ConfigRed {
     const val URL_DISPOSITIVOS = "http://localhost:8082/"
 
     const val TIEMPO_ESPERA_SEGUNDOS = 10L
+
+    /** TT-30: API publica externa (JSONPlaceholder). Es HTTPS, no necesita adb reverse. */
+    const val URL_API_EXTERNA = "https://jsonplaceholder.typicode.com/"
 }

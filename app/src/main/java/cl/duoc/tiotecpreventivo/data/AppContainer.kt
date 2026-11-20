@@ -15,7 +15,10 @@ import cl.duoc.tiotecpreventivo.notificaciones.ProgramadorWorkManager
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import cl.duoc.tiotecpreventivo.repository.PreferenciasRepository
 import cl.duoc.tiotecpreventivo.repository.RecordatorioRepository
+import cl.duoc.tiotecpreventivo.data.remote.ConfigRed
+import cl.duoc.tiotecpreventivo.data.remote.PostsApi
 import cl.duoc.tiotecpreventivo.data.remote.ServiciosRemotos
+import cl.duoc.tiotecpreventivo.repository.PostsRepository
 import cl.duoc.tiotecpreventivo.repository.DispositivoRepositorySincronizado
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepository
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepositorySincronizado
@@ -81,6 +84,11 @@ class AppContainer(context: Context) {
             sincronizacionDao = baseDeDatos.sincronizacionDao(),
             perfilDao = baseDeDatos.perfilDao()
         )
+    }
+
+    /** TT-30: API externa (JSONPlaceholder) con Retrofit; solo lectura y en memoria, no usa Room. */
+    val postsRepository: PostsRepository by lazy {
+        PostsRepository(serviciosRemotos.crearApi(ConfigRed.URL_API_EXTERNA, PostsApi::class.java))
     }
 
     /** Preferencias simples en DataStore (TT-08): tema, primera ejecución y avisos. */
