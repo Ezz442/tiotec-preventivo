@@ -20,9 +20,9 @@ sealed interface ResultadoEliminacion {
  * CRUD de dispositivos de prueba (TT-04, 4.2 y sección 5).
  * La confirmación con AlertDialog la muestra la pantalla (TT-09) antes de llamar a [eliminar].
  */
-class DispositivoRepository(
-    private val dao: DispositivoDao,
-    private val reloj: () -> Long = System::currentTimeMillis
+open class DispositivoRepository(
+    protected val dao: DispositivoDao,
+    protected val reloj: () -> Long = System::currentTimeMillis
 ) {
 
     fun observarActivos(): Flow<List<DispositivoEntity>> = dao.observarActivos()
@@ -39,7 +39,7 @@ class DispositivoRepository(
         dao.existeNombreActivo(nombre, excluirId)
 
     /** Crea un dispositivo y devuelve su id. */
-    suspend fun crear(
+    open suspend fun crear(
         perfilId: Long,
         nombre: String,
         sistemaOperativo: SistemaOperativo,
@@ -59,7 +59,7 @@ class DispositivoRepository(
     }
 
     /** Edita nombre y sistema operativo. Las evaluaciones anteriores conservan su copia. */
-    suspend fun actualizar(id: Long, nombre: String, sistemaOperativo: SistemaOperativo): Boolean {
+    open suspend fun actualizar(id: Long, nombre: String, sistemaOperativo: SistemaOperativo): Boolean {
         val actual = dao.obtener(id) ?: return false
         dao.actualizar(
             actual.copy(
@@ -79,7 +79,7 @@ class DispositivoRepository(
      * Regla de TT-04 (4.2): sin evaluaciones se borra; con evaluaciones se archiva
      * para que el historial siga visible.
      */
-    suspend fun eliminar(id: Long): ResultadoEliminacion {
+    open suspend fun eliminar(id: Long): ResultadoEliminacion {
         val dispositivo = dao.obtener(id) ?: return ResultadoEliminacion.NoEncontrado
         val archivado = dao.eliminarOArchivar(id, reloj())
         return if (archivado) {
@@ -88,4 +88,7 @@ class DispositivoRepository(
             ResultadoEliminacion.Eliminado(dispositivo.imagenRuta)
         }
     }
+
+    /** Trae la lista del servicio y actualiza la copia local. Sin servicio no hace nada. */
+    open suspend fun sincronizar() {}
 }

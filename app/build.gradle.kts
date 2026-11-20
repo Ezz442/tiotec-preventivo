@@ -73,4 +73,8 @@ dependencies {
     // TT-16: avisos programados que sobreviven a cerrar la app y reiniciar el teléfono.
     implementation(libs.androidx.work.runtime.ktx)
 
+    // TT-29: consumo de los microservicios propios con Retrofit (JSON con Gson).
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
 }

@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- TT-29: la app consume los microservicios propios (y, en TT-30, la API externa). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- TT-16: avisos de recordatorios (Android 13+ lo pide en tiempo de ejecución). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -31,6 +34,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.TioTecPreventivo">
         <activity
             android:name=".MainActivity"

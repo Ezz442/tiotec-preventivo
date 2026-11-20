@@ -443,7 +443,11 @@ fun TioTecApp(
                         onConfirmarCambio = detalleViewModel::confirmarCambio,
                         onCancelarCambio = detalleViewModel::cancelarCambio,
                         onReintentar = detalleViewModel::cargar,
-                        onMensajeConsumido = detalleViewModel::limpiarMensaje
+                        onMensajeConsumido = detalleViewModel::limpiarMensaje,
+                        onSolicitarEliminar = detalleViewModel::solicitarEliminar,
+                        onConfirmarEliminar = detalleViewModel::confirmarEliminar,
+                        onCancelarEliminar = detalleViewModel::cancelarEliminar,
+                        onVolver = { navController.popBackStack() }
                     )
                 }
 

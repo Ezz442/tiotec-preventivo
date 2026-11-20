@@ -27,7 +27,7 @@ fun SolicitudDialogo(
     AlertDialog(onDismissRequest = {
         if (!uiState.guardando) onCerrar()
     }, title = {
-        Text("Nueva solicitud simulada")
+        Text("Nueva solicitud")
     }, text = {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState()),

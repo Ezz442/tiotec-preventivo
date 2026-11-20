@@ -4,6 +4,7 @@ import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.duoc.tiotecpreventivo.data.catalogo.Categoria
+import cl.duoc.tiotecpreventivo.data.remote.ErrorRemoto
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepository
 import kotlinx.coroutines.CancellationException
@@ -23,6 +24,7 @@ class SolicitudesViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var cargaJob: Job? = null
+    private var sincronizacionJob: Job? = null
 
     init {
         cargar()
@@ -54,6 +56,35 @@ class SolicitudesViewModel(
                 _uiState.update {
                     it.copy(
                         cargando = false, errorCarga = "No pudimos cargar las solicitudes."
+                    )
+                }
+            }
+        }
+
+        sincronizar()
+    }
+
+    /**
+     * TT-29: pide la lista al servicio y actualiza la copia local. La pantalla ya muestra lo que hay
+     * en Room; si el servicio no responde, se avisa y esos datos siguen visibles.
+     */
+    private fun sincronizar() {
+        sincronizacionJob?.cancel()
+        _uiState.update { it.copy(sincronizando = true, errorSincronizacion = null) }
+
+        sincronizacionJob = viewModelScope.launch {
+            try {
+                solicitudRepository.sincronizar()
+                _uiState.update { it.copy(sincronizando = false) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(sincronizando = false, errorSincronizacion = e.message) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        sincronizando = false,
+                        errorSincronizacion = "No pudimos actualizar desde el servicio."
                     )
                 }
             }
@@ -140,11 +171,13 @@ class SolicitudesViewModel(
                         mostrarFormulario = false,
                         categoriaSeleccionada = null,
                         errorCategoria = null,
-                        mensaje = "Solicitud simulada guardada. No se envió a ningún servicio."
+                        mensaje = "Solicitud registrada en el servicio."
                     )
                 }
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(errorOperacion = e.message) }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorOperacion = "No pudimos guardar. Intenta nuevamente.")

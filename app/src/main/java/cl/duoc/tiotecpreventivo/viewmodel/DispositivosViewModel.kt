@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
+import cl.duoc.tiotecpreventivo.data.remote.ErrorRemoto
 import cl.duoc.tiotecpreventivo.repository.ResultadoEliminacion
 import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenes
 import cl.duoc.tiotecpreventivo.data.imagenes.copiarImagen
@@ -38,9 +39,38 @@ class DispositivosViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var observacion: Job? = null
+    private var sincronizacionJob: Job? = null
 
     init {
         observarDatos()
+        sincronizar()
+    }
+
+    /**
+     * TT-29: pide la lista a dispositivos-service y actualiza la copia local. La pantalla ya muestra
+     * lo que hay en Room; si el servicio no responde, se avisa y esos datos siguen visibles.
+     */
+    private fun sincronizar() {
+        sincronizacionJob?.cancel()
+        _uiState.update { it.copy(sincronizando = true, errorSincronizacion = null) }
+
+        sincronizacionJob = viewModelScope.launch {
+            try {
+                dispositivoRepository.sincronizar()
+                _uiState.update { it.copy(sincronizando = false) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(sincronizando = false, errorSincronizacion = e.message) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        sincronizando = false,
+                        errorSincronizacion = "No pudimos actualizar desde el servicio."
+                    )
+                }
+            }
+        }
     }
 
     private fun observarDatos() {
@@ -82,6 +112,7 @@ class DispositivosViewModel(
         if (_uiState.value.cargando) return
 
         observarDatos()
+        sincronizar()
     }
 
     fun abrirNuevo() {
@@ -276,6 +307,8 @@ class DispositivosViewModel(
                 }
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(errorOperacion = e.message) }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
@@ -357,6 +390,8 @@ class DispositivosViewModel(
                 }
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(errorOperacion = e.message) }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(

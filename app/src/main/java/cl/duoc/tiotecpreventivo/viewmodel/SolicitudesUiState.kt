@@ -10,6 +10,10 @@ data class SolicitudesUiState(
     val categoriaSeleccionada: Categoria? = null,
     val cargando: Boolean = true,
     val guardando: Boolean = false,
+    /** TT-29: se está pidiendo la lista actualizada a solicitudes-service. */
+    val sincronizando: Boolean = false,
+    /** TT-29: el servicio no respondió; se muestran los datos guardados en el teléfono. */
+    val errorSincronizacion: String? = null,
     val errorCarga: String? = null,
     val errorCategoria: String? = null,
     val errorOperacion: String? = null,

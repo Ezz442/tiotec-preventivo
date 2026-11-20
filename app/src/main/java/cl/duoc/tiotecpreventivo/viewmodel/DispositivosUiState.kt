@@ -22,6 +22,10 @@ data class DispositivosUiState(
     /** TT-26: AlertDialog "¿Descartar cambios?" al cancelar con cambios sin guardar. */
     val confirmarDescartar: Boolean = false,
     val guardando: Boolean = false,
+    /** TT-29: se está pidiendo la lista actualizada a dispositivos-service. */
+    val sincronizando: Boolean = false,
+    /** TT-29: el servicio no respondió; se muestran los datos guardados en el teléfono. */
+    val errorSincronizacion: String? = null,
     val dispositivoAEliminar: DispositivoEntity? = null,
     val eliminando: Boolean = false,
     val errorOperacion: String? = null,

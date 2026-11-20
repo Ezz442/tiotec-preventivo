@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.data.catalogo.Categoria
+import cl.duoc.tiotecpreventivo.ui.components.AvisoSincronizacion
 import cl.duoc.tiotecpreventivo.ui.components.SolicitudDialogo
 import cl.duoc.tiotecpreventivo.viewmodel.SolicitudesUiState
 import java.text.DateFormat
@@ -69,7 +70,12 @@ fun SolicitudesScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     // TT-27: el título "Solicitudes de asistencia" ya está en la barra superior.
                     Text(
-                        "Simulación local: las solicitudes no se envían a ningún servicio."
+                        "Las solicitudes se guardan en el servicio de TíoTec (demostración académica)."
+                    )
+                    AvisoSincronizacion(
+                        sincronizando = uiState.sincronizando,
+                        error = uiState.errorSincronizacion,
+                        onReintentar = onReintentar
                     )
                 }
             }
@@ -122,7 +128,7 @@ fun SolicitudesScreen(
 
                     if (uiState.solicitudes.isEmpty()) {
                         item {
-                            Text("Todavía no tienes solicitudes simuladas.")
+                            Text("Todavía no hay solicitudes.")
                         }
                     }
 

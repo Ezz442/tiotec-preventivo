@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cl.duoc.tiotecpreventivo.ui.components.AvisoSincronizacion
 import cl.duoc.tiotecpreventivo.ui.components.TextoConCarga
 import cl.duoc.tiotecpreventivo.ui.components.MensajeError
 import cl.duoc.tiotecpreventivo.data.local.entity.SistemaOperativo
@@ -95,6 +96,14 @@ fun DispositivosScreen(
                 Text(
                     text = "Administra los equipos ficticios de tus evaluaciones.",
                     style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            item {
+                AvisoSincronizacion(
+                    sincronizando = uiState.sincronizando,
+                    error = uiState.errorSincronizacion,
+                    onReintentar = onReintentar
                 )
             }
 

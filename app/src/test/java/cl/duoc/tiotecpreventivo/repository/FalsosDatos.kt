@@ -195,6 +195,13 @@ class SolicitudDaoFalso : SolicitudDao(), ConFalla {
         this.historial.value = this.historial.value + historial.copy(id = id)
         return id
     }
+    override suspend fun borrar(id: Long): Int {
+        revisarFalla()
+        val existia = solicitudes.value.any { it.id == id }
+        solicitudes.value = solicitudes.value.filterNot { it.id == id }
+        historial.value = historial.value.filterNot { it.solicitudId == id }
+        return if (existia) 1 else 0
+    }
     override suspend fun actualizarEstado(id: Long, estado: EstadoSolicitud): Int {
         revisarFalla()
         if (solicitudes.value.none { it.id == id }) return 0

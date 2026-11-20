@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.Flow
  * Solicitudes de asistencia simuladas (TT-04, 4.8). Todo queda en el teléfono:
  * no se envía nada a ningún servicio real.
  */
-class SolicitudRepository(
-    private val dao: SolicitudDao,
-    private val reloj: () -> Long = System::currentTimeMillis
+open class SolicitudRepository(
+    protected val dao: SolicitudDao,
+    protected val reloj: () -> Long = System::currentTimeMillis
 ) {
 
     fun observarTodas(): Flow<List<SolicitudEntity>> = dao.observarTodas()
@@ -23,9 +23,18 @@ class SolicitudRepository(
     suspend fun obtenerConHistorial(id: Long): SolicitudConHistorial? = dao.obtenerConHistorial(id)
 
     /** Crea la solicitud con código DEMO-00X y su primer registro de historial. */
-    suspend fun crear(perfilId: Long, categoria: Categoria): Long =
+    open suspend fun crear(perfilId: Long, categoria: Categoria): Long =
         dao.crear(perfilId, categoria, reloj())
 
-    suspend fun cambiarEstado(id: Long, estado: EstadoSolicitud): Boolean =
+    open suspend fun cambiarEstado(id: Long, estado: EstadoSolicitud): Boolean =
         dao.cambiarEstado(id, estado, reloj())
+
+    /** Borra la solicitud. Devuelve false si ya no existía. */
+    open suspend fun eliminar(id: Long): Boolean = dao.borrar(id) > 0
+
+    /** Trae la lista del servicio y actualiza la copia local. Sin servicio no hace nada. */
+    open suspend fun sincronizar() {}
+
+    /** Trae del servicio el detalle (con historial) de una solicitud. Sin servicio no hace nada. */
+    open suspend fun sincronizarDetalle(id: Long) {}
 }

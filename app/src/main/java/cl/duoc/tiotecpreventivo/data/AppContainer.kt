@@ -15,7 +15,10 @@ import cl.duoc.tiotecpreventivo.notificaciones.ProgramadorWorkManager
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import cl.duoc.tiotecpreventivo.repository.PreferenciasRepository
 import cl.duoc.tiotecpreventivo.repository.RecordatorioRepository
+import cl.duoc.tiotecpreventivo.data.remote.ServiciosRemotos
+import cl.duoc.tiotecpreventivo.repository.DispositivoRepositorySincronizado
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepository
+import cl.duoc.tiotecpreventivo.repository.SolicitudRepositorySincronizado
 
 /**
  * Crea una sola vez la base de datos y los repositorios. Los ViewModels los reciben
@@ -33,8 +36,17 @@ class AppContainer(context: Context) {
         PerfilRepository(baseDeDatos.perfilDao())
     }
 
+    /** TT-29: clientes Retrofit de los microservicios propios (solicitudes y dispositivos). */
+    val serviciosRemotos: ServiciosRemotos by lazy { ServiciosRemotos() }
+
+    /** TT-29: Room es la copia local; dispositivos-service guarda nombre y sistema operativo. */
     val dispositivoRepository: DispositivoRepository by lazy {
-        DispositivoRepository(baseDeDatos.dispositivoDao())
+        DispositivoRepositorySincronizado(
+            dao = baseDeDatos.dispositivoDao(),
+            api = serviciosRemotos.dispositivos,
+            sincronizacionDao = baseDeDatos.sincronizacionDao(),
+            perfilDao = baseDeDatos.perfilDao()
+        )
     }
 
     val evaluacionRepository: EvaluacionRepository by lazy {
@@ -61,8 +73,14 @@ class AppContainer(context: Context) {
     /** TT-18/19: fotos de dispositivos en el almacenamiento privado de la app. */
     val almacenImagenes: AlmacenImagenes by lazy { AlmacenImagenesLocal(context.filesDir) }
 
+    /** TT-29: las solicitudes viven en solicitudes-service; Room guarda una copia con los mismos ids. */
     val solicitudRepository: SolicitudRepository by lazy {
-        SolicitudRepository(baseDeDatos.solicitudDao())
+        SolicitudRepositorySincronizado(
+            dao = baseDeDatos.solicitudDao(),
+            api = serviciosRemotos.solicitudes,
+            sincronizacionDao = baseDeDatos.sincronizacionDao(),
+            perfilDao = baseDeDatos.perfilDao()
+        )
     }
 
     /** Preferencias simples en DataStore (TT-08): tema, primera ejecución y avisos. */

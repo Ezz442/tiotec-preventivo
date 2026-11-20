@@ -3,6 +3,7 @@ package cl.duoc.tiotecpreventivo.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoSolicitud
+import cl.duoc.tiotecpreventivo.data.remote.ErrorRemoto
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -19,6 +20,7 @@ class SolicitudDetalleViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var cargaJob: Job? = null
+    private var sincronizacionJob: Job? = null
 
     init {
         cargar()
@@ -33,7 +35,10 @@ class SolicitudDetalleViewModel(
                 repository.observarConHistorial(solicitudId).collect { detalle ->
                     _uiState.update {
                         it.copy(
-                            detalle = detalle, cargando = false, errorCarga = if (detalle == null) {
+                            detalle = detalle,
+                            cargando = false,
+                            // Al eliminarla, Room emite null un instante antes de volver a la lista.
+                            errorCarga = if (detalle == null && !it.eliminando && !it.eliminada) {
                                 "La solicitud no existe."
                             } else {
                                 null
@@ -47,6 +52,32 @@ class SolicitudDetalleViewModel(
                 _uiState.update {
                     it.copy(
                         cargando = false, errorCarga = "No pudimos cargar el detalle."
+                    )
+                }
+            }
+        }
+
+        sincronizar()
+    }
+
+    /** TT-29: trae del servicio el detalle con su historial; si falla, queda lo guardado. */
+    private fun sincronizar() {
+        sincronizacionJob?.cancel()
+        _uiState.update { it.copy(sincronizando = true, errorSincronizacion = null) }
+
+        sincronizacionJob = viewModelScope.launch {
+            try {
+                repository.sincronizarDetalle(solicitudId)
+                _uiState.update { it.copy(sincronizando = false) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(sincronizando = false, errorSincronizacion = e.message) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        sincronizando = false,
+                        errorSincronizacion = "No pudimos actualizar desde el servicio."
                     )
                 }
             }
@@ -109,7 +140,7 @@ class SolicitudDetalleViewModel(
                         _uiState.update {
                             it.copy(
                                 estadoPorConfirmar = null,
-                                mensaje = "Estado actualizado en la simulación."
+                                mensaje = "Estado actualizado en el servicio."
                             )
                         }
                     }
@@ -122,12 +153,52 @@ class SolicitudDetalleViewModel(
                 }
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(errorOperacion = e.message) }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorOperacion = "No pudimos cambiar el estado. Reintenta.")
                 }
             } finally {
                 _uiState.update { it.copy(actualizando = false) }
+            }
+        }
+    }
+
+    fun solicitarEliminar() {
+        val actual = _uiState.value
+        if (actual.detalle == null || actual.cargando || actual.actualizando || actual.eliminando) return
+
+        _uiState.update { it.copy(confirmarEliminar = true, errorOperacion = null, mensaje = null) }
+    }
+
+    fun cancelarEliminar() {
+        if (_uiState.value.eliminando) return
+
+        _uiState.update { it.copy(confirmarEliminar = false, errorOperacion = null) }
+    }
+
+    /** TT-29: DELETE en solicitudes-service y, si resulta bien, también de la copia local. */
+    fun confirmarEliminar() {
+        val actual = _uiState.value
+        if (!actual.confirmarEliminar || actual.eliminando) return
+
+        _uiState.update { it.copy(eliminando = true, errorOperacion = null) }
+
+        viewModelScope.launch {
+            try {
+                repository.eliminar(solicitudId)
+                _uiState.update { it.copy(confirmarEliminar = false, eliminada = true) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: ErrorRemoto) {
+                _uiState.update { it.copy(errorOperacion = e.message) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorOperacion = "No pudimos eliminar la solicitud. Reintenta.")
+                }
+            } finally {
+                _uiState.update { it.copy(eliminando = false) }
             }
         }
     }
