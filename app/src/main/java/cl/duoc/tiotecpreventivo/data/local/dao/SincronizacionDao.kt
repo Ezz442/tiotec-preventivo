@@ -8,6 +8,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.DispositivoEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.HistorialSolicitudEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.SolicitudEntity
 
+// #guarda en Room lo que llega del microservicio (en transaccion)
 /**
  * TT-29: copia local de lo que guardan los microservicios.
  *

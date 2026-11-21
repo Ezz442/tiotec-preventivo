@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.viewmodel.PostsUiState
 
+// #pantalla que muestra los datos de la api externa
 /** TT-30: textos traídos de una API pública externa (JSONPlaceholder) con Retrofit. */
 @Composable
 fun ComunidadScreen(

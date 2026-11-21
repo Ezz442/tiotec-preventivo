@@ -15,6 +15,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
+// #pruebas de errores de red (sin conexion, 404, 409)
 /** TT-31: llamarServicio traduce los fallos de red y HTTP a ErrorRemoto con mensajes para el usuario. */
 class ErrorRemotoTest {
 

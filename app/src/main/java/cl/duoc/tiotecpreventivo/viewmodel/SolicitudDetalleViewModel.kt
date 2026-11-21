@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// #estado y logica del detalle de solicitud
 class SolicitudDetalleViewModel(
     private val solicitudId: Long, private val repository: SolicitudRepository
 ) : ViewModel() {
@@ -26,6 +27,7 @@ class SolicitudDetalleViewModel(
         cargar()
     }
 
+    // #carga el detalle e historial
     fun cargar() {
         cargaJob?.cancel()
         _uiState.update { it.copy(cargando = true, errorCarga = null) }
@@ -60,6 +62,7 @@ class SolicitudDetalleViewModel(
         sincronizar()
     }
 
+    // #pide el detalle al microservicio
     /** TT-29: trae del servicio el detalle con su historial; si falla, queda lo guardado. */
     private fun sincronizar() {
         sincronizacionJob?.cancel()
@@ -104,6 +107,7 @@ class SolicitudDetalleViewModel(
         _uiState.update { it.copy(estadoPorConfirmar = null) }
     }
 
+    // #actualizar estado de la solicitud en el microservicio
     fun confirmarCambio() {
         val actual = _uiState.value
         val estado = actual.estadoPorConfirmar ?: return
@@ -178,6 +182,7 @@ class SolicitudDetalleViewModel(
         _uiState.update { it.copy(confirmarEliminar = false, errorOperacion = null) }
     }
 
+    // #eliminar solicitud en el microservicio
     /** TT-29: DELETE en solicitudes-service y, si resulta bien, también de la copia local. */
     fun confirmarEliminar() {
         val actual = _uiState.value

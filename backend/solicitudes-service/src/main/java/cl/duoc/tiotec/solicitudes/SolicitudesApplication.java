@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+// #inicio del microservicio solicitudes (puerto 8081)
 @SpringBootApplication
 public class SolicitudesApplication {
 

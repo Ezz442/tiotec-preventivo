@@ -54,6 +54,7 @@ import java.util.Locale
 
 private val ANCHO_MAXIMO = 720.dp
 
+// #pantalla de resultados del riesgo
 /** Resultados de una evaluación guardada (TT-12). Solo muestra: el estado viene del ViewModel. */
 @Composable
 fun ResultadoScreen(
@@ -130,6 +131,7 @@ fun ResultadoScreen(
                     Column(anchoContenido, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         if (resultado.recomendaciones.isNotEmpty()) {
                             Button(onClick = onVerAcciones, modifier = Modifier.fillMaxWidth()) {
+                                // #boton ver mis acciones
                                 Text("Ver mis acciones (${resultado.recomendaciones.size})")
                             }
                         }
@@ -143,6 +145,7 @@ fun ResultadoScreen(
     }
 }
 
+// #nivel general de riesgo
 @Composable
 private fun ResumenGlobal(resultado: ResultadoEvaluacion, modifier: Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -185,6 +188,7 @@ private fun ResumenGlobal(resultado: ResultadoEvaluacion, modifier: Modifier) {
     }
 }
 
+// #riesgo por categoria
 @Composable
 private fun TarjetaCategoria(categoria: ResultadoCategoriaVista, modifier: Modifier) {
     Card(modifier) {
@@ -213,6 +217,7 @@ private fun TarjetaCategoria(categoria: ResultadoCategoriaVista, modifier: Modif
     }
 }
 
+// #recomendacion priorizada
 @Composable
 private fun TarjetaRecomendacion(
     recomendacion: RecomendacionVista,

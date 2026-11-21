@@ -26,6 +26,7 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas de las fabricas de ViewModel
 /**
  * TT-31: cada fábrica crea su ViewModel y rechaza cualquier otro tipo.
  * Los repositorios son simulados con MockK (relaxed): aquí solo importa el cableado.

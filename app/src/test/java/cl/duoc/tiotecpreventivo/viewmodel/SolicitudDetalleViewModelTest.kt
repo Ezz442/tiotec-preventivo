@@ -29,6 +29,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas del detalle de solicitud (cambiar estado y eliminar)
 /** TT-31: detalle de una solicitud (cargar, sincronizar, cambiar estado y eliminar) con MockK. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SolicitudDetalleViewModelTest {

@@ -23,6 +23,7 @@ data class PreferenciasUiState(
     val mensaje: String? = null
 )
 
+// #estado de las preferencias (tema y avisos)
 /**
  * Expone las preferencias de DataStore como un único StateFlow (TT-04, sección 8).
  * La pantalla lo observa con `collectAsState()` y envía eventos; nunca toca DataStore.
@@ -52,8 +53,10 @@ class PreferenciasViewModel(
             initialValue = PreferenciasUiState()
         )
 
+    // #guardar tema claro u oscuro
     fun onTemaChange(tema: Tema) = guardar(ERROR_TEMA) { repositorio.setTema(tema) }
 
+    // #guardar si los avisos estan activos
     fun onAvisosChange(activos: Boolean) = guardar(ERROR_AVISOS) { repositorio.setAvisosActivos(activos) }
 
     /** Se llama al cerrar la bienvenida, para no volver a mostrarla. */

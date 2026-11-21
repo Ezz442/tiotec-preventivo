@@ -11,6 +11,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// #pruebas de Aprende
 /** TT-15: filtros de Aprende y estados de carga/error desde el ViewModel, con el catálogo local. */
 class AprendeViewModelTest {
 

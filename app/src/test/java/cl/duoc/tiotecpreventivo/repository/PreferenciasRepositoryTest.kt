@@ -22,6 +22,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
 
+// #pruebas de las preferencias (DataStore)
 /**
  * TT-08: las preferencias se guardan con DataStore y se recuperan al reabrir.
  * Corre en la JVM (sin emulador): usa un archivo temporal en lugar del almacenamiento del teléfono.

@@ -14,6 +14,7 @@ import cl.duoc.tiotecpreventivo.domain.ReglasRiesgo
 import cl.duoc.tiotecpreventivo.domain.ResultadoReglas
 import cl.duoc.tiotecpreventivo.repository.EvaluacionRepository
 
+// #estado y logica de la evaluacion guiada
 class EvaluacionViewModel(
     private val dispositivoId: Long,
     private val catalogoRepository: CatalogoRepository,
@@ -87,6 +88,7 @@ class EvaluacionViewModel(
         cargarDatos()
     }
 
+    // #guarda la respuesta elegida
     fun onRespuestaChange(respuesta: ValorRespuesta) {
         val estado = _uiState.value
 
@@ -103,6 +105,7 @@ class EvaluacionViewModel(
         }
     }
 
+    // #pasa a la siguiente pregunta (valida que haya respuesta)
     fun siguiente() {
         val estado = _uiState.value
 
@@ -126,6 +129,7 @@ class EvaluacionViewModel(
         }
     }
 
+    // #vuelve a la pregunta anterior
     fun anterior() {
         val estado = _uiState.value
 
@@ -138,6 +142,7 @@ class EvaluacionViewModel(
         }
     }
 
+    // #revisa que todo este respondido antes de finalizar
     fun prepararRevision(): Boolean {
         val estado = _uiState.value
 
@@ -164,6 +169,7 @@ class EvaluacionViewModel(
         return true
     }
 
+    // #calcula el riesgo y guarda la evaluacion en Room
     fun finalizarEvaluacion() {
         if (!prepararRevision()) return
 
@@ -216,6 +222,7 @@ class EvaluacionViewModel(
         }
     }
 
+    // #pide confirmacion al salir sin guardar
     fun solicitarSalida(): Boolean {
         val estado = _uiState.value
 

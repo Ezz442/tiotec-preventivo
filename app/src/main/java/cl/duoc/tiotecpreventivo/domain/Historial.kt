@@ -12,6 +12,7 @@ data class FiltroDispositivo(
     val cantidad: Int
 )
 
+// #orden y filtros del historial
 /**
  * Reglas del historial, sin Android (TT-14).
  *

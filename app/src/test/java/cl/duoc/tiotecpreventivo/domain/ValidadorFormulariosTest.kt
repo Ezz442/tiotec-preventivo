@@ -9,6 +9,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// #pruebas de validacion de formularios
 /** TT-26: reglas de los formularios, sin Android ni ViewModels. */
 class ValidadorFormulariosTest {
 

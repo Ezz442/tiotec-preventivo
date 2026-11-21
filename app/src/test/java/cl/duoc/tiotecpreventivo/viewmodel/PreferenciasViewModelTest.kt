@@ -39,6 +39,7 @@ private class DataStoreFalso : DataStore<Preferences> {
     }
 }
 
+// #pruebas de las preferencias
 /**
  * TT-08: si guardar una preferencia falla, se muestra un mensaje y se mantiene
  * la configuración anterior sin cerrar la app.

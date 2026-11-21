@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+// #detecta el tamano de pantalla (adaptable)
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -19,6 +20,7 @@ import cl.duoc.tiotecpreventivo.ui.navigation.TioTecApp
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.PreferenciasViewModel
 
+// #actividad principal: carga el tema y la app
 class MainActivity : ComponentActivity() {
 
     /** Una sola instancia por pantalla: decide el tema y la usa también Ajustes (TT-08). */

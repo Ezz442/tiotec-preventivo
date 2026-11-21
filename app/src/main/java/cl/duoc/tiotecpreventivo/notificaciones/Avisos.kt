@@ -26,6 +26,7 @@ object Avisos {
     const val EXTRA_DESTINO = "cl.duoc.tiotecpreventivo.DESTINO"
     const val DESTINO_ACCIONES = "acciones"
 
+    // #canal de notificaciones
     /** Se llama al iniciar la app. Desde Android 8 las notificaciones necesitan un canal. */
     fun crearCanal(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -39,6 +40,7 @@ object Avisos {
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(canal)
     }
 
+    // #revisa el permiso de notificaciones
     /**
      * true si la app puede mostrar avisos. En Android 13+ depende del permiso
      * POST_NOTIFICATIONS; antes, de que el usuario no las haya desactivado en Ajustes.
@@ -50,6 +52,7 @@ object Avisos {
         return permiso && NotificationManagerCompat.from(context).areNotificationsEnabled()
     }
 
+    // #muestra la notificacion del recordatorio
     fun mostrarRecordatorio(context: Context, recordatorioId: Long, titulo: String) {
         if (!puedeNotificar(context)) return
 

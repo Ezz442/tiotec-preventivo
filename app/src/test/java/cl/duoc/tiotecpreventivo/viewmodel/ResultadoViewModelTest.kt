@@ -25,6 +25,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas de la pantalla de resultados
 /** TT-12: el estado de la pantalla de resultados se expone desde el ViewModel. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ResultadoViewModelTest {

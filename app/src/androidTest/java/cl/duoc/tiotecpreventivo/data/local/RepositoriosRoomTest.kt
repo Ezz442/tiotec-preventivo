@@ -37,6 +37,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+// #prueba de Room en el emulador
 /**
  * TT-07: CRUD, reglas y transacciones sobre una base Room en memoria.
  * Ejecutar con un emulador encendido: clic derecho → Run 'RepositoriosRoomTest'.

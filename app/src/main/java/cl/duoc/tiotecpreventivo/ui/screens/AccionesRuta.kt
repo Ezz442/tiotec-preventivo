@@ -25,6 +25,7 @@ import cl.duoc.tiotecpreventivo.ui.components.RecordatorioDialogo
 import cl.duoc.tiotecpreventivo.viewmodel.AccionesViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.RecordatorioViewModel
 
+// #conecta Mis acciones con recordatorios y permiso de notificaciones
 /**
  * Mis acciones con recordatorios (TT-13 + TT-16). Une los dos ViewModels, pide el
  * permiso de notificaciones cuando hace falta y muestra el resultado en un Snackbar.

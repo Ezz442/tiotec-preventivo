@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+// #pruebas de los endpoints de dispositivos (base H2 en memoria)
 /** Pruebas de punta a punta de los endpoints (controlador + servicio + H2 en memoria). */
 @SpringBootTest
 @AutoConfigureMockMvc

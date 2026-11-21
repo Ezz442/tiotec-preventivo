@@ -18,6 +18,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 
+// #pruebas de la api externa en el ViewModel (cargando, exito, error)
 /** TT-30: estados de PostsViewModel (cargando, lista, vacío, error y reintento). */
 @OptIn(ExperimentalCoroutinesApi::class)
 class PostsViewModelTest {

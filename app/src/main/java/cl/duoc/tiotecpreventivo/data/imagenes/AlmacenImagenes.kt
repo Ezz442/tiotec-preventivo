@@ -25,6 +25,7 @@ interface AlmacenImagenes {
     fun borrar(ruta: String?)
 }
 
+// #guarda las fotos en el almacenamiento privado de la app
 /** Implementación con `java.io.File`, sin Android: se puede probar en la JVM. */
 class AlmacenImagenesLocal(private val base: File) : AlmacenImagenes {
 

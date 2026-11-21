@@ -18,6 +18,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas del ViewModel del perfil
 /** TT-21 (TT-09): validación por campo y guardado del perfil ficticio. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class PerfilViewModelTest {

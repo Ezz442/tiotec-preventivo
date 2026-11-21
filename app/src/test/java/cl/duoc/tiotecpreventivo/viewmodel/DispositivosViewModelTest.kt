@@ -24,6 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+// #pruebas del ViewModel de dispositivos (crear, editar, eliminar, validaciones)
 /** TT-21 (TT-09): CRUD de dispositivos, validaciones por campo y regla de archivado. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DispositivosViewModelTest {

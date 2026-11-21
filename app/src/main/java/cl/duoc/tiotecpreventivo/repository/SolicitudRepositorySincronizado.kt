@@ -14,6 +14,7 @@ import cl.duoc.tiotecpreventivo.data.remote.model.CambioEstadoPeticion
 import cl.duoc.tiotecpreventivo.data.remote.model.SolicitudDto
 import cl.duoc.tiotecpreventivo.data.remote.model.SolicitudPeticion
 
+// #repositorio solicitudes: servicio + copia local Room
 /**
  * TT-29: solicitudes con solicitudes-service como fuente de verdad.
  *
@@ -31,12 +32,14 @@ class SolicitudRepositorySincronizado(
     reloj: () -> Long = System::currentTimeMillis
 ) : SolicitudRepository(dao, reloj) {
 
+    // #baja la lista del servicio y actualiza Room
     override suspend fun sincronizar() {
         val perfil = perfilDao.obtener() ?: return
         val remotas = llamarServicio { api.listar() }
         sincronizacionDao.reemplazarSolicitudes(remotas.mapNotNull { it.aEntidad(perfil.id) })
     }
 
+    // #baja el detalle e historial de una solicitud
     override suspend fun sincronizarDetalle(id: Long) {
         val perfil = perfilDao.obtener() ?: return
         try {
@@ -46,6 +49,7 @@ class SolicitudRepositorySincronizado(
         }
     }
 
+    // #CRUD crear: POST al servicio y guardar local
     override suspend fun crear(perfilId: Long, categoria: Categoria): Long {
         val perfil = perfilDao.obtener()
             ?: throw ErrorRemoto("Crea tu perfil antes de solicitar asistencia.")
@@ -54,6 +58,7 @@ class SolicitudRepositorySincronizado(
         return creada.id
     }
 
+    // #CRUD actualizar: PATCH del estado al servicio
     override suspend fun cambiarEstado(id: Long, estado: EstadoSolicitud): Boolean {
         val perfil = perfilDao.obtener() ?: return false
         return try {
@@ -75,6 +80,7 @@ class SolicitudRepositorySincronizado(
         }
     }
 
+    // #CRUD eliminar: DELETE al servicio
     override suspend fun eliminar(id: Long): Boolean {
         try {
             llamarServicio { api.eliminar(id) }

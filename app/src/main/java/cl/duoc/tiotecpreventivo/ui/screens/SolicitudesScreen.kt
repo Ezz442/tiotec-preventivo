@@ -30,6 +30,7 @@ import cl.duoc.tiotecpreventivo.viewmodel.SolicitudesUiState
 import java.text.DateFormat
 import java.util.Date
 
+// #pantalla lista de solicitudes (datos del microservicio)
 @Composable
 fun SolicitudesScreen(
     uiState: SolicitudesUiState,
@@ -112,6 +113,7 @@ fun SolicitudesScreen(
                                 Button(
                                     onClick = onNuevaSolicitud, enabled = !uiState.guardando
                                 ) {
+                                    // #boton nueva solicitud (crear)
                                     Text("Nueva solicitud")
                                 }
                             }
@@ -149,6 +151,7 @@ fun SolicitudesScreen(
                                 )
                                 TextButton(
                                     onClick = { onAbrirDetalle(solicitud.id) }) {
+                                    // #boton ver detalle de solicitud
                                     Text("Ver detalle")
                                 }
                             }

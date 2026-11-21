@@ -40,6 +40,7 @@ data class RecordatoriosUiState(
     val mensaje: String? = null
 )
 
+// #estado y logica de los recordatorios
 /**
  * Recordatorios de acciones (TT-16). Valida la fecha y hora aquí, no en la pantalla,
  * y usa [GestorRecordatorios] para guardar en Room y programar el aviso.
@@ -119,6 +120,7 @@ class RecordatorioViewModel(
         _uiState.update { it.copy(formulario = null, errorOperacion = null) }
     }
 
+    // #validar fecha y programar el recordatorio
     /**
      * @param puedeNotificar si el teléfono permite mostrar avisos. Si no, el recordatorio
      *   se guarda igual y se avisa al usuario cómo activarlos, sin bloquear la app.
@@ -183,6 +185,7 @@ class RecordatorioViewModel(
 
     fun volverDeCancelacion() = actualizarFormulario { it.copy(confirmandoCancelacion = false) }
 
+    // #cancelar un recordatorio
     fun cancelarRecordatorio(recordatorioId: Long) {
         if (_uiState.value.guardando) return
         _uiState.update { it.copy(guardando = true, errorOperacion = null) }

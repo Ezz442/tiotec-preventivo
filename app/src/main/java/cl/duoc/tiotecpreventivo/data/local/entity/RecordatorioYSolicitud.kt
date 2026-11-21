@@ -31,6 +31,7 @@ import cl.duoc.tiotecpreventivo.data.catalogo.Categoria
     ],
     indices = [Index("accionId"), Index("dispositivoId")]
 )
+// #tabla recordatorio
 data class RecordatorioEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val tipo: TipoRecordatorio,
@@ -57,6 +58,7 @@ data class RecordatorioEntity(
     ],
     indices = [Index("perfilId"), Index(value = ["codigo"], unique = true)]
 )
+// #tabla solicitud (copia local del servicio)
 data class SolicitudEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val perfilId: Long,
@@ -78,6 +80,7 @@ data class SolicitudEntity(
     ],
     indices = [Index("solicitudId")]
 )
+// #tabla historial de la solicitud
 data class HistorialSolicitudEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val solicitudId: Long,

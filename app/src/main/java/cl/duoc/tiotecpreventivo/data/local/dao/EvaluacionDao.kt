@@ -11,6 +11,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.RespuestaEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.ResultadoCategoriaEntity
 import kotlinx.coroutines.flow.Flow
 
+// #consultas de evaluaciones
 @Dao
 abstract class EvaluacionDao {
 

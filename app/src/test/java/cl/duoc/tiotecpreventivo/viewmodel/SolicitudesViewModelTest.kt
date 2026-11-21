@@ -20,6 +20,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas de la lista de solicitudes (con el microservicio simulado)
 /** TT-21 (TT-17): solicitudes, categoría obligatoria y transiciones de estado (repositorio solo local). */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SolicitudesViewModelTest {

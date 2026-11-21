@@ -17,6 +17,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas del checklist de acciones
 /** TT-21 (TT-13): transiciones pendiente ↔ completada, filtros y contador con StateFlow. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AccionesViewModelTest {

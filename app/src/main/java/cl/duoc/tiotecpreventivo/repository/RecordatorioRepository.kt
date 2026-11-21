@@ -6,6 +6,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.RecordatorioEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.TipoRecordatorio
 import kotlinx.coroutines.flow.Flow
 
+// #repositorio de recordatorios
 /**
  * Recordatorios guardados localmente (TT-04, 4.7). Aquí solo se persisten; el aviso
  * del sistema lo programa GestorRecordatorios con WorkManager (TT-16).

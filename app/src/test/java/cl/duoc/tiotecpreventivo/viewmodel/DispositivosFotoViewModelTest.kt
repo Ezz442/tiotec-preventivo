@@ -24,6 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+// #pruebas de la foto con camara (exito, cancelar, sin permiso)
 /** TT-18: tomar, reemplazar, cancelar y quitar la foto de un dispositivo desde el ViewModel. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DispositivosFotoViewModelTest {

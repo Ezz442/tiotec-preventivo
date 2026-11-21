@@ -7,9 +7,11 @@ import cl.duoc.tiotecpreventivo.data.local.entity.SolicitudConHistorial
 import cl.duoc.tiotecpreventivo.data.local.entity.SolicitudEntity
 import kotlinx.coroutines.flow.Flow
 
+// #repositorio de solicitudes (Room)
 /**
- * Solicitudes de asistencia simuladas (TT-04, 4.8). Todo queda en el teléfono:
- * no se envía nada a ningún servicio real.
+ * Solicitudes de asistencia simuladas (TT-04, 4.8). Esta clase lee la copia local (Room);
+ * crear, cambiar estado y eliminar se hacen en el microservicio (ver SolicitudRepositorySincronizado).
+ * No se envía nada a especialistas reales.
  */
 open class SolicitudRepository(
     protected val dao: SolicitudDao,

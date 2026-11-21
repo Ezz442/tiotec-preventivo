@@ -18,6 +18,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas del historial
 /** TT-14: el historial se observa desde Room y se filtra en el ViewModel. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HistorialViewModelTest {

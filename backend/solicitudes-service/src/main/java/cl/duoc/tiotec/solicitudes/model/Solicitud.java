@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
+// #tabla solicitud en la base de datos
 /**
  * Solicitud de asistencia simulada. No guarda texto libre ni datos personales:
  * solo un alias ficticio y una categoria.
@@ -50,6 +51,7 @@ public class Solicitud {
     @Column(nullable = false)
     private long actualizadaEn;
 
+    // #relacion solicitud con su historial
     @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("fecha ASC, id ASC")
     private List<HistorialSolicitud> historial = new ArrayList<>();

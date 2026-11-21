@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// #estado y logica de la lista de solicitudes
 class SolicitudesViewModel(
     private val solicitudRepository: SolicitudRepository,
     private val perfilRepository: PerfilRepository
@@ -30,6 +31,7 @@ class SolicitudesViewModel(
         cargar()
     }
 
+    // #carga las solicitudes desde Room
     fun cargar() {
         cargaJob?.cancel()
         _uiState.update { it.copy(cargando = true, errorCarga = null) }
@@ -64,6 +66,7 @@ class SolicitudesViewModel(
         sincronizar()
     }
 
+    // #pide las solicitudes al microservicio
     /**
      * TT-29: pide la lista al servicio y actualiza la copia local. La pantalla ya muestra lo que hay
      * en Room; si el servicio no responde, se avisa y esos datos siguen visibles.
@@ -91,6 +94,7 @@ class SolicitudesViewModel(
         }
     }
 
+    // #abre el dialogo nueva solicitud
     fun abrirFormulario() {
         val estado = _uiState.value
         if (estado.cargando || estado.guardando) return
@@ -136,6 +140,7 @@ class SolicitudesViewModel(
         }
     }
 
+    // #crear solicitud en el microservicio
     fun guardar() {
         val estado = _uiState.value
         if (estado.guardando || !estado.mostrarFormulario) return

@@ -5,6 +5,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+// #crea los clientes Retrofit
 /**
  * Crea los clientes Retrofit una sola vez (los usa AppContainer). Todos comparten el mismo
  * OkHttpClient y los mismos tiempos de espera; cada servicio tiene su propia URL base.
@@ -16,6 +17,7 @@ class ServiciosRemotos(
     private val urlDispositivos: String = ConfigRed.URL_DISPOSITIVOS
 ) {
 
+    // #cliente http con tiempos de espera
     private val cliente: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .connectTimeout(ConfigRed.TIEMPO_ESPERA_SEGUNDOS, TimeUnit.SECONDS)
@@ -24,6 +26,7 @@ class ServiciosRemotos(
             .build()
     }
 
+    // #construye Retrofit con Gson
     fun <T> crearApi(urlBase: String, clase: Class<T>): T =
         Retrofit.Builder()
             .baseUrl(urlBase)
@@ -32,7 +35,9 @@ class ServiciosRemotos(
             .build()
             .create(clase)
 
+    // #api del microservicio solicitudes
     val solicitudes: SolicitudesApi by lazy { crearApi(urlSolicitudes, SolicitudesApi::class.java) }
 
+    // #api del microservicio dispositivos
     val dispositivos: DispositivosApi by lazy { crearApi(urlDispositivos, DispositivosApi::class.java) }
 }

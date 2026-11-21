@@ -24,6 +24,7 @@ import cl.duoc.tiotec.solicitudes.model.EstadoSolicitud;
 import cl.duoc.tiotec.solicitudes.service.SolicitudService;
 import jakarta.validation.Valid;
 
+// #controlador REST de solicitudes
 @RestController
 @RequestMapping("/api/solicitudes")
 public class SolicitudController {
@@ -34,38 +35,45 @@ public class SolicitudController {
         this.servicio = servicio;
     }
 
+    // #endpoint crear solicitud (POST)
     @PostMapping
     public ResponseEntity<SolicitudResponse> crear(@Valid @RequestBody SolicitudRequest datos) {
         SolicitudResponse creada = servicio.crear(datos);
         return ResponseEntity.created(URI.create("/api/solicitudes/" + creada.id())).body(creada);
     }
 
+    // #endpoint listar solicitudes (GET)
     @GetMapping
     public List<SolicitudResponse> listar(@RequestParam(required = false) Categoria categoria,
                                           @RequestParam(required = false) EstadoSolicitud estado) {
         return servicio.listar(categoria, estado);
     }
 
+    // #endpoint obtener solicitud por id (GET)
     @GetMapping("/{id}")
     public SolicitudResponse obtener(@PathVariable Long id) {
         return servicio.obtener(id);
     }
 
+    // #endpoint historial de estados (GET)
     @GetMapping("/{id}/historial")
     public List<HistorialResponse> historial(@PathVariable Long id) {
         return servicio.historial(id);
     }
 
+    // #endpoint editar solicitud (PUT)
     @PutMapping("/{id}")
     public SolicitudResponse actualizar(@PathVariable Long id, @Valid @RequestBody SolicitudRequest datos) {
         return servicio.actualizar(id, datos);
     }
 
+    // #endpoint cambiar estado (PATCH)
     @PatchMapping("/{id}/estado")
     public SolicitudResponse cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambioEstadoRequest cambio) {
         return servicio.cambiarEstado(id, cambio);
     }
 
+    // #endpoint eliminar solicitud (DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         servicio.eliminar(id);

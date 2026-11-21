@@ -1,5 +1,6 @@
 package cl.duoc.tiotecpreventivo.data.preferences
 
+// #opciones de tema: sistema, claro u oscuro
 /** Tema elegido por el usuario (TT-04, sección 7). */
 enum class Tema(val etiqueta: String) {
     SISTEMA("Igual que el teléfono"),

@@ -21,6 +21,7 @@ data class ResultadoUiState(
     val resultado: ResultadoEvaluacion? = null
 )
 
+// #estado y logica de la pantalla de resultados
 /**
  * Resultados de una evaluación ya guardada (TT-12).
  * Solo lee desde Room: abrir esta pantalla muchas veces (o desde el historial, TT-14)

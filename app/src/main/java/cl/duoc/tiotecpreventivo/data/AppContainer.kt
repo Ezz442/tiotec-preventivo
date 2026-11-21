@@ -23,6 +23,7 @@ import cl.duoc.tiotecpreventivo.repository.DispositivoRepositorySincronizado
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepository
 import cl.duoc.tiotecpreventivo.repository.SolicitudRepositorySincronizado
 
+// #crea y entrega los repositorios a los ViewModels
 /**
  * Crea una sola vez la base de datos y los repositorios. Los ViewModels los reciben
  * mediante su Factory; ningún Composable accede a Room directamente.
@@ -39,6 +40,7 @@ class AppContainer(context: Context) {
         PerfilRepository(baseDeDatos.perfilDao())
     }
 
+    // #clientes Retrofit de los microservicios
     /** TT-29: clientes Retrofit de los microservicios propios (solicitudes y dispositivos). */
     val serviciosRemotos: ServiciosRemotos by lazy { ServiciosRemotos() }
 
@@ -86,6 +88,7 @@ class AppContainer(context: Context) {
         )
     }
 
+    // #repositorio de la api externa
     /** TT-30: API externa (JSONPlaceholder) con Retrofit; solo lectura y en memoria, no usa Room. */
     val postsRepository: PostsRepository by lazy {
         PostsRepository(serviciosRemotos.crearApi(ConfigRed.URL_API_EXTERNA, PostsApi::class.java))

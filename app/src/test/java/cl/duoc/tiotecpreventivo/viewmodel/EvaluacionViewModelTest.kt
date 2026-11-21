@@ -23,6 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas de la evaluacion guiada
 /** TT-21 (TT-11): evaluación guiada, validación por pregunta y guardado sin duplicados. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class EvaluacionViewModelTest {

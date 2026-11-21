@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// #aviso cuando el microservicio no responde
 /**
  * TT-29: estado de la conexión con un microservicio.
  * - Mientras se actualiza: indicador de carga con texto.

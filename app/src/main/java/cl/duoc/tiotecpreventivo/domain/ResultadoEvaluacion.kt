@@ -58,6 +58,7 @@ data class RecomendacionVista(
     val contenidoId: String?
 )
 
+// #arma el resultado para mostrarlo en pantalla
 /**
  * Convierte lo que guardó Room (TT-07/TT-11) en lo que muestra la pantalla de resultados.
  *

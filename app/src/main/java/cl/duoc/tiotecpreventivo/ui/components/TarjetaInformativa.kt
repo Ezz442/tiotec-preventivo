@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 
+// #tarjeta de informacion reutilizable
 @Composable
 fun TarjetaInformativa(
     titulo: String,

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+// #estado y logica de Aprende
 class AprendeViewModel(
     private val repository: CatalogoRepository
 ) : ViewModel() {
@@ -40,6 +41,7 @@ class AprendeViewModel(
         }
     }
 
+    // #filtra contenidos por categoria
     fun seleccionarCategoria(categoria: Categoria?) {
         if (_uiState.value.categoriaSeleccionada == categoria) return
 

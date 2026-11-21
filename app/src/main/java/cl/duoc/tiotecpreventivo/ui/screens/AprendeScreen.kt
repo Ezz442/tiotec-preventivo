@@ -27,6 +27,7 @@ import cl.duoc.tiotecpreventivo.data.catalogo.Categoria
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.AprendeUiState
 
+// #pantalla Aprende (contenidos educativos)
 @Composable
 fun AprendeScreen(
     modifier: Modifier = Modifier,
@@ -47,6 +48,7 @@ fun AprendeScreen(
                     text = "Aprende", style = MaterialTheme.typography.headlineMedium
                 )
                 Text("Consejos para proteger tus dispositivos y tus cuentas.")
+                // #boton ir a Comunidad (api externa)
                 OutlinedButton(onClick = onAbrirComunidad) {
                     Text("Consejos de la comunidad (API externa)")
                 }
@@ -55,6 +57,7 @@ fun AprendeScreen(
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // #filtro por categoria
                     FilterChip(
                         selected = uiState.categoriaSeleccionada == null,
                         onClick = { onCategoriaChange(null) },

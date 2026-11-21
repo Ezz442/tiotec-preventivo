@@ -20,6 +20,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// #pruebas del armado del resultado
 /**
  * TT-12: la pantalla de resultados muestra lo que se guardó, con cada recomendación
  * relacionada a su respuesta y prioridad. Corre en la JVM, sin emulador.

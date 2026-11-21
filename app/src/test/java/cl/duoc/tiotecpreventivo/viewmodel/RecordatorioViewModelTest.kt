@@ -19,6 +19,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas de los recordatorios
 /** TT-16: crear, editar y cancelar recordatorios desde el ViewModel, con errores por campo. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecordatorioViewModelTest {

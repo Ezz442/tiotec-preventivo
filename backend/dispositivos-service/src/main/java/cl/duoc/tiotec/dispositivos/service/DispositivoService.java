@@ -14,6 +14,7 @@ import cl.duoc.tiotec.dispositivos.model.Dispositivo;
 import cl.duoc.tiotec.dispositivos.model.SistemaOperativo;
 import cl.duoc.tiotec.dispositivos.repository.DispositivoRepository;
 
+// #logica de negocio de dispositivos
 /** Logica de negocio de los dispositivos: el controlador solo traduce HTTP. */
 @Service
 @Transactional
@@ -29,6 +30,7 @@ public class DispositivoService {
         this.reloj = reloj;
     }
 
+    // #crear dispositivo y validar nombre repetido
     public DispositivoResponse crear(DispositivoRequest datos) {
         if (repositorio.existsByNombreIgnoreCase(datos.nombre())) {
             throw new ReglaNegocioException(NOMBRE_REPETIDO);
@@ -37,6 +39,7 @@ public class DispositivoService {
         return DispositivoResponse.desde(repositorio.save(dispositivo));
     }
 
+    // #listar con filtros opcionales
     @Transactional(readOnly = true)
     public List<DispositivoResponse> listar(SistemaOperativo sistemaOperativo, Boolean archivado) {
         List<Dispositivo> resultado;
@@ -58,6 +61,7 @@ public class DispositivoService {
         return DispositivoResponse.desde(buscar(id));
     }
 
+    // #editar dispositivo (no si esta archivado)
     /** Un dispositivo archivado no se edita: primero hay que desarchivarlo. */
     public DispositivoResponse actualizar(Long id, DispositivoRequest datos) {
         Dispositivo dispositivo = buscar(id);
@@ -73,6 +77,7 @@ public class DispositivoService {
         return DispositivoResponse.desde(dispositivo);
     }
 
+    // #archivar o desarchivar dispositivo
     public DispositivoResponse cambiarArchivado(Long id, boolean archivado) {
         Dispositivo dispositivo = buscar(id);
         if (dispositivo.isArchivado() == archivado) {
@@ -85,10 +90,12 @@ public class DispositivoService {
         return DispositivoResponse.desde(dispositivo);
     }
 
+    // #eliminar dispositivo
     public void eliminar(Long id) {
         repositorio.delete(buscar(id));
     }
 
+    // #buscar por id o error 404
     private Dispositivo buscar(Long id) {
         return repositorio.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No existe el dispositivo con id " + id + "."));

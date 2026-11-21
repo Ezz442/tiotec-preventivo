@@ -14,6 +14,7 @@ import cl.duoc.tiotecpreventivo.repository.ProgramadorAvisos
 import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 
+// #tarea en segundo plano que lanza el aviso
 /**
  * Se ejecuta a la hora del recordatorio y muestra el aviso (TT-16).
  * Antes de avisar vuelve a leer Room: si el recordatorio se canceló, la acción ya se
@@ -50,6 +51,7 @@ class RecordatorioWorker(
     }
 }
 
+// #programa y cancela avisos con WorkManager
 /** Programa los avisos con WorkManager: sobreviven a cerrar la app y a reiniciar el teléfono. */
 class ProgramadorWorkManager(context: Context) : ProgramadorAvisos {
 

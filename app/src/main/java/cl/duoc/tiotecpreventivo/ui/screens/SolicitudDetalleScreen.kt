@@ -33,6 +33,7 @@ import cl.duoc.tiotecpreventivo.viewmodel.SolicitudDetalleUiState
 import java.text.DateFormat
 import java.util.Date
 
+// #pantalla detalle de solicitud (leer, actualizar y eliminar)
 @Composable
 fun SolicitudDetalleScreen(
     uiState: SolicitudDetalleUiState,
@@ -138,6 +139,7 @@ fun SolicitudDetalleScreen(
                             Text("Selecciona un estado y confirma el cambio.")
 
                             EstadoSolicitud.entries.forEach { estado ->
+                                // #elegir nuevo estado de la solicitud
                                 FilterChip(
                                     modifier = Modifier.fillMaxWidth(),
                                     selected = detalle.solicitud.estado == estado,
@@ -162,6 +164,7 @@ fun SolicitudDetalleScreen(
                             enabled = !uiState.actualizando && !uiState.eliminando,
                             modifier = Modifier.fillMaxWidth()
                         ) {
+                            // #boton eliminar solicitud
                             Text("Eliminar solicitud")
                         }
                     }
@@ -204,6 +207,7 @@ fun SolicitudDetalleScreen(
     uiState.estadoPorConfirmar?.let { estado ->
         AlertDialog(onDismissRequest = {
             if (!uiState.actualizando) onCancelarCambio()
+        // #dialogo confirmar cambio de estado
         }, title = { Text("Confirmar cambio") }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("¿Cambiar el estado a «${estado.etiqueta}»?")
@@ -234,6 +238,7 @@ fun SolicitudDetalleScreen(
             onDismissRequest = {
                 if (!uiState.eliminando) onCancelarEliminar()
             },
+            // #dialogo confirmar eliminacion
             title = { Text("Eliminar solicitud") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

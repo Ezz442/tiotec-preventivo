@@ -50,6 +50,7 @@ fun dispositivoDePrueba(id: Long, nombre: String, archivado: Boolean = false, im
         imagenRuta = imagenRuta, archivado = archivado, creadoEn = 0, actualizadoEn = 0
     )
 
+// #DAOs falsos para probar sin base de datos
 class PerfilDaoFalso(inicial: PerfilEntity? = null) : PerfilDao, ConFalla {
     override var falla = false
     val perfil = MutableStateFlow(inicial)

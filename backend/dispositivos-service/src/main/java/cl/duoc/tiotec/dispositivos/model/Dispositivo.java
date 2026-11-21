@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+// #tabla dispositivo en la base de datos
 /**
  * Dispositivo ficticio de prueba que se evalua en la app. Solo guarda un nombre
  * y el sistema operativo: la foto del dispositivo se queda en el telefono.

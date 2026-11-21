@@ -12,6 +12,7 @@ interface ProgramadorAvisos {
     fun cancelar(recordatorioId: Long)
 }
 
+// #une el repositorio con las notificaciones programadas
 /**
  * Une el registro en Room (RecordatorioRepository, TT-07) con el aviso programado.
  * Primero se guarda y luego se programa: si programar falla, el recordatorio queda

@@ -19,6 +19,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+// #pruebas de la pantalla de inicio
 /** TT-31: InicioViewModel combina el alias y las acciones pendientes, y muestra un error si falla. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class InicioViewModelTest {

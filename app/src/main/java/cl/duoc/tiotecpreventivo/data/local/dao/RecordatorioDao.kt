@@ -8,6 +8,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.EstadoRecordatorio
 import cl.duoc.tiotecpreventivo.data.local.entity.RecordatorioEntity
 import kotlinx.coroutines.flow.Flow
 
+// #consultas de recordatorios
 @Dao
 interface RecordatorioDao {
 
