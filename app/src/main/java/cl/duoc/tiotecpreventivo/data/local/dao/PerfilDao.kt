@@ -7,6 +7,7 @@ import androidx.room.Update
 import cl.duoc.tiotecpreventivo.data.local.entity.PerfilEntity
 import kotlinx.coroutines.flow.Flow
 
+// #consultas del perfil
 @Dao
 interface PerfilDao {
 

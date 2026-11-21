@@ -26,6 +26,7 @@ import cl.duoc.tiotecpreventivo.data.catalogo.ValorRespuesta
     ],
     indices = [Index("dispositivoId")]
 )
+// #tabla evaluacion
 data class EvaluacionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val dispositivoId: Long,
@@ -48,6 +49,7 @@ data class EvaluacionEntity(
         )
     ]
 )
+// #tabla respuesta
 data class RespuestaEntity(
     val evaluacionId: Long = 0,
     val preguntaId: String,
@@ -70,6 +72,7 @@ data class RespuestaEntity(
         )
     ]
 )
+// #tabla resultado por categoria
 data class ResultadoCategoriaEntity(
     val evaluacionId: Long = 0,
     val categoria: Categoria,
@@ -97,6 +100,7 @@ data class ResultadoCategoriaEntity(
         Index(value = ["evaluacionId", "recomendacionId"], unique = true)
     ]
 )
+// #tabla accion (checklist)
 data class AccionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val evaluacionId: Long = 0,

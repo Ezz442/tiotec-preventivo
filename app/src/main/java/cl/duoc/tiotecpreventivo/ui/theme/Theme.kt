@@ -90,6 +90,7 @@ internal val LightColorScheme = lightColorScheme(
     surfaceContainerHighest = SuperficieClaraMasAlta
 )
 
+// #tema Material 3 claro y oscuro
 @Composable
 fun TioTecPreventivoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

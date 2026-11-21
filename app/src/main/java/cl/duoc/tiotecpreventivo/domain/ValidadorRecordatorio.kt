@@ -13,6 +13,7 @@ data class ValidacionRecordatorio(
     val esValido: Boolean get() = fechaHora != null
 }
 
+// #validacion de fecha y hora del recordatorio
 /**
  * Reglas del formulario de recordatorio, sin Android (TT-16).
  *
@@ -57,6 +58,7 @@ object ValidadorRecordatorio {
         return Triple(fechaUtc, local.get(Calendar.HOUR_OF_DAY), local.get(Calendar.MINUTE))
     }
 
+    // #la fecha debe ser futura
     fun validar(
         fechaUtcMillis: Long?,
         hora: Int?,

@@ -12,6 +12,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.SolicitudEntity
 import kotlinx.coroutines.flow.Flow
 import java.util.Locale
 
+// #consultas de solicitudes
 @Dao
 abstract class SolicitudDao {
 

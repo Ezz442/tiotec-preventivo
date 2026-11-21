@@ -8,6 +8,7 @@ import org.junit.Test
 import java.util.Calendar
 import java.util.TimeZone
 
+// #pruebas de validacion del recordatorio
 /** TT-16: fecha y hora del recordatorio, con la zona horaria de Chile fija para que sea reproducible. */
 class ValidadorRecordatorioTest {
 

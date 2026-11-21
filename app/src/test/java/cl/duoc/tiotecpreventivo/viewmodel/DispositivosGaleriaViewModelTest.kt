@@ -25,6 +25,7 @@ import org.junit.rules.TemporaryFolder
 import java.io.ByteArrayInputStream
 import java.io.File
 
+// #pruebas de la imagen de galeria
 /**
  * TT-21 (TT-19): imagen elegida desde la galería. La copia se hace en Dispatchers.IO,
  * por eso cada prueba espera a que termine el procesamiento.

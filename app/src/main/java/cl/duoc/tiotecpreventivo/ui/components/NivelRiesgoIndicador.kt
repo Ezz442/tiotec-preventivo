@@ -47,6 +47,7 @@ fun colorNivel(nivel: NivelRiesgo): Color {
     }
 }
 
+// #indicador de riesgo con icono, texto y color
 /** Ícono + etiqueta del nivel ("Riesgo medio"). */
 @Composable
 fun NivelRiesgoIndicador(

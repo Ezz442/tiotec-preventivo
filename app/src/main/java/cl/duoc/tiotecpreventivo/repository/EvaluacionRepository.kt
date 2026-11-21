@@ -21,6 +21,7 @@ data class ResultadoCalculado(
     val explicacion: String
 )
 
+// #repositorio de evaluaciones
 /**
  * Guarda y lee evaluaciones (TT-04, 4.3 y sección 5).
  * El cálculo de puntajes y niveles es de TT-10/TT-12: este repositorio recibe los
@@ -39,6 +40,7 @@ class EvaluacionRepository(
 
     suspend fun obtenerDetalle(id: Long): EvaluacionConDetalle? = evaluacionDao.obtenerDetalle(id)
 
+    // #guarda evaluacion, respuestas, resultados y acciones juntos
     /**
      * Guarda la evaluación finalizada con sus respuestas, resultados y las acciones de
      * las recomendaciones activadas. Si algo falla, no se guarda nada (transacción) y

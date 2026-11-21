@@ -22,6 +22,7 @@ import cl.duoc.tiotecpreventivo.data.catalogo.CatalogoLocal
 import cl.duoc.tiotecpreventivo.data.catalogo.Contenido
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 
+// #pantalla de lectura de un contenido
 /**
  * Detalle mínimo de un contenido educativo, para el botón "Aprender cómo hacerlo"
  * de los resultados (TT-12). TT-15 lo amplía con la lista y los filtros de Aprende.

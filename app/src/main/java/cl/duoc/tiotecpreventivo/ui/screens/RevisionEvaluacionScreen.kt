@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.ui.components.TextoConCarga
 import cl.duoc.tiotecpreventivo.viewmodel.EvaluacionUiState
 
+// #pantalla de revision antes de guardar
 @Composable
 fun RevisionEvaluacionScreen(
     uiState: EvaluacionUiState,
@@ -87,6 +88,7 @@ fun RevisionEvaluacionScreen(
                     TextButton(
                         onClick = { onEditarRespuesta(indice) }, enabled = habilitado
                     ) {
+                        // #boton cambiar una respuesta
                         Text("Cambiar respuesta")
                     }
                 }
@@ -116,6 +118,7 @@ fun RevisionEvaluacionScreen(
                     enabled = !uiState.guardando,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    // #boton volver a las preguntas
                     Text("Volver a las preguntas")
                 }
 

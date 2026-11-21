@@ -14,6 +14,7 @@ import java.util.Locale
 private inline fun <reified T : Enum<T>> String.aEnumOrNull(): T? =
     enumValues<T>().firstOrNull { it.name == this }
 
+// #convierte la respuesta del servidor a datos locales (Room)
 /** null si la categoría o el estado no existen en la app: ese registro se ignora en vez de romper todo. */
 fun SolicitudDto.aEntidad(perfilId: Long): SolicitudEntity? {
     val categoriaLocal = categoria.aEnumOrNull<Categoria>() ?: return null
@@ -40,6 +41,7 @@ fun SolicitudDto.historialEntidades(): List<HistorialSolicitudEntity> =
         )
     }
 
+// #convierte dispositivo del servidor a dato local (Room)
 fun DispositivoDto.aEntidad(perfilId: Long, imagenRuta: String? = null): DispositivoEntity? {
     val sistema = sistemaOperativo.aEnumOrNull<SistemaOperativo>() ?: return null
     return DispositivoEntity(

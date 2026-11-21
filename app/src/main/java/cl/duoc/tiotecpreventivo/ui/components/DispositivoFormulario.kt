@@ -20,6 +20,7 @@ import cl.duoc.tiotecpreventivo.domain.ValidadorFormularios
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosUiState
 
+// #formulario de dispositivo (agregar y editar)
 @Composable
 fun DispositivoFormulario(
     uiState: DispositivosUiState,
@@ -40,6 +41,7 @@ fun DispositivoFormulario(
             }, style = MaterialTheme.typography.titleLarge
         )
 
+        // #campo nombre con validacion
         OutlinedTextField(
             value = uiState.nombre,
             onValueChange = onNombreChange,
@@ -66,6 +68,7 @@ fun DispositivoFormulario(
             text = "Sistema operativo", style = MaterialTheme.typography.titleMedium
         )
 
+        // #seleccion del sistema operativo
         GrupoOpciones(
             opciones = SistemaOperativo.entries,
             seleccionada = uiState.sistemaOperativo,
@@ -79,12 +82,14 @@ fun DispositivoFormulario(
         MensajeError(uiState.errorOperacion)
 
         Button(
+            // #boton guardar dispositivo
             onClick = onGuardar, enabled = !uiState.guardando, modifier = Modifier.fillMaxWidth()
         ) {
             TextoConCarga(texto = "Guardar dispositivo", cargando = uiState.guardando)
         }
 
         OutlinedButton(
+            // #boton cancelar formulario
             onClick = onCancelar, enabled = !uiState.guardando, modifier = Modifier.fillMaxWidth()
         ) {
             Text("Cancelar")

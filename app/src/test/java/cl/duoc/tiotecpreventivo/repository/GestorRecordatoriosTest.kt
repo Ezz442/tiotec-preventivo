@@ -11,6 +11,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
+// #pruebas de los recordatorios programados
 /** TT-16: guardar en Room y programar, reprogramar o cancelar el aviso. */
 class GestorRecordatoriosTest {
 

@@ -59,6 +59,7 @@ import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 /** Guarda el último texto no nulo sin provocar recomposiciones. */
 private class UltimoTexto(var valor: String)
 
+// #mensaje de error de formulario
 /**
  * Error con ícono + texto que aparece y desaparece con AnimatedVisibility.
  * Mientras se oculta sigue mostrando el último texto, para que no quede una fila vacía.
@@ -186,6 +187,7 @@ fun OpcionSeleccionable(
     }
 }
 
+// #grupo de opciones para elegir una
 /** Grupo de [OpcionSeleccionable] con la semántica de grupo de radio. */
 @Composable
 fun <T> GrupoOpciones(
@@ -211,6 +213,7 @@ fun <T> GrupoOpciones(
     }
 }
 
+// #barra de progreso animada
 /**
  * Barra de progreso que avanza suavemente hacia [fraccion].
  * Con [desdeCero] parte vacía al aparecer (resultados); si no, solo anima los cambios.
@@ -242,6 +245,7 @@ fun BarraAnimada(
     )
 }
 
+// #texto del boton con indicador de carga
 /**
  * Contenido de un botón que guarda: muestra un indicador pequeño solo mientras
  * [cargando] es verdadero, es decir, mientras la operación real está en curso.

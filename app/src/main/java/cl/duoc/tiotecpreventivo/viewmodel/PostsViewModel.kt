@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// #estado de la pantalla Comunidad (api externa)
 /** TT-30: carga los textos de la API externa y expone el estado para ComunidadScreen. */
 class PostsViewModel(private val repository: PostsRepository) : ViewModel() {
 
@@ -23,6 +24,7 @@ class PostsViewModel(private val repository: PostsRepository) : ViewModel() {
         cargar()
     }
 
+    // #carga los consejos: cargando, exito o error
     /** Se llama al abrir la pantalla y desde el botón Reintentar. */
     fun cargar() {
         cargaJob?.cancel()

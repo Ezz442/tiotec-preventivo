@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
  * sin correos ni numeros largos (telefonos, RUT).
  */
 public record SolicitudRequest(
+        // #validacion del alias y la categoria
         @NotBlank(message = "Ingresa un alias ficticio.")
         @Size(min = 2, max = 30, message = "El alias debe tener entre 2 y 30 caracteres.")
         @Pattern(regexp = "^(?!.*@)(?!(?:\\D*\\d){7}).*$",

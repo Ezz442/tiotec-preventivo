@@ -14,6 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import jakarta.servlet.http.HttpServletRequest;
 
+// #manejo de errores del servicio
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
@@ -23,6 +24,7 @@ public class ApiExceptionHandler {
         this.reloj = reloj;
     }
 
+    // #error 400 por datos invalidos
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> validacion(MethodArgumentNotValidException ex, HttpServletRequest req) {
         Map<String, String> campos = new LinkedHashMap<>();
@@ -44,11 +46,13 @@ public class ApiExceptionHandler {
                 "Valor no permitido para el parametro '" + ex.getName() + "'.", req, null);
     }
 
+    // #error 404 no existe el recurso
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<ErrorResponse> noEncontrado(RecursoNoEncontradoException ex, HttpServletRequest req) {
         return responder(HttpStatus.NOT_FOUND, ex.getMessage(), req, null);
     }
 
+    // #error 409 regla de negocio
     @ExceptionHandler(ReglaNegocioException.class)
     public ResponseEntity<ErrorResponse> reglaNegocio(ReglaNegocioException ex, HttpServletRequest req) {
         return responder(HttpStatus.CONFLICT, ex.getMessage(), req, null);

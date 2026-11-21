@@ -28,6 +28,7 @@ const val PERMISO_CAMARA_DENEGADO =
     "Sin permiso de cámara no se puede tomar la foto. Puedes elegir una imagen de galería " +
         "o activar el permiso en Ajustes del teléfono."
 
+// #estado y logica de Mis dispositivos (MVVM)
 class DispositivosViewModel(
     private val dispositivoRepository: DispositivoRepository,
     private val perfilRepository: PerfilRepository,
@@ -36,6 +37,7 @@ class DispositivosViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DispositivosUiState())
+    // #estado que observa la pantalla
     val uiState = _uiState.asStateFlow()
 
     private var observacion: Job? = null
@@ -46,6 +48,7 @@ class DispositivosViewModel(
         sincronizar()
     }
 
+    // #pide los dispositivos al microservicio
     /**
      * TT-29: pide la lista a dispositivos-service y actualiza la copia local. La pantalla ya muestra
      * lo que hay en Room; si el servicio no responde, se avisa y esos datos siguen visibles.
@@ -73,6 +76,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #escucha los cambios de Room
     private fun observarDatos() {
         observacion?.cancel()
 
@@ -115,6 +119,7 @@ class DispositivosViewModel(
         sincronizar()
     }
 
+    // #abre el formulario para agregar dispositivo
     fun abrirNuevo() {
         val estado = _uiState.value
 
@@ -134,6 +139,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #abre el formulario para editar
     fun editarDispositivo(id: Long) {
         val estado = _uiState.value
 
@@ -204,6 +210,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #actualiza el nombre y valida
     fun onNombreChange(nombre: String) {
         if (_uiState.value.guardando) return
 
@@ -227,6 +234,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #validar y guardar dispositivo (crear o editar)
     fun guardarDispositivo() {
         val estado = _uiState.value
 
@@ -323,6 +331,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #pide confirmacion para eliminar
     fun solicitarEliminacion(id: Long) {
         val estado = _uiState.value
 
@@ -347,6 +356,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #eliminar dispositivo (o archivar si tiene evaluaciones)
     fun confirmarEliminacion() {
         val estado = _uiState.value
 
@@ -417,6 +427,7 @@ class DispositivosViewModel(
     private fun ocupado(estado: DispositivosUiState): Boolean =
         estado.cargando || estado.guardando || estado.eliminando || estado.procesandoFoto || estado.capturaFoto != null || estado.dispositivoGaleriaId != null || estado.formularioVisible
 
+    // #preparar seleccion de imagen de galeria
     fun prepararGaleria(dispositivoId: Long): Boolean {
         val estado = _uiState.value
 
@@ -440,6 +451,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #guardar la imagen elegida de galeria
     fun imagenSeleccionada(abrirOrigen: () -> InputStream?) {
         val estado = _uiState.value
         val dispositivoId = estado.dispositivoGaleriaId ?: return
@@ -506,6 +518,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #preparar archivo para la foto de camara
     /**
      * Reserva una ruta para la foto y la devuelve para que la pantalla abra la cámara.
      * Devuelve null si no se puede tomar ahora (otra operación en curso).
@@ -530,6 +543,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #guardar el resultado de la camara
     /**
      * Resultado de la cámara. `exito = false` si la persona canceló o la cámara falló:
      * se borra el archivo temporal y la foto anterior se conserva.
@@ -569,6 +583,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #aviso: el telefono no tiene camara
     /** El teléfono no tiene app de cámara: se avisa sin bloquear el resto de la app. */
     fun camaraNoDisponible() {
         _uiState.value.capturaFoto?.let { almacenImagenes.borrar(it.rutaTemporal) }
@@ -580,6 +595,7 @@ class DispositivosViewModel(
         }
     }
 
+    // #aviso: permiso de camara denegado
     /** La persona no concedió el permiso de cámara: se avisa y se puede usar la galería. */
     fun permisoCamaraDenegado() {
         _uiState.value.capturaFoto?.let { almacenImagenes.borrar(it.rutaTemporal) }
@@ -608,6 +624,7 @@ class DispositivosViewModel(
         _uiState.update { it.copy(dispositivoQuitarFoto = null) }
     }
 
+    // #quitar la foto del dispositivo
     fun confirmarQuitarFoto() {
         val dispositivo = _uiState.value.dispositivoQuitarFoto ?: return
         if (_uiState.value.procesandoFoto) return

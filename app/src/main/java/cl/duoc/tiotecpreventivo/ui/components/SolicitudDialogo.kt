@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import cl.duoc.tiotecpreventivo.data.catalogo.Categoria
 import cl.duoc.tiotecpreventivo.viewmodel.SolicitudesUiState
 
+// #dialogo para crear una solicitud
 @Composable
 fun SolicitudDialogo(
     uiState: SolicitudesUiState,
@@ -33,7 +34,7 @@ fun SolicitudDialogo(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Esta solicitud se guarda solo en tu teléfono. No se envía a ningún servicio.")
+            Text("Esta solicitud se envía a un servicio de demostración. No llega a especialistas reales.")
             Text(
                 text = "Categoría obligatoria", style = MaterialTheme.typography.titleSmall
             )

@@ -3,13 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- TT-29: la app consume los microservicios propios (y, en TT-30, la API externa). -->
+    <!-- #permiso de internet (microservicios y api externa) -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- TT-16: avisos de recordatorios (Android 13+ lo pide en tiempo de ejecución). -->
+    <!-- #permiso de notificaciones -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- TT-18: permiso de cámara pedido en tiempo de ejecución antes de abrir la cámara.
          Si se declara, Android exige que esté concedido también para TakePicture. -->
+    <!-- #permiso de camara -->
     <uses-permission android:name="android.permission.CAMERA" />
 
     <!-- La cámara no es obligatoria para instalar la app; el archivo se comparte solo
@@ -36,6 +39,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.TioTecPreventivo">
+        <!-- #actividad principal de la app -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -51,6 +55,7 @@
         </activity>
 
         <!-- TT-18: entrega a la app de cámara una URI temporal para guardar la foto. -->
+        <!-- #FileProvider: guarda la foto de la camara -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.archivos"

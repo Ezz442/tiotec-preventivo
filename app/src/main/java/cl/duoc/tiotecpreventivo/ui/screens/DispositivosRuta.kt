@@ -18,6 +18,7 @@ import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenes
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosViewModel
 import androidx.activity.result.PickVisualMediaRequest
 
+// #pantalla dispositivos con camara y galeria
 /**
  * Mis dispositivos con cámara (TT-09 + TT-18).
  *
@@ -38,6 +39,7 @@ fun DispositivosRuta(
 
     val resolver = context.applicationContext.contentResolver
 
+    // #selector de imagen de galeria
     val elegirImagen = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -50,12 +52,14 @@ fun DispositivosRuta(
         }
     }
 
+    // #lanzador de la camara (TakePicture)
     // true = la cámara guardó la foto; false = la persona canceló o la cámara falló.
     val tomarFoto =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { exito ->
             viewModel.fotoTomada(exito)
         }
 
+    // #abrir la camara con FileProvider
     // Abre la app de cámara; solo se llama con el permiso ya concedido.
     val lanzarCamara: (Long) -> Unit = abrir@{ dispositivoId ->
         val ruta = viewModel.prepararFoto(dispositivoId) ?: return@abrir
@@ -79,9 +83,11 @@ fun DispositivosRuta(
         }
     }
 
+    // #guarda que dispositivo espera el permiso de camara
     // Dispositivo que espera la respuesta del diálogo de permiso (sobrevive a la rotación).
     var esperandoPermisoPara by rememberSaveable { mutableStateOf<Long?>(null) }
 
+    // #permiso de camara (dialogo del sistema)
     val pedirPermisoCamara = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -91,22 +97,26 @@ fun DispositivosRuta(
         if (concedido) lanzarCamara(dispositivoId) else viewModel.permisoCamaraDenegado()
     }
 
+    // #revisa si hay camara y permiso antes de abrirla
     // 1) ¿hay cámara? 2) ¿hay permiso? Si no, se pide con el diálogo del sistema.
     val abrirCamara: (Long) -> Unit = abrir@{ dispositivoId ->
         if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             viewModel.camaraNoDisponible()
             return@abrir
         }
+        // #revisa si el permiso de camara ya esta concedido
         val tienePermiso = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_GRANTED
         if (tienePermiso) {
             lanzarCamara(dispositivoId)
         } else {
             esperandoPermisoPara = dispositivoId
+            // #pide el permiso de camara
             pedirPermisoCamara.launch(Manifest.permission.CAMERA)
         }
     }
 
+    // #abrir galeria de imagenes
     val abrirGaleria: (Long) -> Unit = { dispositivoId ->
         if (viewModel.prepararGaleria(dispositivoId)) {
             try {
@@ -126,6 +136,7 @@ fun DispositivosRuta(
         }
     }
 
+    // #dibuja la pantalla y le pasa las acciones
     DispositivosScreen(
         uiState = uiState,
         onAgregar = viewModel::abrirNuevo,

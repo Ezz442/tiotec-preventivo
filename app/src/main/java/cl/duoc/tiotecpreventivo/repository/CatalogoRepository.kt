@@ -6,6 +6,7 @@ import cl.duoc.tiotecpreventivo.data.catalogo.Pregunta
 import cl.duoc.tiotecpreventivo.data.catalogo.Recomendacion
 import cl.duoc.tiotecpreventivo.data.catalogo.ValorRespuesta
 
+// #preguntas y contenidos locales
 /**
  * Acceso al catálogo fijo (TT-04, sección 5). Los ViewModels usan esta interfaz,
  * nunca el objeto CatalogoLocal directamente.

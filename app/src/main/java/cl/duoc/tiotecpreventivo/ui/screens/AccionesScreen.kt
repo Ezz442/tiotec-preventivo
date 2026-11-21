@@ -42,6 +42,7 @@ import cl.duoc.tiotecpreventivo.viewmodel.AccionesUiState
 import java.text.DateFormat
 import java.util.Date
 
+// #pantalla Mis acciones (checklist)
 @Composable
 fun AccionesScreen(
     modifier: Modifier = Modifier,
@@ -82,6 +83,7 @@ fun AccionesScreen(
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // #filtro pendientes y completadas
                     FilterChip(
                         selected = uiState.filtro == EstadoAccion.PENDIENTE,
                         onClick = { onFiltroChange(EstadoAccion.PENDIENTE) },
@@ -181,6 +183,7 @@ fun AccionesScreen(
                             )
 
                             Row {
+                                // #marcar accion como completada
                                 Checkbox(
                                     checked = completada,
                                     onCheckedChange = { onCambiarEstado(accion.id) },

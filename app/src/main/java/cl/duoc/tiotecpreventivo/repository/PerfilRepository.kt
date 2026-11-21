@@ -5,6 +5,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.ExperienciaDigital
 import cl.duoc.tiotecpreventivo.data.local.entity.PerfilEntity
 import kotlinx.coroutines.flow.Flow
 
+// #repositorio del perfil
 /**
  * Perfil ficticio único. Las validaciones de formulario (alias de 2 a 30 caracteres)
  * se hacen en el ViewModel (TT-26); aquí solo se limpia y se guarda.

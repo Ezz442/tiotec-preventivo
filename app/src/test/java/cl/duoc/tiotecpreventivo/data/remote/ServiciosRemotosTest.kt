@@ -5,6 +5,7 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// #pruebas de la creacion de los clientes Retrofit
 /** TT-31: los clientes Retrofit se crean sin salir a la red y las URLs son válidas para Retrofit. */
 class ServiciosRemotosTest {
 

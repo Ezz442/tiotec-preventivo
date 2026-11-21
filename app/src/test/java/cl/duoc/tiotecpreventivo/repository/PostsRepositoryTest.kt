@@ -16,6 +16,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
+// #pruebas del repositorio de la api externa (MockK)
 /** TT-30: PostsRepository con una API falsa (sin red real). */
 class PostsRepositoryTest {
 

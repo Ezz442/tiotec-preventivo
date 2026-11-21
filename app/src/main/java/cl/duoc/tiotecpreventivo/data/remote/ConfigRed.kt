@@ -9,11 +9,15 @@ package cl.duoc.tiotecpreventivo.data.remote
  * - Cada URL debe terminar en `/`, como exige Retrofit.
  */
 object ConfigRed {
+    // #url del microservicio solicitudes
     const val URL_SOLICITUDES = "http://localhost:8081/"
+    // #url del microservicio dispositivos
     const val URL_DISPOSITIVOS = "http://localhost:8082/"
 
+    // #tiempo maximo de espera de la red
     const val TIEMPO_ESPERA_SEGUNDOS = 10L
 
+    // #url de la api externa (JSONPlaceholder)
     /** TT-30: API publica externa (JSONPlaceholder). Es HTTPS, no necesita adb reverse. */
     const val URL_API_EXTERNA = "https://jsonplaceholder.typicode.com/"
 }

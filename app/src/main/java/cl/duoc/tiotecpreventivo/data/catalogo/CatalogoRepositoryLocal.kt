@@ -2,6 +2,7 @@ package cl.duoc.tiotecpreventivo.data.catalogo
 
 import cl.duoc.tiotecpreventivo.repository.CatalogoRepository
 
+// #catalogo local de preguntas, recomendaciones y contenidos
 /**
  * Implementación sin red ni base de datos: lee el catálogo definido en código.
  * Al ser datos fijos, cada llamada devuelve siempre el mismo contenido y nunca se duplica.

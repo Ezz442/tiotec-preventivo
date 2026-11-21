@@ -3,6 +3,7 @@ package cl.duoc.tiotecpreventivo.data.imagenes
 import java.io.IOException
 import java.io.InputStream
 
+// #copia la imagen elegida a la carpeta de la app
 fun AlmacenImagenes.copiarImagen(
     ruta: String, abrirOrigen: () -> InputStream?
 ) {

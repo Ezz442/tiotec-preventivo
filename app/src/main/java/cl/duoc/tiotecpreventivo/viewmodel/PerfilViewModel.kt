@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// #estado y logica del perfil
 class PerfilViewModel(
     private val repository: PerfilRepository
 ) : ViewModel() {
@@ -64,6 +65,7 @@ class PerfilViewModel(
         cargarPerfil()
     }
 
+    // #actualiza el alias y valida
     fun onAliasChange(alias: String) {
         if (_uiState.value.cargando || _uiState.value.guardando) return
 
@@ -84,6 +86,7 @@ class PerfilViewModel(
         }
     }
 
+    // #validar y guardar perfil
     fun guardarPerfil() {
         val estado = _uiState.value
 

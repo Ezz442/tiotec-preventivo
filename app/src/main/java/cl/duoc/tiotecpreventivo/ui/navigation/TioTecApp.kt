@@ -79,6 +79,7 @@ import cl.duoc.tiotecpreventivo.viewmodel.PostsViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.PostsViewModelFactory
 import cl.duoc.tiotecpreventivo.ui.screens.ComunidadScreen
 
+// #rutas de navegacion de la app
 private const val RUTA_DISPOSITIVOS = "dispositivos"
 private const val GRAFO_DISPOSITIVOS = "gestion_dispositivos"
 private const val RUTA_AJUSTES = "ajustes"
@@ -90,6 +91,7 @@ private const val RUTA_SOLICITUDES = "solicitudes"
 private const val RUTA_SOLICITUD_DETALLE = "solicitud/{solicitudId}"
 private const val RUTA_COMUNIDAD = "comunidad"
 
+// #pestanas de la barra inferior
 /** TT-27: cada destino usa un ícono vectorial Material junto a su etiqueta visible. */
 private enum class DestinoPrincipal(
     val ruta: String, val titulo: String, @param:DrawableRes val icono: Int
@@ -109,6 +111,7 @@ private fun IconoDestino(destino: DestinoPrincipal) {
     Icon(painter = painterResource(destino.icono), contentDescription = null)
 }
 
+// #pantalla raiz: barra superior, menu y NavHost
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TioTecApp(
@@ -118,6 +121,7 @@ fun TioTecApp(
     /** TT-16: pantalla que pidió abrir un aviso (por ejemplo "acciones"); null si ninguna. */
     destinoPendiente: String? = null, onDestinoConsumido: () -> Unit = {}
 ) {
+    // #controlador de navegacion
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
     val rutaActual = entradaActual?.destination?.route
@@ -183,6 +187,7 @@ fun TioTecApp(
                 }
             }
         }) {
+        // #estructura base de la pantalla
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.background,
@@ -208,6 +213,7 @@ fun TioTecApp(
                 }, navigationIcon = {
                     // TT-27: flecha Material que se invierte en idiomas de derecha a izquierda.
                     if (enPantallaSecundaria) {
+                        // #boton volver
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_volver),
@@ -219,6 +225,7 @@ fun TioTecApp(
             },
             bottomBar = {
                 if (esCompacto && !enEvaluacion) {
+                    // #menu inferior (pantallas chicas)
                     NavigationBar {
                         DestinoPrincipal.entries.forEach { destino ->
                             NavigationBarItem(
@@ -234,6 +241,7 @@ fun TioTecApp(
                     }
                 }
             }) { innerPadding ->
+            // #mapa de pantallas de la app
             NavHost(
                 navController = navController,
                 startDestination = DestinoPrincipal.INICIO.ruta,
@@ -241,6 +249,7 @@ fun TioTecApp(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
+                // #pantalla Inicio
                 composable(DestinoPrincipal.INICIO.ruta) {
                     val context = LocalContext.current
                     val contenedor = (context.applicationContext as TioTecApplication).contenedor
@@ -271,6 +280,7 @@ fun TioTecApp(
                     })
                 }
 
+                // #pantalla Historial
                 composable(RUTA_HISTORIAL) {
                     val contenedor =
                         (LocalContext.current.applicationContext as TioTecApplication).contenedor
@@ -303,6 +313,7 @@ fun TioTecApp(
                     )
                 }
 
+                // #pantalla Mis acciones
                 composable(DestinoPrincipal.ACCIONES.ruta) {
                     val context = LocalContext.current
                     val contenedor = (context.applicationContext as TioTecApplication).contenedor
@@ -325,6 +336,7 @@ fun TioTecApp(
                     )
                 }
 
+                // #pantalla Aprende
                 composable(DestinoPrincipal.APRENDE.ruta) {
                     val context = LocalContext.current
                     val contenedor = (context.applicationContext as TioTecApplication).contenedor
@@ -350,6 +362,7 @@ fun TioTecApp(
                         })
                 }
 
+                // #pantalla Perfil
                 composable(DestinoPrincipal.PERFIL.ruta) {
                     val context = LocalContext.current
 
@@ -384,6 +397,7 @@ fun TioTecApp(
                         })
                 }
 
+                // #pantalla Comunidad (api externa)
                 composable(RUTA_COMUNIDAD) {
                     val contenedor =
                         (LocalContext.current.applicationContext as TioTecApplication).contenedor
@@ -399,6 +413,7 @@ fun TioTecApp(
                     )
                 }
 
+                // #pantalla Ajustes
                 composable(RUTA_AJUSTES) {
                     if (preferenciasViewModel != null) {
                         AjustesRuta(viewModel = preferenciasViewModel)
@@ -410,6 +425,7 @@ fun TioTecApp(
                             onAvisosChange = {})
                     }
                 }
+                // #pantalla lista de solicitudes (microservicio)
                 composable(RUTA_SOLICITUDES) {
                     val contenedor =
                         (LocalContext.current.applicationContext as TioTecApplication).contenedor
@@ -448,6 +464,7 @@ fun TioTecApp(
                             type = NavType.LongType
                         })
                 ) { entrada ->
+                    // #pantalla detalle de solicitud (recibe el id)
                     val solicitudId = requireNotNull(entrada.arguments).getLong("solicitudId")
                     val contenedor =
                         (LocalContext.current.applicationContext as TioTecApplication).contenedor

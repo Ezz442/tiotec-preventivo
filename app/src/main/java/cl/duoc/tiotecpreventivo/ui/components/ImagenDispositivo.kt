@@ -34,6 +34,7 @@ private sealed interface EstadoImagen {
     data object NoDisponible : EstadoImagen
 }
 
+// #muestra la foto del dispositivo
 /**
  * Foto de un dispositivo ficticio (TT-18). Componente compartido con la galería (TT-19).
  *

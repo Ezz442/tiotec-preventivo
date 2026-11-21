@@ -11,6 +11,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
 
+// #pruebas del guardado de imagenes
 /** TT-18: archivos de fotos en el almacenamiento privado, con una carpeta temporal en la JVM. */
 class AlmacenImagenesLocalTest {
 

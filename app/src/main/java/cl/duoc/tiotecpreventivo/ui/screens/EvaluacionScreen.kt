@@ -33,6 +33,7 @@ import cl.duoc.tiotecpreventivo.ui.components.Movimiento
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.EvaluacionUiState
 
+// #pantalla de preguntas de la evaluacion
 @Composable
 fun EvaluacionScreen(
     uiState: EvaluacionUiState,
@@ -88,6 +89,7 @@ fun EvaluacionScreen(
 
                     BarraAnimada(fraccion = Movimiento.fraccion(respondidas, total))
 
+                    // #progreso de respuestas
                     Text("Respondidas: $respondidas de $total")
 
                     // TT-25: al avanzar, la pregunta nueva entra por la derecha; al volver, por la izquierda.
@@ -142,6 +144,7 @@ fun EvaluacionScreen(
                         enabled = habilitado && uiState.indiceActual > 0,
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        // #boton pregunta anterior
                         Text("Anterior")
                     }
 
@@ -166,6 +169,7 @@ fun EvaluacionScreen(
         TextButton(
             onClick = onSalir, enabled = !uiState.guardando
         ) {
+            // #boton salir de la evaluacion
             Text("Salir de la evaluación")
         }
     }

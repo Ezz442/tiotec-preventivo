@@ -8,6 +8,7 @@ import cl.duoc.tiotec.solicitudes.model.Categoria;
 import cl.duoc.tiotec.solicitudes.model.EstadoSolicitud;
 import cl.duoc.tiotec.solicitudes.model.Solicitud;
 
+// #acceso a la base de datos (JPA)
 public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
 
     List<Solicitud> findAllByOrderByCreadaEnDescIdDesc();

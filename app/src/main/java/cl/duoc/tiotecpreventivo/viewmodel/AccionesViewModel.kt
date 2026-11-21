@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// #estado y logica del checklist de acciones
 class AccionesViewModel(
     private val repository: AccionRepository
 ) : ViewModel() {
@@ -61,6 +62,7 @@ class AccionesViewModel(
         }
     }
 
+    // #cambia entre pendientes y completadas
     fun cambiarFiltro(filtro: EstadoAccion) {
         val estado = _uiState.value
         if (estado.filtro == filtro || estado.actualizandoId != null) return
@@ -76,6 +78,7 @@ class AccionesViewModel(
         observarAcciones()
     }
 
+    // #marcar o desmarcar una accion
     fun cambiarEstado(id: Long) {
         val estado = _uiState.value
         if (estado.cargando || estado.errorCarga != null || estado.actualizandoId != null) return

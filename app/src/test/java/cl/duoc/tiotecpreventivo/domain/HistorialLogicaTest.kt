@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// #pruebas del orden y filtros del historial
 /** TT-14: orden y filtro del historial con evaluaciones ficticias. */
 class HistorialLogicaTest {
 

@@ -27,6 +27,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
+// #pruebas del repositorio de dispositivos con el microservicio simulado
 /** TT-31: DispositivoRepositorySincronizado con APIs y DAOs simulados con MockK. */
 class DispositivoRepositorySincronizadoTest {
 

@@ -34,6 +34,7 @@ import cl.duoc.tiotecpreventivo.ui.components.TextoConCarga
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.PerfilUiState
 
+// #pantalla de perfil
 @Composable
 fun PerfilScreen(
     modifier: Modifier = Modifier,
@@ -88,6 +89,7 @@ fun PerfilScreen(
                 }
 
                 else -> {
+                    // #campo alias con validacion
                     OutlinedTextField(
                         value = uiState.alias,
                         onValueChange = onAliasChange,
@@ -119,6 +121,7 @@ fun PerfilScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
 
+                    // #seleccion de nivel de experiencia
                     GrupoOpciones(
                         opciones = ExperienciaDigital.entries,
                         seleccionada = uiState.experienciaDigital,
@@ -130,6 +133,7 @@ fun PerfilScreen(
                     MensajeError(uiState.errorExperiencia)
 
                     Button(
+                        // #boton guardar perfil
                         onClick = onGuardar,
                         enabled = !uiState.guardando,
                         modifier = Modifier.fillMaxWidth()
@@ -145,12 +149,14 @@ fun PerfilScreen(
             OutlinedButton(
                 onClick = onAbrirSolicitudes, modifier = Modifier.fillMaxWidth()
             ) {
+                // #boton ir a solicitudes (microservicio)
                 Text("Solicitudes de asistencia")
             }
 
             OutlinedButton(
                 onClick = onAbrirAjustes, modifier = Modifier.fillMaxWidth()
             ) {
+                // #boton ir a ajustes
                 Text("Ajustes")
             }
         }

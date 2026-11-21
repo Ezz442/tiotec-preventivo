@@ -35,6 +35,7 @@ import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
 
+// #pantalla historial de evaluaciones
 /** Historial preventivo local (TT-14). El detalle reutiliza la pantalla de resultados (TT-12). */
 @Composable
 fun HistorialScreen(
@@ -98,6 +99,7 @@ fun HistorialScreen(
                             modifier = ancho.horizontalScroll(rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            // #filtro por dispositivo
                             FilterChip(
                                 selected = uiState.dispositivoSeleccionado == null,
                                 onClick = { onSeleccionarDispositivo(null) },
@@ -123,6 +125,7 @@ fun HistorialScreen(
     }
 }
 
+// #tarjeta de una evaluacion guardada
 @Composable
 private fun TarjetaEvaluacion(
     evaluacion: EvaluacionEntity,

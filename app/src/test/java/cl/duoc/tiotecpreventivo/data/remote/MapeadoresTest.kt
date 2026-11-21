@@ -13,6 +13,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// #pruebas de la conversion servidor a datos locales
 /** TT-31: conversión de los JSON de los microservicios a entidades de Room. */
 class MapeadoresTest {
 

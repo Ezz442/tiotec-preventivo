@@ -20,6 +20,7 @@ import cl.duoc.tiotecpreventivo.ui.components.TarjetaInformativa
 import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.InicioUiState
 
+// #pantalla de inicio
 @Composable
 fun InicioScreen(
     uiState: InicioUiState = InicioUiState(cargando = false),
@@ -81,6 +82,7 @@ fun InicioScreen(
             enabled = !uiState.cargando,
             modifier = Modifier.fillMaxWidth()
         ) {
+            // #boton ir a Mis dispositivos
             Text("Mis dispositivos")
         }
 
@@ -89,6 +91,7 @@ fun InicioScreen(
             enabled = !uiState.cargando,
             modifier = Modifier.fillMaxWidth()
         ) {
+            // #boton ir al historial
             Text("Historial de evaluaciones")
         }
     }

@@ -5,6 +5,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.AccionEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoAccion
 import kotlinx.coroutines.flow.Flow
 
+// #repositorio de acciones
 /** Checklist de acciones (TT-04, 4.6). Las acciones se crean al guardar una evaluación. */
 class AccionRepository(
     private val dao: AccionDao,

@@ -27,6 +27,7 @@ sealed interface ResultadoReglas {
     data class Incompleta(val faltantes: List<String>) : ResultadoReglas
 }
 
+// #reglas para calcular el nivel de riesgo
 /**
  * Reglas de riesgo de TT-10 (ver docs/TT-10-reglas-riesgo.md).
  *
@@ -37,6 +38,7 @@ sealed interface ResultadoReglas {
  */
 class ReglasRiesgo(private val catalogo: CatalogoRepository) {
 
+    // #calcula el puntaje y nivel de riesgo por categoria
     /** Calcula resultados por categoría, nivel global y recomendaciones priorizadas. */
     fun evaluar(respuestas: Map<String, ValorRespuesta>): ResultadoReglas {
         val faltantes = preguntasFaltantes(respuestas)
@@ -56,6 +58,7 @@ class ReglasRiesgo(private val catalogo: CatalogoRepository) {
         )
     }
 
+    // #ordena las recomendaciones por prioridad
     /**
      * Orden de las recomendaciones: prioridad (Alta → Media → Baja) y, dentro de la misma
      * prioridad, primero la categoría con más riesgo. Lo usan [evaluar] y la pantalla de
@@ -146,6 +149,7 @@ class ReglasRiesgo(private val catalogo: CatalogoRepository) {
             "Este resultado es una orientación según tus respuestas. " +
                 "La app no revisa ni escanea tu dispositivo."
 
+        // #convierte el porcentaje en nivel bajo, medio o alto
         fun nivelPorPorcentaje(porcentaje: Int): NivelRiesgo = when {
             porcentaje >= UMBRAL_ALTO -> NivelRiesgo.RIESGO_ALTO
             porcentaje >= UMBRAL_MEDIO -> NivelRiesgo.RIESGO_MEDIO

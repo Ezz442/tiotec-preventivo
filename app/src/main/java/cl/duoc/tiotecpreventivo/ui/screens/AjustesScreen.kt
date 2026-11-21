@@ -67,6 +67,7 @@ fun AjustesRuta(
     }
 }
 
+// #pantalla de ajustes (tema y avisos)
 /** Pantalla sin estado propio: recibe el UiState y avisa los cambios hacia arriba. */
 @Composable
 fun AjustesScreen(
@@ -141,6 +142,7 @@ fun AjustesScreen(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+            // #interruptor de avisos
             Switch(
                 checked = uiState.avisosActivos,
                 onCheckedChange = null // el clic lo maneja toda la fila

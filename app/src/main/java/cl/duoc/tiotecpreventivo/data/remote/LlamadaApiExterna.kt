@@ -8,6 +8,7 @@ import java.io.IOException
 const val MENSAJE_API_EXTERNA_SIN_CONEXION =
     "No pudimos conectar con el servicio externo. Revisa tu conexión a internet."
 
+// #llamada a la api externa con manejo de errores
 /**
  * TT-30: igual que [llamarServicio] pero para una API de terceros. Reutiliza [ErrorRemoto],
  * con mensajes distintos: aquí el fallo no es de un servicio de TíoTec que haya que encender,

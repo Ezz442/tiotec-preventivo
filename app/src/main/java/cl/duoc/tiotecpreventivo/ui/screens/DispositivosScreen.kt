@@ -38,6 +38,7 @@ import cl.duoc.tiotecpreventivo.ui.theme.TioTecPreventivoTheme
 import cl.duoc.tiotecpreventivo.viewmodel.DispositivosUiState
 import androidx.compose.foundation.layout.WindowInsets
 
+// #pantalla Mis dispositivos
 @Composable
 fun DispositivosScreen(
     modifier: Modifier = Modifier,
@@ -68,6 +69,7 @@ fun DispositivosScreen(
 ) {
     val fotoOcupada =
         uiState.procesandoFoto || uiState.capturaFoto != null || uiState.dispositivoGaleriaId != null
+    // #mensajes cortos (snackbar)
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.mensaje) {
@@ -85,6 +87,7 @@ fun DispositivosScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }) { innerPadding ->
+        // #lista de dispositivos
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -128,6 +131,7 @@ fun DispositivosScreen(
                                 text = uiState.errorCarga, color = MaterialTheme.colorScheme.error
                             )
 
+                            // #boton reintentar carga
                             Button(onClick = onReintentar) {
                                 Text("Reintentar")
                             }
@@ -164,6 +168,7 @@ fun DispositivosScreen(
                 else -> {
                     item {
                         Button(
+                            // #boton agregar dispositivos
                             onClick = onAgregar,
                             enabled = !uiState.eliminando && !fotoOcupada,
                             modifier = Modifier.fillMaxWidth()
@@ -223,6 +228,7 @@ fun DispositivosScreen(
                                 }
 
                                 OutlinedButton(
+                                    // #boton elegir imagen de galeria
                                     onClick = { onElegirImagen(dispositivo.id) },
                                     enabled = !uiState.eliminando && !fotoOcupada,
                                     modifier = Modifier.fillMaxWidth()
@@ -231,6 +237,7 @@ fun DispositivosScreen(
                                 }
 
                                 Button(
+                                    // #boton evaluar dispositivo
                                     onClick = { onEvaluar(dispositivo.id) },
                                     enabled = !uiState.eliminando && !fotoOcupada
                                 ) {
@@ -238,6 +245,7 @@ fun DispositivosScreen(
                                 }
 
                                 OutlinedButton(
+                                    // #boton editar dispositivo
                                     onClick = { onEditar(dispositivo.id) },
                                     enabled = !uiState.eliminando && !fotoOcupada
                                 ) {
@@ -269,6 +277,7 @@ fun DispositivosScreen(
         }
     }
 
+    // #dialogo descartar cambios
     // TT-26: cancelar con cambios sin guardar pide confirmación.
     if (uiState.confirmarDescartar) {
         AlertDialog(
@@ -292,6 +301,7 @@ fun DispositivosScreen(
     uiState.dispositivoQuitarFoto?.let { dispositivo ->
         AlertDialog(
             onDismissRequest = onCancelarQuitarFoto,
+            // #dialogo quitar foto
             title = { Text("Quitar foto") },
             text = { Text("¿Quitar la foto de «${dispositivo.nombre}»? El archivo se borrará del teléfono.") },
             confirmButton = {

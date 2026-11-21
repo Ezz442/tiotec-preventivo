@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
+// #repositorio de preferencias (DataStore)
 /**
  * Lee y guarda las preferencias simples (TT-08). DataStore trabaja fuera del hilo
  * principal: las lecturas son `Flow` y las escrituras son funciones `suspend`.

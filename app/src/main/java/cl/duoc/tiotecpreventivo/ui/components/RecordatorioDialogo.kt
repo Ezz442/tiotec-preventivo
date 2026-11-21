@@ -30,6 +30,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+// #dialogo para programar un recordatorio
 /**
  * Formulario de recordatorio con los selectores de fecha y hora de Material 3 (TT-16).
  * No valida: muestra los errores por campo que calcula RecordatorioViewModel.
@@ -88,6 +89,7 @@ fun RecordatorioDialogo(
 
                 formulario.recordatorioId?.let {
                     TextButton(onClick = onPedirCancelacion, enabled = !guardando) {
+                        // #boton cancelar recordatorio
                         Text("Cancelar recordatorio", color = MaterialTheme.colorScheme.error)
                     }
                 }
@@ -149,6 +151,7 @@ fun RecordatorioDialogo(
         )
         AlertDialog(
             onDismissRequest = { eligiendoHora = false },
+            // #selector de hora
             title = { Text("Elige la hora") },
             text = { TimePicker(state = estadoHora) },
             confirmButton = {

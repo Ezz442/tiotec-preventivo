@@ -6,6 +6,7 @@ import cl.duoc.tiotecpreventivo.repository.DispositivoRepository
 import cl.duoc.tiotecpreventivo.repository.PerfilRepository
 import cl.duoc.tiotecpreventivo.data.imagenes.AlmacenImagenes
 
+// #crea el ViewModel con sus repositorios
 class DispositivosViewModelFactory(
     private val dispositivoRepository: DispositivoRepository,
     private val perfilRepository: PerfilRepository,

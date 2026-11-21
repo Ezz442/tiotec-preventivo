@@ -15,6 +15,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// #pruebas de las reglas de riesgo
 /**
  * TT-10: reglas de puntuación y riesgo con respuestas ficticias.
  * Corre en la JVM, sin emulador: las reglas no dependen de Android.

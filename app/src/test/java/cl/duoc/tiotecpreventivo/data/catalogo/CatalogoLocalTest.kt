@@ -8,6 +8,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
+// #pruebas del catalogo local
 /**
  * TT-06: comprueba que el catálogo ficticio es coherente y que la app no depende de la red.
  */

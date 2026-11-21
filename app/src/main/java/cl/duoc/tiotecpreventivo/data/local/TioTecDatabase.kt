@@ -23,6 +23,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.RespuestaEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.ResultadoCategoriaEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.SolicitudEntity
 
+// #base de datos local Room
 /**
  * Base SQLite de la app mediante Room (TT-04, 4.9).
  *
@@ -64,6 +65,7 @@ abstract class TioTecDatabase : RoomDatabase() {
          * solicitudes simuladas de la versión anterior para que sus ids no choquen con los del servicio.
          */
         val MIGRACION_1_2: Migration = object : Migration(1, 2) {
+            // #migracion de la base de datos (version 1 a 2)
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("DELETE FROM historial_solicitud")
                 db.execSQL("DELETE FROM solicitud")

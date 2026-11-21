@@ -6,6 +6,7 @@ import cl.duoc.tiotecpreventivo.data.local.entity.AccionEntity
 import cl.duoc.tiotecpreventivo.data.local.entity.EstadoAccion
 import kotlinx.coroutines.flow.Flow
 
+// #consultas de acciones
 @Dao
 interface AccionDao {
 

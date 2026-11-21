@@ -11,6 +11,7 @@ import cl.duoc.tiotecpreventivo.data.remote.llamarServicio
 import cl.duoc.tiotecpreventivo.data.remote.model.ArchivadoPeticion
 import cl.duoc.tiotecpreventivo.data.remote.model.DispositivoPeticion
 
+// #repositorio dispositivos: servicio + copia local Room
 /**
  * TT-29: dispositivos con dispositivos-service como fuente de verdad del nombre y el sistema
  * operativo. Lo que solo existe en el teléfono (foto, evaluaciones, historial) sigue en Room y no
@@ -27,12 +28,14 @@ class DispositivoRepositorySincronizado(
     reloj: () -> Long = System::currentTimeMillis
 ) : DispositivoRepository(dao, reloj) {
 
+    // #baja la lista del servicio y actualiza Room
     override suspend fun sincronizar() {
         val perfil = perfilDao.obtener() ?: return
         val remotos = llamarServicio { api.listar() }
         sincronizacionDao.guardarDispositivosRemotos(perfil.id, remotos.mapNotNull { it.aEntidad(perfil.id) })
     }
 
+    // #CRUD crear: POST al servicio y guardar local
     override suspend fun crear(
         perfilId: Long,
         nombre: String,
@@ -48,6 +51,7 @@ class DispositivoRepositorySincronizado(
         return creado.id
     }
 
+    // #CRUD editar: PUT al servicio y guardar local
     override suspend fun actualizar(id: Long, nombre: String, sistemaOperativo: SistemaOperativo): Boolean {
         val actual = dao.obtener(id) ?: return false
         val actualizado = llamarServicio {
@@ -63,6 +67,7 @@ class DispositivoRepositorySincronizado(
         return true
     }
 
+    // #CRUD eliminar: DELETE al servicio o archivar
     override suspend fun eliminar(id: Long): ResultadoEliminacion {
         if (dao.obtener(id) == null) return ResultadoEliminacion.NoEncontrado
 

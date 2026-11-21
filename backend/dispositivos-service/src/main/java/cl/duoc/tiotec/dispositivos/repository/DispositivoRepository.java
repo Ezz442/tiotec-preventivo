@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import cl.duoc.tiotec.dispositivos.model.Dispositivo;
 import cl.duoc.tiotec.dispositivos.model.SistemaOperativo;
 
+// #acceso a la base de datos (JPA)
 public interface DispositivoRepository extends JpaRepository<Dispositivo, Long> {
 
     List<Dispositivo> findAllByOrderByCreadoEnDescIdDesc();

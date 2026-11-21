@@ -14,6 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
+// #pruebas del repositorio de inicio
 /** TT-21 (TT-13): Inicio muestra el alias y el contador reales, no datos de ejemplo. */
 class InicioRepositoryLocalTest {
 

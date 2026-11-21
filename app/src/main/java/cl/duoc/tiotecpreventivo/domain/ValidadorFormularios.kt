@@ -22,6 +22,7 @@ data class ValidacionDispositivo(
     val valida: Boolean get() = errorNombre == null && errorSistemaOperativo == null
 }
 
+// #validaciones de formularios
 /**
  * Reglas de los formularios de la app, en un solo lugar y sin Android (TT-26).
  *
@@ -57,10 +58,12 @@ object ValidadorFormularios {
     /** Quita espacios al inicio y al final y deja uno solo entre palabras. */
     fun normalizar(texto: String): String = texto.trim().replace(Regex("\\s+"), " ")
 
+    // #rechaza correos y telefonos (datos personales)
     /** Un correo (tiene @) o un número largo (teléfono, RUT) no corresponde a un alias ficticio. */
     fun pareceDatoPersonal(texto: String): Boolean =
         '@' in texto || texto.count { it.isDigit() } >= DIGITOS_DATO_PERSONAL
 
+    // #valida alias y experiencia
     fun validarPerfil(alias: String, experiencia: ExperienciaDigital?): ValidacionPerfil {
         val limpio = normalizar(alias)
         return ValidacionPerfil(
@@ -70,6 +73,7 @@ object ValidadorFormularios {
         )
     }
 
+    // #valida nombre y sistema operativo
     fun validarDispositivo(nombre: String, sistema: SistemaOperativo?): ValidacionDispositivo {
         val limpio = normalizar(nombre)
         return ValidacionDispositivo(
@@ -79,6 +83,7 @@ object ValidadorFormularios {
         )
     }
 
+    // #valida que haya categoria
     fun validarSolicitud(categoria: Categoria?): String? =
         if (categoria == null) CATEGORIA_VACIA else null
 

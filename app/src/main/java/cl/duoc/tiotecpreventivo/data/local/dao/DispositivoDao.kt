@@ -8,6 +8,7 @@ import androidx.room.Update
 import cl.duoc.tiotecpreventivo.data.local.entity.DispositivoEntity
 import kotlinx.coroutines.flow.Flow
 
+// #consultas de dispositivos
 @Dao
 abstract class DispositivoDao {
 

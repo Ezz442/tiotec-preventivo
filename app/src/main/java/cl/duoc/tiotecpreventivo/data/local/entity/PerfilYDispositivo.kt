@@ -5,6 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+// #tabla perfil
 /** Perfil ficticio. La app maneja un solo perfil (TT-04, 4.1). */
 @Entity(tableName = "perfil")
 data class PerfilEntity(
@@ -31,6 +32,7 @@ data class PerfilEntity(
     ],
     indices = [Index("perfilId")]
 )
+// #tabla dispositivo (copia local del servicio)
 data class DispositivoEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val perfilId: Long,

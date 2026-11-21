@@ -17,6 +17,7 @@ import cl.duoc.tiotec.solicitudes.model.EstadoSolicitud;
 import cl.duoc.tiotec.solicitudes.model.Solicitud;
 import cl.duoc.tiotec.solicitudes.repository.SolicitudRepository;
 
+// #logica de negocio de solicitudes
 /** Logica de negocio de las solicitudes: el controlador solo traduce HTTP. */
 @Service
 @Transactional
@@ -30,6 +31,7 @@ public class SolicitudService {
         this.reloj = reloj;
     }
 
+    // #crear solicitud con codigo DEMO e historial inicial
     public SolicitudResponse crear(SolicitudRequest datos) {
         long ahora = reloj.millis();
         Solicitud solicitud = new Solicitud(datos.alias(), datos.categoria(), EstadoSolicitud.PENDIENTE, ahora);
@@ -39,6 +41,7 @@ public class SolicitudService {
         return SolicitudResponse.desde(solicitud, true);
     }
 
+    // #listar con filtros opcionales
     @Transactional(readOnly = true)
     public List<SolicitudResponse> listar(Categoria categoria, EstadoSolicitud estado) {
         List<Solicitud> resultado;
@@ -64,6 +67,7 @@ public class SolicitudService {
         return buscar(id).getHistorial().stream().map(HistorialResponse::desde).toList();
     }
 
+    // #editar solo si esta pendiente
     /** Solo se pueden editar los datos mientras la solicitud sigue pendiente. */
     public SolicitudResponse actualizar(Long id, SolicitudRequest datos) {
         Solicitud solicitud = buscar(id);
@@ -76,6 +80,7 @@ public class SolicitudService {
         return SolicitudResponse.desde(solicitud, true);
     }
 
+    // #cambiar estado con transiciones permitidas
     public SolicitudResponse cambiarEstado(Long id, CambioEstadoRequest cambio) {
         Solicitud solicitud = buscar(id);
         EstadoSolicitud actual = solicitud.getEstado();
@@ -94,10 +99,12 @@ public class SolicitudService {
         return SolicitudResponse.desde(solicitud, true);
     }
 
+    // #eliminar solicitud
     public void eliminar(Long id) {
         repositorio.delete(buscar(id));
     }
 
+    // #buscar por id o error 404
     private Solicitud buscar(Long id) {
         return repositorio.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No existe la solicitud con id " + id + "."));

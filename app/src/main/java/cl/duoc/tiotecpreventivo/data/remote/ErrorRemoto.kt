@@ -7,6 +7,7 @@ import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import java.io.IOException
 
+// #error de red con mensaje para el usuario
 /**
  * Error al hablar con un microservicio, con un mensaje listo para mostrar al usuario.
  * Los ViewModels solo capturan este tipo y muestran [message]; no conocen Retrofit ni HTTP.
@@ -29,6 +30,7 @@ const val MENSAJE_SIN_CONEXION =
 
 private val gson = Gson()
 
+// #ejecuta la llamada y traduce los errores (sin conexion, 404, 409)
 /**
  * Ejecuta una llamada a un servicio y traduce sus fallos a [ErrorRemoto]:
  * sin red o tiempo agotado → mensaje de conexión; HTTP 4xx/5xx → mensaje del servicio;

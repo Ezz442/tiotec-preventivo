@@ -16,6 +16,7 @@ sealed interface ResultadoEliminacion {
     data object NoEncontrado : ResultadoEliminacion
 }
 
+// #repositorio de dispositivos (Room)
 /**
  * CRUD de dispositivos de prueba (TT-04, 4.2 y sección 5).
  * La confirmación con AlertDialog la muestra la pantalla (TT-09) antes de llamar a [eliminar].

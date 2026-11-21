@@ -29,6 +29,7 @@ import cl.duoc.tiotecpreventivo.ui.screens.RevisionEvaluacionScreen
 import cl.duoc.tiotecpreventivo.viewmodel.EvaluacionViewModel
 import cl.duoc.tiotecpreventivo.viewmodel.EvaluacionViewModelFactory
 
+// #flujo de evaluacion: preguntas, revision y guardado
 @Composable
 fun EvaluacionFlujo(
     dispositivoId: Long,
@@ -79,6 +80,7 @@ fun EvaluacionFlujo(
             Text("Tus respuestas y resultados quedaron guardados.")
 
             Button(onClick = { onVerResultado(evaluacionGuardadaId) }) {
+                // #boton ver resultados
                 Text("Ver resultados")
             }
 
@@ -132,6 +134,7 @@ fun EvaluacionFlujo(
     }
 
     if (uiState.mostrarConfirmarSalida) {
+        // #confirmar salir sin guardar
         AlertDialog(onDismissRequest = evaluacionViewModel::cancelarSalida, title = {
             Text("¿Salir sin guardar?")
         }, text = {

@@ -33,6 +33,7 @@ data class HistorialUiState(
         get() = HistorialLogica.filtrar(todas, dispositivoSeleccionado)
 }
 
+// #estado y logica del historial
 /**
  * Historial preventivo local (TT-14). Observa Room: una evaluación nueva aparece sola
  * en la lista. Solo lee, nunca escribe.
@@ -85,6 +86,7 @@ class HistorialViewModel(
         }
     }
 
+    // #filtra el historial por dispositivo
     fun seleccionarDispositivo(dispositivoId: Long?) {
         val estado = _uiState.value
         if (dispositivoId != null && estado.filtros.none { it.dispositivoId == dispositivoId }) return

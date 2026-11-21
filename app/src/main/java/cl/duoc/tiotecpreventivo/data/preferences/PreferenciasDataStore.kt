@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 
+// #DataStore: guarda las preferencias
 /** Un solo DataStore por app, guardado en el archivo `preferencias_tiotec.preferences_pb`. */
 val Context.preferenciasDataStore: DataStore<Preferences> by preferencesDataStore(
     name = "preferencias_tiotec"

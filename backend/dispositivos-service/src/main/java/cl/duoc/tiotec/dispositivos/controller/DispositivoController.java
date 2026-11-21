@@ -22,6 +22,7 @@ import cl.duoc.tiotec.dispositivos.model.SistemaOperativo;
 import cl.duoc.tiotec.dispositivos.service.DispositivoService;
 import jakarta.validation.Valid;
 
+// #controlador REST de dispositivos
 @RestController
 @RequestMapping("/api/dispositivos")
 public class DispositivoController {
@@ -32,33 +33,39 @@ public class DispositivoController {
         this.servicio = servicio;
     }
 
+    // #endpoint crear dispositivo (POST)
     @PostMapping
     public ResponseEntity<DispositivoResponse> crear(@Valid @RequestBody DispositivoRequest datos) {
         DispositivoResponse creado = servicio.crear(datos);
         return ResponseEntity.created(URI.create("/api/dispositivos/" + creado.id())).body(creado);
     }
 
+    // #endpoint listar dispositivos (GET)
     @GetMapping
     public List<DispositivoResponse> listar(@RequestParam(required = false) SistemaOperativo sistemaOperativo,
                                             @RequestParam(required = false) Boolean archivado) {
         return servicio.listar(sistemaOperativo, archivado);
     }
 
+    // #endpoint obtener dispositivo por id (GET)
     @GetMapping("/{id}")
     public DispositivoResponse obtener(@PathVariable Long id) {
         return servicio.obtener(id);
     }
 
+    // #endpoint editar dispositivo (PUT)
     @PutMapping("/{id}")
     public DispositivoResponse actualizar(@PathVariable Long id, @Valid @RequestBody DispositivoRequest datos) {
         return servicio.actualizar(id, datos);
     }
 
+    // #endpoint archivar dispositivo (PATCH)
     @PatchMapping("/{id}/archivado")
     public DispositivoResponse cambiarArchivado(@PathVariable Long id, @Valid @RequestBody ArchivadoRequest cuerpo) {
         return servicio.cambiarArchivado(id, cuerpo.archivado());
     }
 
+    // #endpoint eliminar dispositivo (DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         servicio.eliminar(id);

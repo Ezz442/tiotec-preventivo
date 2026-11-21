@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
+// #estado de la pantalla de inicio
 class InicioViewModel(
     repository: InicioRepository
 ) : ViewModel() {
