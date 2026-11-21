@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -5,8 +7,26 @@ plugins {
     alias(libs.plugins.androidx.room)
 }
 
+val propiedadesFirma = Properties().apply {
+    val archivo = rootProject.file("keystore.properties")
+    if (archivo.exists()) archivo.inputStream().use { load(it) }
+}
+val hayFirma = propiedadesFirma.getProperty("storeFile") != null
+
 android {
     namespace = "cl.duoc.tiotecpreventivo"
+
+    signingConfigs {
+        if (hayFirma) {
+            create("release") {
+                storeFile = rootProject.file(propiedadesFirma.getProperty("storeFile"))
+                storePassword = propiedadesFirma.getProperty("storePassword")
+                keyAlias = propiedadesFirma.getProperty("keyAlias")
+                keyPassword = propiedadesFirma.getProperty("keyPassword")
+            }
+        }
+    }
+
     compileSdk {
         version = release(37)
     }
@@ -26,9 +46,10 @@ android {
             enableUnitTestCoverage = true
             }
         release {
+            if (hayFirma) signingConfig = signingConfigs.getByName("release")
             optimization {
                 enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
+                packageScope = setOf("androidx.**")
             }
         }
     }
